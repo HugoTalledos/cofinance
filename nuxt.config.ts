@@ -1,5 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  // SSR habilitado explícitamente
+  ssr: true,
+  
   devtools: { enabled: true },
   
   modules: [
@@ -23,5 +26,17 @@ export default defineNuxtConfig({
       firebaseMessagingSenderId: process.env.NUXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
       firebaseAppId: process.env.NUXT_PUBLIC_FIREBASE_APP_ID
     }
+  },
+  
+  // Optimizaciones para SSR
+  nitro: {
+    compressPublicAssets: true,
+  },
+  
+  // Renderizado de rutas para mejor SEO
+  routeRules: {
+    '/': { prerender: true },
+    '/categories': { ssr: true },
+    '/transactions': { ssr: true }
   }
 })

@@ -30,6 +30,13 @@ export const createCategory = async (data: CategoryInput): Promise<ApiResponse<s
 
   try {
     const db = useFirestoreDb()
+    
+    // Verificar que Firebase esté disponible (SSR compatible)
+    if (!db) {
+      response.error = 'Firebase no está disponible en el servidor'
+      return response
+    }
+    
     const categoriesRef = collection(db, COLLECTIONS.CATEGORIES)
 
     const categoryData = {
