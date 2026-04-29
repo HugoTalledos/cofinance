@@ -30,7 +30,7 @@ const emit = defineEmits<{
   <li
     class="flex items-center justify-start gap-4 w-full"
     :class="{ 'cursor-pointer': clickable }"
-    @click="emit('click', props)"
+    @click="clickable && emit('click', props)"
   >
     <span :class="icon.color" class="text-sm font-medium rounded-full w-12 h-12 flex items-center justify-center">{{ icon.icon }}</span>
     <div>
