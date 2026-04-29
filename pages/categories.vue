@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import FloatingButton from '~/components/FloatingButton.vue'
 import { useCategories } from '~/composables'
 import { formatCurrency } from '~/types'
 
@@ -139,6 +140,7 @@ const handleCloseError = () => {
 </script>
 
 <template>
+  <floating-button label="⬅️" @click="navigateTo('/')" />
   <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-4xl mx-auto">
       <!-- Header -->
