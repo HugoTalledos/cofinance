@@ -3,13 +3,11 @@ import Container from '~/components/Container.vue'
 import FloatingButton from '~/components/FloatingButton.vue'
 import type { ItemProps } from '~/components/ListItem.vue'
 import ProgressBarChart from '~/components/ProgressBarChart.vue'
-import { useExampleStore } from '~/stores/example'
 import { useShowScreen } from '~/composables/useShowScreen'
 
-const store = useExampleStore()
 const { showScreen: showBottomSheet, openScreen: openBottomSheet, closeScreen: closeBottomSheet } = useShowScreen()
 const { showScreen: showLateralSheet, openScreen: openLateralSheet, closeScreen: closeLateralSheet } = useShowScreen()
-const title = ref<string>('Bienvenido a Cofinance')
+const { currentTransactions } = useTransactions()
 const isFirebaseConfigured = ref<boolean>(false)
 
 
@@ -21,137 +19,24 @@ onMounted(() => {
                                 config.public.firebaseProjectId !== 'your_project_id'
 })
 
-const items = ref<ItemProps[]>([
-  {
-    id: '1',
-    title: 'Transacción 1',
-    description: 'Descripción 1',
-    amount: {
-      value: formatCurrency(100),
-      short: shortFormatCurrency(100)
-    },
-    author: 'Juan Perez',
-    icon: {
-      icon: '🍔',
-      color: 'bg-orange-100'
-    },
-    date: '2026-01-01'
-  },
-  {
-    id: '1',
-    title: 'Transacción 1',
-    description: 'Descripción 1',
-    amount: {
-      value: formatCurrency(100),
-      short: shortFormatCurrency(100)
-    },
-    author: 'Juan Perez',
-    icon: {
-      icon: '🍔',
-      color: 'bg-orange-100'
-    },
-    date: '2026-01-01'
-  },
-  {
-    id: '1',
-    title: 'Transacción 1',
-    description: 'Descripción 1',
-    amount: {
-      value: formatCurrency(100),
-      short: shortFormatCurrency(100)
-    },
-    author: 'Juan Perez',
-    icon: {
-      icon: '🍔',
-      color: 'bg-orange-100'
-    },
-    date: '2026-01-01'
-  },
-  {
-    id: '1',
-    title: 'Transacción 1',
-    description: 'Descripción 1',
-    amount: {
-      value: formatCurrency(100),
-      short: shortFormatCurrency(100)
-    },
-    author: 'Juan Perez',
-    icon: {
-      icon: '🍔',
-      color: 'bg-orange-100'
-    },
-    date: '2026-01-01'
-  },
-  {
-    id: '1',
-    title: 'Transacción 1',
-    description: 'Descripción 1',
-    amount: {
-      value: formatCurrency(100),
-      short: shortFormatCurrency(100)
-    },
-    author: 'Juan Perez',
-    icon: {
-      icon: '🍔',
-      color: 'bg-orange-100'
-    },
-    date: '2026-01-01'
-  },
-  {
-    id: '1',
-    title: 'Transacción 1',
-    description: 'Descripción 1',
-    amount: {
-      value: formatCurrency(100),
-      short: shortFormatCurrency(100)
-    },
-    author: 'Juan Perez',
-    icon: {
-      icon: '🍔',
-      color: 'bg-orange-100'
-    },
-    date: '2026-01-01'
-  },
-  {
-    id: '1',
-    title: 'Transacción 1',
-    description: 'Descripción 1',
-    amount: {
-      value: formatCurrency(100),
-      short: shortFormatCurrency(100)
-    },
-    author: 'Juan Perez',
-    icon: {
-      icon: '🍔',
-      color: 'bg-orange-100'
-    },
-    date: '2026-01-01'
-  },
-  {
-    id: '2',
-    title: 'Transacción 2',
-    description: 'Descripción 2',
-    amount: {
-      value: formatCurrency(7000000),
-      short: shortFormatCurrency(7000000)
-    },
-    author: 'Maria Lopez',
-    icon: {
-      icon: '🍔',
-      color: 'bg-orange-100'
-    },
-    date: '2026-01-02'
-  }
-])
+const handleClick = (item: ItemProps) => {
+  const { id } = item
+  const routeToRedirect = ROUTES_OPTIONS[id as keyof typeof ROUTES_OPTIONS]
+  navigateTo(routeToRedirect)
+}
 </script>
 
 <template>
   <lateral-sheet
-    title="Configuración"
+    title="Más opciones"
     :isOpen="showLateralSheet"
     @sidebar-close="closeLateralSheet"
-  />
-  <floating-button label="Config" color="blue" size="md" position="top-right" @click="openLateralSheet" />
+  >
+  <template #content>
+    <list :items="LATERAL_OPTIONS"  @item-click="handleClick" />
+  </template>
+  </lateral-sheet>
+  <floating-button label="+" color="blue" size="md" position="top-right" @click="openLateralSheet" />
   <main class="flex flex-col items-center min-h-screen mt-24">
     <container class="flex flex-col items-center justify-center gap-5">
       <header>
@@ -163,13 +48,13 @@ const items = ref<ItemProps[]>([
       </article>
       <article class="w-full">
         <h2 class="text-2xl font-bold tracking-tight text-heading">Hoy: </h2>
-        <list :items="items" />
+        <list :items="currentTransactions" />
       </article>
     </container>
   </main>
   <floating-button label="Agregar" color="blue" size="md" @click="openBottomSheet" />
   <bottom-sheet
-    title="Agregar Transacción"
+    title="Agregar Movimiento"
     allowClose
     :visible="showBottomSheet"
     showActionButtons
