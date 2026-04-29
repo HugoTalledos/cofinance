@@ -13,7 +13,6 @@ import type {
 } from '~/types'
 import {
   getCurrentMonth,
-  formatCurrency,
   isOverBudget as isOverBudgetHelper
 } from '~/types'
 
