@@ -2,10 +2,7 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { useTransactions, useCategories } from '~/composables'
 import FloatingButton from '~/components/FloatingButton.vue'
-import { 
-  getCurrentMonth,
-  formatCurrency 
-} from '~/types'
+import { getCurrentMonth } from '~/types'
 import type { TransactionFilters } from '~/types'
 
 // Mock userId - en producción vendría de autenticación

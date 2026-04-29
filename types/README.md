@@ -198,7 +198,6 @@ const currentMonth = getCurrentMonth()  // "2026-04"
 import {
   calculateBudgetPercentage,
   isOverBudget,
-  formatCurrency
 } from '~/types'
 
 // Calcular porcentaje

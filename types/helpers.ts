@@ -106,15 +106,6 @@ export const parseMonthlySummaryId = (id: string): { userId: string; month: stri
   }
 }
 
-/**
- * Formatea un número como moneda
- */
-export const formatCurrency = (amount: number, currency: string = 'USD'): string => {
-  return new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: currency
-  }).format(amount)
-}
 
 /**
  * Obtiene el rango de meses entre dos fechas

@@ -19,7 +19,6 @@ import {
   getCurrentDate,
   extractMonthFromDate,
   getCurrentMonth,
-  formatCurrency
 } from '~/types'
 
 import type {
