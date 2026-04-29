@@ -21,7 +21,6 @@ export function useToast() {
     type.value = newType
     show.value = true
 
-    // Se oculta automáticamente después de la duración especificada
     setTimeout(() => {
       show.value = false
     }, duration)
