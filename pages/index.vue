@@ -5,9 +5,11 @@ import type { ItemProps } from '~/components/ListItem.vue'
 import ProgressBarChart from '~/components/ProgressBarChart.vue'
 import Toast from '~/components/Toast/Toast.vue'
 import { useShowScreen } from '~/composables/useShowScreen'
+import { useAuth } from '~/composables/useLogin'
 
 const { showScreen: showBottomSheet, openScreen: openBottomSheet, closeScreen: closeBottomSheet } = useShowScreen()
 const { showScreen: showLateralSheet, openScreen: openLateralSheet, closeScreen: closeLateralSheet } = useShowScreen()
+const { signInWithGoogle, user } = useAuth()
 const { currentTransactions } = useTransactions()
 const isFirebaseConfigured = ref<boolean>(false)
 
@@ -20,8 +22,31 @@ onMounted(() => {
                                 config.public.firebaseProjectId !== 'your_project_id'
 })
 
+const lateralOptions = computed(() => {
+  if (user) {
+    return [...LATERAL_OPTIONS, {
+      id: LOGIN_OPTION_ID,
+      title: `¡Hola, ${user.value?.displayName}!`,
+      description: '',
+      icon: {
+          icon: '👋',
+          color: 'bg-green-100'
+      },
+      clickable: false
+    }]
+  }
+
+  return [...LATERAL_OPTIONS, USER_UNAUTHENTICATED_OPTION]
+})
+
 const handleClick = (item: ItemProps) => {
   const { id } = item
+
+  if (id === LOGIN_OPTION_ID) {
+    signInWithGoogle()
+    closeLateralSheet()
+    return;
+  }
   const routeToRedirect = ROUTES_OPTIONS[id as keyof typeof ROUTES_OPTIONS]
   navigateTo(routeToRedirect)
 }
@@ -35,7 +60,7 @@ const handleClick = (item: ItemProps) => {
     @sidebar-close="closeLateralSheet"
   >
   <template #content>
-    <list :items="LATERAL_OPTIONS"  @item-click="handleClick" />
+    <list :items="lateralOptions"  @item-click="handleClick" />
   </template>
   </lateral-sheet>
   <floating-button label="+" color="blue" size="md" position="top-right" @click="openLateralSheet" />
