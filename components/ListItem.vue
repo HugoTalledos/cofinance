@@ -20,7 +20,7 @@ export interface ItemProps {
   date: string
 }
 
-const props = defineProps<ItemProps>()
+defineProps<ItemProps>()
 </script>
 <template>
   <li class="flex items-center justify-between w-full">

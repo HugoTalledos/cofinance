@@ -47,7 +47,7 @@ interface Data {
   color: string
 };
 
-const props = defineProps<{
+defineProps<{
   data?: Data[]
 }>()
 

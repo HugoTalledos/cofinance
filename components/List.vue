@@ -5,7 +5,7 @@ interface Props {
   items: ItemProps[]
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 </script>
 <template>
   <ul class="size-full bg-white rounded-md p-2 overflow-auto flex flex-col gap-4">
