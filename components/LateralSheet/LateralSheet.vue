@@ -37,7 +37,7 @@ const close = () => {
         <p>{{ subtitle }}</p>
       </div>
       <div class="sidebar-aside__content">
-        <slot />
+        <slot name="content" />
       </div>
     </aside>
   </div>
