@@ -6,6 +6,9 @@ interface Props {
 }
 
 defineProps<Props>()
+const emit = defineEmits<{
+  (e: 'itemClick', item: ItemProps): void
+}>()
 </script>
 <template>
   <ul class="size-full bg-white rounded-md p-2 overflow-auto flex flex-col gap-4">
@@ -18,6 +21,8 @@ defineProps<Props>()
         :amount="item.amount"
         :author="item.author"
         :date="item.date"
+        :clickable="item.clickable"
+        @click="emit('itemClick', item)"
       />
     </template>
   </ul>
