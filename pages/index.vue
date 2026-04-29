@@ -3,6 +3,7 @@ import Container from '~/components/Container.vue'
 import FloatingButton from '~/components/FloatingButton.vue'
 import type { ItemProps } from '~/components/ListItem.vue'
 import ProgressBarChart from '~/components/ProgressBarChart.vue'
+import Toast from '~/components/Toast/Toast.vue'
 import { useShowScreen } from '~/composables/useShowScreen'
 
 const { showScreen: showBottomSheet, openScreen: openBottomSheet, closeScreen: closeBottomSheet } = useShowScreen()
@@ -27,6 +28,7 @@ const handleClick = (item: ItemProps) => {
 </script>
 
 <template>
+  <Toast />
   <lateral-sheet
     title="Más opciones"
     :isOpen="showLateralSheet"
