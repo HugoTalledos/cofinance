@@ -8,7 +8,7 @@ const { show, message, type } = useToast()
 <template>
   <div
     v-if="show"
-    class="fixed top-5 right-5 p-4 rounded-md shadow-lg"
+    class="fixed z-50 top-5 right-5 p-4 rounded-md shadow-lg overflow-x-auto"
     :class="type === 'success' ? 'bg-green-50 border-l-4 border-green-400' : 'bg-red-50 border-l-4 border-red-400'"
   >
     <div class="flex">
