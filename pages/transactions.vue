@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
 import { useTransactions, useCategories } from '~/composables'
+import FloatingButton from '~/components/FloatingButton.vue'
 import { 
-  getCurrentDate, 
-  extractMonthFromDate, 
   getCurrentMonth,
   formatCurrency 
 } from '~/types'
@@ -16,38 +15,14 @@ const userId = ref('user123')
 const transactions = useTransactions()
 const categories = useCategories()
 
-// Estado del formulario
-const formData = ref({
-  categoryId: '',
-  amount: 0,
-  description: '',
-  date: getCurrentDate()
-})
-
 // Estado de filtros
 const filters = ref({
   categoryId: '',
   month: getCurrentMonth()
 })
 
-// Estado de UI
-const showForm = ref(true)
 const successMessage = ref<string | null>(null)
 
-// Validación del formulario
-const isFormValid = computed(() => {
-  return (
-    formData.value.categoryId !== '' &&
-    formData.value.amount > 0 &&
-    formData.value.description.trim().length > 0 &&
-    formData.value.date !== ''
-  )
-})
-
-// Categoría seleccionada
-const selectedCategory = computed(() => {
-  return categories.findCategoryById(formData.value.categoryId)
-})
 
 // Lista de meses disponibles (últimos 12 meses)
 const availableMonths = computed(() => {
@@ -121,44 +96,6 @@ watch(() => filters.value.categoryId, () => {
   loadTransactions()
 })
 
-// Crear transacción
-const handleCreateTransaction = async () => {
-  if (!isFormValid.value || !selectedCategory.value) return
-
-  const transactionId = await transactions.addTransaction({
-    userId: userId.value,
-    categoryId: formData.value.categoryId,
-    categoryName: selectedCategory.value.name,
-    amount: formData.value.amount,
-    description: formData.value.description.trim(),
-    date: formData.value.date,
-    month: extractMonthFromDate(formData.value.date)
-  })
-
-  if (transactionId) {
-    successMessage.value = `Gasto de ${formatCurrency(formData.value.amount)} registrado`
-    
-    // Limpiar formulario
-    formData.value = {
-      categoryId: '',
-      amount: 0,
-      description: '',
-      date: getCurrentDate()
-    }
-
-    // Recargar transacciones si es del mes actual
-    const transactionMonth = extractMonthFromDate(formData.value.date)
-    if (transactionMonth === filters.value.month) {
-      await loadTransactions()
-    }
-
-    // Limpiar mensaje después de 3 segundos
-    setTimeout(() => {
-      successMessage.value = null
-    }, 3000)
-  }
-}
-
 // Formatear fecha para display
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString + 'T00:00:00')
@@ -194,6 +131,7 @@ const closeSuccessMessage = () => {
 </script>
 
 <template>
+  <floating-button label="⬅️" @click="navigateTo('/')" />
   <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-6xl mx-auto">
       <!-- Header -->
@@ -247,111 +185,10 @@ const closeSuccessMessage = () => {
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Left Column: Form and Filters -->
         <div class="lg:col-span-1 space-y-6">
-          <!-- Create Transaction Form -->
-          <div class="bg-white shadow rounded-lg p-6">
-            <div class="flex justify-between items-center mb-4">
-              <h2 class="text-xl font-semibold text-gray-900">Nuevo Gasto</h2>
-              <button
-                @click="showForm = !showForm"
-                class="text-indigo-600 hover:text-indigo-700"
-              >
-                <svg v-if="showForm" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                </svg>
-                <svg v-else class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-            </div>
-            
-            <form v-show="showForm" @submit.prevent="handleCreateTransaction" class="space-y-4">
-              <!-- Category Select -->
-              <div>
-                <label for="category" class="block text-sm font-medium text-gray-700 mb-1">
-                  Categoría
-                </label>
-                <select
-                  id="category"
-                  v-model="formData.categoryId"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  required
-                >
-                  <option value="" disabled>Selecciona una categoría</option>
-                  <option
-                    v-for="category in categories.sortedCategories.value"
-                    :key="category.id"
-                    :value="category.id"
-                  >
-                    {{ category.name }} ({{ formatCurrency(category.budget) }})
-                  </option>
-                </select>
-              </div>
-
-              <!-- Amount Input -->
-              <div>
-                <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">
-                  Monto
-                </label>
-                <div class="relative">
-                  <span class="absolute left-3 top-2 text-gray-500">$</span>
-                  <input
-                    id="amount"
-                    v-model.number="formData.amount"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    placeholder="0.00"
-                    class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    required
-                  />
-                </div>
-              </div>
-
-              <!-- Description Input -->
-              <div>
-                <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
-                  Descripción
-                </label>
-                <input
-                  id="description"
-                  v-model="formData.description"
-                  type="text"
-                  placeholder="Ej: Supermercado, Gasolina"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  required
-                />
-              </div>
-
-              <!-- Date Input -->
-              <div>
-                <label for="date" class="block text-sm font-medium text-gray-700 mb-1">
-                  Fecha
-                </label>
-                <input
-                  id="date"
-                  v-model="formData.date"
-                  type="date"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  required
-                />
-              </div>
-
-              <!-- Submit Button -->
-              <button
-                type="submit"
-                :disabled="!isFormValid || transactions.loading.value"
-                class="w-full px-6 py-3 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {{ transactions.loading.value ? 'Guardando...' : 'Registrar Gasto' }}
-              </button>
-            </form>
-          </div>
-
           <!-- Filters -->
           <div class="bg-white shadow rounded-lg p-6">
             <h2 class="text-xl font-semibold text-gray-900 mb-4">Filtros</h2>
-            
-            <div class="space-y-4">
+            <div class="flex gap-2">
               <!-- Month Filter -->
               <div>
                 <label for="filterMonth" class="block text-sm font-medium text-gray-700 mb-1">
