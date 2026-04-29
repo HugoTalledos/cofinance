@@ -42,13 +42,6 @@ export interface MonthlySummaryFilters {
 }
 
 /**
- * Helper para generar el ID compuesto
- */
-export const generateMonthlySummaryId = (userId: string, month: string): string => {
-  return `${userId}_${month}`
-}
-
-/**
  * Estadísticas del resumen mensual
  */
 export interface MonthlySummaryStats {
