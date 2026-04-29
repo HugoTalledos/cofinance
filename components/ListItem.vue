@@ -28,7 +28,7 @@ const emit = defineEmits<{
 </script>
 <template>
   <li
-    class="flex items-center justify-between w-full"
+    class="flex items-center justify-start gap-4 w-full"
     :class="{ 'cursor-pointer': clickable }"
     @click="emit('click', props)"
   >
@@ -38,7 +38,7 @@ const emit = defineEmits<{
       <p v-if="description" class="text-sm text-gray-500">{{ description }}</p>
       <p v-if="author && date" class="text-sm text-gray-500">{{ author }} - {{ date }}</p>
     </div>
-    <div v-if="amount" class="flex items-center gap-2">
+    <div v-if="amount" class="flex items-center gap-2 ml-auto">
       <span class="text-sm font-medium bg-gray-100 rounded-md p-2">{{ amount.short }}</span>
     </div>
   </li>
