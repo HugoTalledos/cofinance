@@ -1,4 +1,5 @@
 import type { ItemProps } from '~/components/ListItem.vue'
+import type { Transaction } from '~/types'
 
 export const LATERAL_OPTIONS: ItemProps[] = [
   {
@@ -27,3 +28,87 @@ export const ROUTES_OPTIONS = {
   'lateral-option-1': '/transactions',
   'lateral-option-2': '/categories'
 }
+
+
+
+
+
+export const MOCK_TRANSACTIONS: Transaction[] = [
+  {
+    id: '1',
+    userId: '1',
+    categoryId: '1',
+    categoryName: 'Comida',
+    description: 'Descripción 1',
+    amount: 100,
+    date: '2026-01-01',
+    month: '2026-01',
+    createdAt: 1714857600
+  },
+  {
+    id: '1',
+    userId: '1',
+    categoryId: '1',
+    categoryName: 'Comida',
+    description: 'Descripción 1',
+    amount: 100,
+    date: '2026-01-01',
+    month: '2026-01',
+    createdAt: 1714857600
+  },
+  {
+    id: '1',
+    userId: '1',
+    categoryId: '1',
+    categoryName: 'Comida',
+    description: 'Descripción 1',
+    amount: 100,
+    date: '2026-01-01',
+    month: '2026-01',
+    createdAt: 1714857600
+  },
+  {
+    id: '1',
+    userId: '1',
+    categoryId: '1',
+    categoryName: 'Comida',
+    description: 'Descripción 1',
+    amount: 100,
+    date: '2026-01-01',
+    month: '2026-01',
+    createdAt: 1714857600
+  },
+  {
+    id: '1',
+    userId: '1',
+    categoryId: '1',
+    categoryName: 'Comida',
+    description: 'Descripción 1',
+    amount: 100,
+    date: '2026-01-01',
+    month: '2026-01',
+    createdAt: 1714857600
+  },
+  {
+    id: '1',
+    userId: '1',
+    categoryId: '1',
+    categoryName: 'Comida',
+    description: 'Descripción 1',
+    amount: 100,
+    date: '2026-01-01',
+    month: '2026-01',
+    createdAt: 1714857600
+  },
+  {
+    id: '1',
+    userId: '1',
+    categoryId: '1',
+    categoryName: 'Comida',
+    description: 'Descripción 1',
+    amount: 100,
+    date: '2026-01-01',
+    month: '2026-01',
+    createdAt: 1714857600
+  }
+];
