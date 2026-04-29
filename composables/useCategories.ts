@@ -81,7 +81,6 @@ export const useCategories = () => {
 
       categories.value = result.data || []
       return true
-
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Error al cargar categorías'
       return false
