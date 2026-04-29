@@ -35,6 +35,7 @@ import {
 export const useTransactions = () => {
   // Estado reactivo
   const transactions: Ref<Transaction[]> = ref([])
+  const currentListTransactions: Ref<Transaction[]> = ref(MOCK_TRANSACTIONS)
   const loading: Ref<boolean> = ref(false)
   const error: Ref<string | null> = ref(null)
   const currentMonth: Ref<string> = ref(getCurrentMonth())
@@ -319,12 +320,28 @@ export const useTransactions = () => {
     return await fetchTransactions(filters)
   }
 
+  const currentTransactions = computed(() => {
+    return currentListTransactions.value.map(transaction => {
+      return {
+        id: transaction.id,
+        title: transaction.categoryName,
+        description: transaction.description,
+        icon: { icon: '💰', color: 'bg-orange-100' },
+        amount: { value: formatCurrency(transaction.amount), short: shortFormatCurrency(transaction.amount) },
+        author: transaction.userId,
+        date: transaction.date,
+        clickable: true
+      }
+    })
+  })
+
   return {
     // Estado
     transactions,
     loading,
     error,
     currentMonth,
+    currentTransactions,
     
     // Computed
     hasTransactions,
