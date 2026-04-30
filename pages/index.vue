@@ -3,23 +3,47 @@ import Container from '~/components/Container.vue'
 import FloatingButton from '~/components/FloatingButton.vue'
 import type { ItemProps } from '~/components/ListItem.vue'
 import ProgressBarChart from '~/components/ProgressBarChart.vue'
+import CreateMovementForm from './modules/CreateMovementForm.vue'
+import Toast from '~/components/Toast/Toast.vue'
 import { useShowScreen } from '~/composables/useShowScreen'
 import { useAuth } from '~/composables/useLogin'
+import { useCategories } from '~/composables/useCategories'
+import { useToast } from '~/components/Toast/useToast'
 
 const { showScreen: showBottomSheet, openScreen: openBottomSheet, closeScreen: closeBottomSheet } = useShowScreen()
 const { showScreen: showLateralSheet, openScreen: openLateralSheet, closeScreen: closeLateralSheet } = useShowScreen()
 const { signInWithGoogle, user } = useAuth()
-const { currentTransactions } = useTransactions()
-const isFirebaseConfigured = ref<boolean>(false)
+const { showToast } = useToast()
+const { sortedCategories, fetchCategories } = useCategories()
+const { currentTransactions, addTransaction, error } = useTransactions()
+const movementFormRef = ref<InstanceType<typeof CreateMovementForm> | null>(null);
 
 
-const config = useRuntimeConfig()
+onMounted(async () => await fetchCategories())
 
-onMounted(() => {
-  // Verifica si Firebase está configurado
-  isFirebaseConfigured.value = !!config.public.firebaseProjectId && 
-                                config.public.firebaseProjectId !== 'your_project_id'
-})
+async function createMovement() {
+  if (!movementFormRef.value) return;
+  const payload = movementFormRef.value.submit();
+
+  if (!payload) return;
+
+  const body = {
+    userId: user.value?.uid || '',
+    categoryId: payload.category.id,
+    categoryName: payload.category.name,
+    amount: payload.value,
+    description: payload.detail,
+    date: payload.date.toISOString(),
+    month: ''
+  }
+  const success = await addTransaction(body);
+  if (success) {
+    closeBottomSheet()
+    return
+  }
+
+  showToast(error.value || '', 'error')
+}
 
 const lateralOptions = computed(() => {
   if (user) {
@@ -52,6 +76,7 @@ const handleClick = (item: ItemProps) => {
 </script>
 
 <template>
+  <toast />
   <lateral-sheet
     title="Más opciones"
     :isOpen="showLateralSheet"
@@ -88,7 +113,14 @@ const handleClick = (item: ItemProps) => {
       doneButton: { label: 'Guardar', icon: 'X', enabled: true, show: true },
     }"
     @modalClose="closeBottomSheet"
-    @modalDone="closeBottomSheet"
+    @modalDone="createMovement"
     @modalCancel="closeBottomSheet"
-  />
+  >
+    <template #modal-content>
+      <create-movement-form
+        ref="movementFormRef"
+        :categories="sortedCategories"
+      />
+    </template>
+  </bottom-sheet>
 </template>
