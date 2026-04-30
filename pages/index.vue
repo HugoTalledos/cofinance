@@ -15,11 +15,22 @@ const { showScreen: showLateralSheet, openScreen: openLateralSheet, closeScreen:
 const { signInWithGoogle, user } = useAuth()
 const { showToast } = useToast()
 const { sortedCategories, fetchCategories } = useCategories()
-const { currentTransactions, addTransaction, error } = useTransactions()
+const {
+  transactionsList,
+  error,
+  currentMonth,
+  addTransaction,
+  fetchRecentTransactions,
+  getMonthTotal
+} = useTransactions()
 const movementFormRef = ref<InstanceType<typeof CreateMovementForm> | null>(null);
 
 
-onMounted(async () => await fetchCategories())
+onMounted(async () => {
+  await fetchCategories()
+  await fetchRecentTransactions(50)
+  await getMonthTotal(currentMonth.value)
+})
 
 async function createMovement() {
   if (!movementFormRef.value) return;
@@ -29,6 +40,7 @@ async function createMovement() {
 
   const body = {
     userId: user.value?.uid || '',
+    username: user.value?.displayName,
     categoryId: payload.category.id,
     categoryName: payload.category.name,
     amount: payload.value,
@@ -98,7 +110,7 @@ const handleClick = (item: ItemProps) => {
       </article>
       <article class="w-full">
         <h2 class="text-2xl font-bold tracking-tight text-heading">Hoy: </h2>
-        <list :items="currentTransactions" />
+        <list :items="transactionsList" />
       </article>
     </container>
   </main>
