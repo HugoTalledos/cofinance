@@ -15,6 +15,7 @@ import type {
 import {
   getCurrentMonth,
   extractMonthFromDate,
+  formatDateToString,
 } from '~/types'
 
 /**
@@ -34,7 +35,6 @@ import {
 export const useTransactions = () => {
   // Estado reactivo
   const transactions: Ref<Transaction[]> = ref([])
-  const currentListTransactions: Ref<Transaction[]> = ref(MOCK_TRANSACTIONS)
   const loading: Ref<boolean> = ref(false)
   const error: Ref<string | null> = ref(null)
   const currentMonth: Ref<string> = ref(getCurrentMonth())
@@ -132,14 +132,13 @@ export const useTransactions = () => {
    * Obtiene las N transacciones más recientes
    */
   const fetchRecentTransactions = async (
-    userId: string,
     limit: number = 10
   ): Promise<boolean> => {
     loading.value = true
     error.value = null
 
     try {
-      const result = await getRecentTransactionsService(userId, limit)
+      const result = await getRecentTransactionsService(limit)
       
       if (result.error) {
         error.value = result.error
@@ -219,11 +218,10 @@ export const useTransactions = () => {
    * Obtiene el total gastado en un mes
    */
   const getMonthTotal = async (
-    userId: string,
     month: string
   ): Promise<number> => {
     try {
-      return await getMonthlyTotalService(userId, month)
+      return await getMonthlyTotalService(month)
     } catch (err) {
       console.error('Error al calcular total mensual:', err)
       return 0
@@ -322,16 +320,16 @@ export const useTransactions = () => {
     return await fetchTransactions(filters)
   }
 
-  const currentTransactions = computed(() => {
-    return currentListTransactions.value.map(transaction => {
+  const formatedTransactions = computed(() => {
+    return transactions.value.map(transaction => {
       return {
         id: transaction.id,
         title: transaction.categoryName,
         description: transaction.description,
         icon: { icon: '💰', color: 'bg-orange-100' },
         amount: { value: formatCurrency(transaction.amount), short: shortFormatCurrency(transaction.amount) },
-        author: transaction.userId,
-        date: transaction.date,
+        author: transaction.username,
+        date: formatDateToString(new Date(transaction.date)),
         clickable: true
       }
     })
@@ -343,7 +341,7 @@ export const useTransactions = () => {
     loading,
     error,
     currentMonth,
-    currentTransactions,
+    transactionsList: formatedTransactions,
     
     // Computed
     hasTransactions,
