@@ -112,7 +112,7 @@ export const deleteCategory = async (categoryId: string): Promise<ApiResponse<bo
 /**
  * Obtiene todas las categorías de un usuario
  */
-export const getCategories = async (userId: string): Promise<ApiResponse<Category[]>> => {
+export const getCategories = async (): Promise<ApiResponse<Category[]>> => {
   const response: ApiResponse<Category[]> = {
     data: null,
     error: null,
@@ -124,7 +124,6 @@ export const getCategories = async (userId: string): Promise<ApiResponse<Categor
     const categoriesRef = collection(db, COLLECTIONS.CATEGORIES)
 
     const constraints: QueryConstraint[] = [
-      where('userId', '==', userId),
       orderBy('name', 'asc')
     ]
 
@@ -135,6 +134,7 @@ export const getCategories = async (userId: string): Promise<ApiResponse<Categor
       id: doc.id,
       ...doc.data()
     })) as Category[]
+    console.log('🚀 ~ getCategories ~ categories:', categories);
 
     response.data = categories
 
