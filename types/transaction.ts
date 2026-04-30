@@ -6,6 +6,7 @@
 export interface Transaction {
   id: string
   userId: string
+  username: string
   categoryId: string
   categoryName: string
   amount: number
@@ -31,7 +32,7 @@ export type TransactionUpdate = Partial<Omit<Transaction, 'id' | 'userId' | 'cre
  * Filtros optimizados para consultas comunes
  */
 export interface TransactionFilters {
-  userId: string
+  userId?: string
   /** Mes en formato YYYY-MM */
   month?: string
   categoryId?: string
