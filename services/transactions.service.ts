@@ -1,7 +1,6 @@
 import {
   collection,
   doc,
-  addDoc,
   getDocs,
   query,
   where,
@@ -27,73 +26,59 @@ export const createTransaction = async (data: TransactionInput): Promise<ApiResp
     data: null,
     error: null,
     loading: false
-  }
+  };
 
   try {
-    const db = useFirestoreDb()
-
-    // Usar transacción de Firestore para operación atómica
+    const db = useFirestoreDb();
     const transactionId = await runTransaction(db, async (transaction) => {
-      // 1. Crear la transacción
-      const transactionsRef = collection(db, COLLECTIONS.TRANSACTIONS)
-      const newTransactionRef = doc(transactionsRef)
-
+      const summaryRef = doc(db, COLLECTIONS.MONTHLY_SUMMARY, `${data.userId}_${data.month}`);
+      const summaryDoc = await transaction.get(summaryRef);
+      const transactionsRef = collection(db, COLLECTIONS.TRANSACTIONS);
+      const newTransactionRef = doc(transactionsRef);
       const transactionData = {
         ...data,
         createdAt: getCurrentTimestamp()
-      }
-
-      transaction.set(newTransactionRef, transactionData)
-
-      // 2. Actualizar el resumen mensual
-      const summaryRef = doc(
-        db,
-        COLLECTIONS.MONTHLY_SUMMARY,
-        `${data.userId}_${data.month}`
-      )
-
-      const summaryDoc = await transaction.get(summaryRef)
+      };
+      transaction.set(newTransactionRef, transactionData);
 
       if (summaryDoc.exists()) {
-        // Actualizar resumen existente
-        const summaryData = summaryDoc.data()
-        const categories = summaryData.categories || {}
-        const categoryData = categories[data.categoryId] || { budget: 0, spent: 0 }
+        const summaryData = summaryDoc.data();
+        const categories = summaryData.categories || {};
+        const categoryData = categories[data.categoryId] || { budget: 0, spent: 0 };
 
         transaction.update(summaryRef, {
           [`categories.${data.categoryId}.spent`]: categoryData.spent + data.amount,
           totalSpent: (summaryData.totalSpent || 0) + data.amount,
           updatedAt: getCurrentTimestamp()
-        })
+        });
       } else {
-        // Crear nuevo resumen mensual
         transaction.set(summaryRef, {
           id: `${data.userId}_${data.month}`,
           userId: data.userId,
           month: data.month,
           categories: {
             [data.categoryId]: {
-              budget: 0, // Se debe actualizar desde la categoría
+              budget: 0,
               spent: data.amount
             }
           },
           totalSpent: data.amount,
           updatedAt: getCurrentTimestamp()
-        })
+        });
       }
 
-      return newTransactionRef.id
-    })
+      return newTransactionRef.id;
+    });
 
-    response.data = transactionId
-
+    response.data = transactionId;
   } catch (error) {
-    console.error('Error creating transaction:', error)
-    response.error = error instanceof Error ? error.message : 'Error al crear la transacción'
+    console.error('Error creating transaction:', error);
+    response.error = error instanceof Error ? error.message : 'Error al crear la transacción';
   }
 
-  return response
-}
+  return response;
+};
+
 
 /**
  * Obtiene transacciones con filtros opcionales
