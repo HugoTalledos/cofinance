@@ -14,6 +14,13 @@ const categories: Ref<Category[]> = ref([])
 const currentCategory: Ref<Category | null> = ref(null)
 const loading: Ref<boolean> = ref(false)
 const error: Ref<string | null> = ref(null)
+
+/**
+ * Obtiene categorías ordenadas por nombre
+ */
+const sortedCategories = computed(() => {
+  return [...categories.value].sort((a, b) => a.name.localeCompare(b.name))
+})
 /**
  * Composable para gestión de categorías
  * 
@@ -39,13 +46,6 @@ export const useCategories = () => {
    */
   const totalBudget = computed(() => {
     return categories.value.reduce((sum, cat) => sum + cat.budget, 0)
-  })
-
-  /**
-   * Obtiene categorías ordenadas por nombre
-   */
-  const sortedCategories = computed(() => {
-    return [...categories.value].sort((a, b) => a.name.localeCompare(b.name))
   })
 
   /**
