@@ -97,9 +97,7 @@ export const getTransactions = async (
     const transactionsRef = collection(db, COLLECTIONS.TRANSACTIONS)
 
     // Construir constraints dinámicamente
-    const constraints: QueryConstraint[] = [
-      where('userId', '==', filters.userId)
-    ]
+    const constraints: QueryConstraint[] = []
 
     // Filtro por mes (más común y eficiente)
     if (filters.month) {
@@ -144,7 +142,6 @@ export const getTransactions = async (
  * Obtiene las transacciones más recientes de un usuario
  */
 export const getRecentTransactions = async (
-  userId: string,
   limitCount: number = 10
 ): Promise<ApiResponse<Transaction[]>> => {
   const response: ApiResponse<Transaction[]> = {
@@ -161,7 +158,6 @@ export const getRecentTransactions = async (
 
     const q = query(
       transactionsRef,
-      where('userId', '==', userId),
       orderBy('createdAt', 'desc'),
       limit(limitCount)
     )
@@ -216,12 +212,10 @@ export const getCategorySpentInMonth = async (
  * Obtiene el total de transacciones en un mes
  */
 export const getMonthlyTotal = async (
-  userId: string,
   month: string
 ): Promise<number> => {
   try {
     const filters: TransactionFilters = {
-      userId,
       month
     }
 
