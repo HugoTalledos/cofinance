@@ -2,18 +2,21 @@
 import { ref, onMounted } from 'vue'
 import FloatingButton from '~/components/FloatingButton.vue'
 import { useCategories } from '~/composables'
-import { formatCurrency } from '~/types'
 import { useToast } from '~/components/Toast/useToast'
 import InputCurrency from '~/components/InputForm/InputCurrency.vue'
 import Card from '~/components/Card.vue'
+import ConfirmMessage from '~/components/ConfirmMessage/ConfirmMessage.vue'
 import NewCategoryForm from './modules/NewCategoryForm.vue'
+import Toast from '~/components/Toast/Toast.vue'
+
+import { useConfirmMessage } from '~/components/ConfirmMessage/useConfirmMessage'
+import type { Category } from '~/types'
 
 // Mock userId - en producción vendría de autenticación
 const userId = ref('user123')
 
 // Composable de categorías
 const {
-  categories,
   loading,
   error,
   hasCategories,
@@ -24,6 +27,8 @@ const {
   updateCategory,
   removeCategory,
 } = useCategories()
+
+const { showDialog } = useConfirmMessage();
 
 const { showToast } = useToast()
 
@@ -72,9 +77,21 @@ const saveEditedBudget = async (categoryId: string) => {
   }
 }
 
-// Confirmar eliminación
-const confirmDelete = (categoryId: string) => {
-  showDeleteConfirm.value = categoryId
+const confirmDelete = async (category: Category) => {
+  const { id, name } = category
+  const isConfirmed = await showDialog({
+    title: `¿Estás seguro de eliminar la categoría ${ name }?`,
+    message: 'Esta acción no se puede deshacer.',
+    confirmText: 'Sí, eliminar',
+    cancelText: 'Cancelar'
+  })
+  
+  if (isConfirmed) {
+    handleDeleteCategory(id)
+    return;
+  }
+
+  cancelDelete()
 }
 
 // Cancelar eliminación
@@ -90,13 +107,14 @@ const handleDeleteCategory = async (categoryId: string) => {
     showToast('Categoría eliminada', 'success')
     showDeleteConfirm.value = null
   } else if (error.value) {
-    // TODO: talvez aca toca mostrar el error en el toast
+    showToast(error.value, 'error')
   }
 }
 
 </script>
 
 <template>
+  <toast />
   <floating-button label="⬅️" @click="navigateTo('/')" />
   <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
     <div class="flex flex-col gap-4 max-w-4xl mx-auto">
@@ -118,7 +136,7 @@ const handleDeleteCategory = async (categoryId: string) => {
       </template>
       </card>
 
-      <card title="Mis Categorías">
+      <card :title="`Mis Categorías (${categoriesCount})`">
       <template #content>
         <div v-if="loading && !hasCategories" class="px-6 py-12 text-center">
           <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
@@ -170,14 +188,14 @@ const handleDeleteCategory = async (categoryId: string) => {
                     class="p-2 text-green-600 hover:bg-green-50 rounded-md"
                     title="Guardar"
                   >
-                    <!-- TODO: agregar icono -->
+                   ✅
                   </button>
                   <button
                     @click="cancelEdit"
                     class="p-2 text-gray-600 hover:bg-gray-100 rounded-md"
                     title="Cancelar"
                   >
-                    <!-- TODO: agregar icono -->
+                    ❌
                   </button>
                 </div>
   
@@ -188,43 +206,21 @@ const handleDeleteCategory = async (categoryId: string) => {
                     class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
                     title="Editar presupuesto"
                   >
-                    <!-- TODO: agregar icono -->
+                    ✏️ 
                   </button>
                   <button
-                    @click="confirmDelete(category.id)"
+                    @click="confirmDelete(category)"
                     class="p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors"
                     title="Eliminar"
                   >
-                    <!-- TODO: agregar icono -->
+                    🗑️
                   </button>
                 </div>
               </div>
             </div>
   
             <!-- Delete Confirmation -->
-            <div
-              v-if="showDeleteConfirm === category.id"
-              class="mt-4 p-4 bg-red-50 border border-red-200 rounded-md"
-            >
-              <p class="text-sm text-red-800 mb-3">
-                ¿Estás seguro de eliminar la categoría "<strong>{{ category.name }}</strong>"?
-                Esta acción no se puede deshacer.
-              </p>
-              <div class="flex space-x-3">
-                <button
-                  @click="handleDeleteCategory(category.id)"
-                  class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors"
-                >
-                  Sí, eliminar
-                </button>
-                <button
-                  @click="cancelDelete"
-                  class="px-4 py-2 bg-white text-gray-700 text-sm font-medium border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                >
-                  Cancelar
-                </button>
-              </div>
-            </div>
+            <confirm-message />
           </div>
         </div>
       </template>
