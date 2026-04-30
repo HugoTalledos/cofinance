@@ -134,7 +134,6 @@ export const getCategories = async (): Promise<ApiResponse<Category[]>> => {
       id: doc.id,
       ...doc.data()
     })) as Category[]
-    console.log('🚀 ~ getCategories ~ categories:', categories);
 
     response.data = categories
 
