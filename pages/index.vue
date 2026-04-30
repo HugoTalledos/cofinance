@@ -14,6 +14,7 @@ const { showScreen: showBottomSheet, openScreen: openBottomSheet, closeScreen: c
 const { showScreen: showLateralSheet, openScreen: openLateralSheet, closeScreen: closeLateralSheet } = useShowScreen()
 const { signInWithGoogle, user } = useAuth()
 const { showToast } = useToast()
+const totalMonthlyExpenses = ref<number>(0)
 const { sortedCategories, fetchCategories } = useCategories()
 const {
   transactionsList,
@@ -29,7 +30,7 @@ const movementFormRef = ref<InstanceType<typeof CreateMovementForm> | null>(null
 onMounted(async () => {
   await fetchCategories()
   await fetchRecentTransactions(50)
-  await getMonthTotal(currentMonth.value)
+  totalMonthlyExpenses.value = await getMonthTotal(currentMonth.value)
 })
 
 async function createMovement() {
@@ -40,7 +41,7 @@ async function createMovement() {
 
   const body = {
     userId: user.value?.uid || '',
-    username: user.value?.displayName,
+    username: user.value?.displayName || '',
     categoryId: payload.category.id,
     categoryName: payload.category.name,
     amount: payload.value,
@@ -51,6 +52,7 @@ async function createMovement() {
   const success = await addTransaction(body);
   if (success) {
     closeBottomSheet()
+    totalMonthlyExpenses.value = await getMonthTotal(currentMonth.value)
     return
   }
 
@@ -101,9 +103,9 @@ const handleClick = (item: ItemProps) => {
   <floating-button label="+" color="blue" size="md" position="top-right" @click="openLateralSheet" />
   <main class="flex flex-col items-center min-h-screen mt-24">
     <container class="flex flex-col items-center justify-center gap-5">
-      <header>
-        <h1 class="mb-4 text-5xl font-bold tracking-tight text-heading">{{ formatCurrency(1226459) }}</h1>
-        <input type="month" class="w-full p-2 border border-gray-300 rounded-md">
+      <header class="flex flex-col justify-center align-center gap-2">
+        <h1 class="text-5xl font-bold tracking-tight text-heading text-center">{{ formatCurrency(totalMonthlyExpenses) }}</h1>
+        <h2 class="text-2xl font-bold tracking-tight text-heading text-center text-gray-500">Gasto del mes</h2>
       </header>
       <article class="w-full">
         <progress-bar-chart />
