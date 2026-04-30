@@ -165,9 +165,12 @@ export const useTransactions = () => {
     loading.value = true
     error.value = null
 
+    const body = {
+      ...data,
+      month: extractMonthFromDate(data.date)
+    }
     try {
-      const result = await createTransactionService(data)
-      
+      const result = await createTransactionService(body)
       if (result.error) {
         error.value = result.error
         return null
