@@ -9,6 +9,11 @@ import {
 } from '~/services'
 import type { Category, CategoryInput, CategoryUpdate } from '~/types'
 
+// Estado reactivo
+const categories: Ref<Category[]> = ref([])
+const currentCategory: Ref<Category | null> = ref(null)
+const loading: Ref<boolean> = ref(false)
+const error: Ref<string | null> = ref(null)
 /**
  * Composable para gestión de categorías
  * 
@@ -24,11 +29,6 @@ import type { Category, CategoryInput, CategoryUpdate } from '~/types'
  * await fetchCategories('user123')
  */
 export const useCategories = () => {
-  // Estado reactivo
-  const categories: Ref<Category[]> = ref([])
-  const currentCategory: Ref<Category | null> = ref(null)
-  const loading: Ref<boolean> = ref(false)
-  const error: Ref<string | null> = ref(null)
 
   // Computed
   const hasCategories = computed(() => categories.value.length > 0)
