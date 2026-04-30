@@ -7,6 +7,7 @@ import InputCurrency from '~/components/InputForm/InputCurrency.vue'
 import InputForm from '~/components/InputForm/InputForm.vue'
 import type { Category, MovementPayload } from './CreateMovementForm.type'
 import { useToast } from '~/components/Toast/useToast'
+import SelectForm from '~/components/SelectForm.vue'
 
 const { showToast } = useToast()
 
@@ -55,19 +56,11 @@ defineExpose({ submit });
 <template>
   <form @submit.prevent>
     <div class="space-y-4">
-      <div>
-        <label for="category" class="block text-sm font-medium text-gray-700">Categoría</label>
-        <select
-          id="category"
-          v-model="form.category"
-          class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-        >
-          <option disabled value="">Selecciona una categoría</option>
-          <option v-for="category in categories" :key="category.id" :value="category">
-            {{ category.name }}
-          </option>
-        </select>
-      </div>
+      <SelectForm
+        label="Categoría"
+        v-model="form.category"
+        :options="categories"
+      />
 
       <InputForm
         id="detail"
