@@ -35,8 +35,8 @@ const emit = defineEmits<{
     <span :class="icon.color" class="text-sm font-medium rounded-full w-12 h-12 flex items-center justify-center">{{ icon.icon }}</span>
     <div>
       <h3 class="text-lg font-bold">{{ title }}</h3>
-      <p v-if="description" class="text-sm text-gray-500">{{ description }}</p>
-      <p v-if="author && date" class="text-sm text-gray-500">{{ author }} - {{ date }}</p>
+      <p v-if="description" class="text-sm text-gray-500 ellipsis">{{ description }}</p>
+      <p v-if="author && date" class="text-sm text-gray-500 ellipsis">{{ author }} - {{ date }}</p>
     </div>
     <div v-if="amount" class="flex items-center gap-2 ml-auto">
       <span class="text-sm font-medium bg-gray-100 rounded-md p-2">{{ amount.short }}</span>
