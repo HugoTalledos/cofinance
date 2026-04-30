@@ -12,8 +12,6 @@ import Toast from '~/components/Toast/Toast.vue'
 import { useConfirmMessage } from '~/components/ConfirmMessage/useConfirmMessage'
 import type { Category } from '~/types'
 
-// Mock userId - en producción vendría de autenticación
-const userId = ref('user123')
 
 // Composable de categorías
 const {
@@ -40,9 +38,7 @@ const showDeleteConfirm = ref<string | null>(null)
 
 
 // Cargar categorías al montar
-onMounted(async () => {
-  await fetchCategories(userId.value)
-})
+onMounted(async () => await fetchCategories())
 
 watch(error, (newError) => {
   if (newError) {
