@@ -4,7 +4,7 @@ import { computed } from 'vue';
 // 1. DEFINICIÓN DE TIPOS Y PROPS
 // -----------------------------------------------------------------------------
 // Definimos los tipos de input que permitiremos para mayor seguridad y autocompletado.
-type InputType = 'text' | 'number' | 'email' | 'password';
+type InputType = 'text' | 'number' | 'email' | 'password' | "date";
 
 const props = withDefaults(defineProps<{
   modelValue: string | number | null; // El valor, compatible con v-model.
