@@ -12,7 +12,8 @@ const emit = defineEmits<{
 </script>
 <template>
   <ul class="size-full bg-white rounded-md p-2 overflow-auto flex flex-col gap-4">
-    <template v-for="item in items" :key="item.id">
+    <p v-if="items.length === 0" class="text-center text-gray-500">No hay items</p>
+    <template v-else v-for="item in items" :key="item.id">
       <list-item
         :id="item.id"
         :icon="item.icon"
