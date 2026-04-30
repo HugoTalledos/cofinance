@@ -67,13 +67,12 @@ export const useCategories = () => {
   /**
    * Obtiene todas las categorías de un usuario
    */
-  const fetchCategories = async (userId: string): Promise<boolean> => {
+  const fetchCategories = async (): Promise<boolean> => {
     loading.value = true
     error.value = null
 
     try {
-      const result = await getCategoriesService(userId)
-      
+      const result = await getCategoriesService()
       if (result.error) {
         error.value = result.error
         return false
@@ -248,8 +247,8 @@ export const useCategories = () => {
   /**
    * Recarga las categorías (útil después de cambios)
    */
-  const refreshCategories = async (userId: string): Promise<boolean> => {
-    return await fetchCategories(userId)
+  const refreshCategories = async (): Promise<boolean> => {
+    return await fetchCategories()
   }
 
   return {
