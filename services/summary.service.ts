@@ -2,7 +2,6 @@ import {
   doc,
   getDoc,
   setDoc,
-  updateDoc,
   getDocs,
   collection,
   query,
@@ -21,6 +20,8 @@ import type {
 } from '~/types'
 import { getCurrentTimestamp, generateMonthlySummaryId } from '~/types'
 
+import { getCategoryById } from '~/services/categories.service'
+
 /**
  * Servicio para gestión de resúmenes mensuales en Firestore
  */
@@ -30,11 +31,9 @@ import { getCurrentTimestamp, generateMonthlySummaryId } from '~/types'
  * Incrementa el gasto de una categoría y el total gastado
  */
 export const updateMonthlySummaryIncremental = async (
-  userId: string,
   month: string,
   categoryId: string,
   amount: number,
-  categoryBudget: number = 0
 ): Promise<ApiResponse<boolean>> => {
   const response: ApiResponse<boolean> = {
     data: null,
@@ -44,11 +43,13 @@ export const updateMonthlySummaryIncremental = async (
 
   try {
     const db = useFirestoreDb()
-    const summaryId = generateMonthlySummaryId(userId, month)
+    const summaryId = generateMonthlySummaryId(month)
     const summaryRef = doc(db, COLLECTIONS.MONTHLY_SUMMARY, summaryId)
 
     await runTransaction(db, async (transaction) => {
       const summaryDoc = await transaction.get(summaryRef)
+      const category = await getCategoryById(categoryId);
+      const categoryBudget = category.data?.budget || 0
 
       if (summaryDoc.exists()) {
         // Actualizar resumen existente
@@ -64,9 +65,12 @@ export const updateMonthlySummaryIncremental = async (
         })
       } else {
         // Crear nuevo resumen
+
+    
+
+        category.data?.budget
         const newSummary: MonthlySummaryInput = {
           id: summaryId,
-          userId,
           month,
           categories: {
             [categoryId]: {
@@ -98,7 +102,6 @@ export const updateMonthlySummaryIncremental = async (
  * Obtiene un resumen mensual específico
  */
 export const getMonthlySummary = async (
-  userId: string,
   month: string
 ): Promise<ApiResponse<MonthlySummary>> => {
   const response: ApiResponse<MonthlySummary> = {
@@ -109,7 +112,7 @@ export const getMonthlySummary = async (
 
   try {
     const db = useFirestoreDb()
-    const summaryId = generateMonthlySummaryId(userId, month)
+    const summaryId = generateMonthlySummaryId(month)
     const summaryRef = doc(db, COLLECTIONS.MONTHLY_SUMMARY, summaryId)
 
     const docSnap = await getDoc(summaryRef)
@@ -123,7 +126,6 @@ export const getMonthlySummary = async (
       // Retornar un resumen vacío en lugar de error
       response.data = {
         id: summaryId,
-        userId,
         month,
         categories: {},
         totalSpent: 0,
