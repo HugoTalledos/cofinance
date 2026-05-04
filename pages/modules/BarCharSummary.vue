@@ -5,20 +5,40 @@ import { categoriesEmojis } from '#imports';
 
 
 const props = defineProps<{ currentMonth: string }>()
-const { fetchCurrentMonthSummary, totalBudget, categoriesData } = useSummary()
+const { fetchCurrentMonthSummary, categoriesData } = useSummary()
+
 const formatedData = computed(() => {
-  return categoriesData.value.map((category) => {
-    const percentageOfBudget = ruleOfThree(totalBudget.value, category.budget)
-    const rawPercentageOfSpent = (category.percentage * percentageOfBudget) / 100
-    const percentageOfSpent = rawPercentageOfSpent.toFixed(2)
-    return ({
+  if (!categoriesData.value || categoriesData.value.length === 0) {
+    return [];
+  }
+
+  const maxBudget = categoriesData.value[0].budget;
+
+  if (maxBudget === 0) {
+    return categoriesData.value.map(category => ({
       icon: categoriesEmojis[`code_${category.categoryId}` as keyof typeof categoriesEmojis] || '',
       value: shortFormatCurrency(category.spent),
+      targetValue: shortFormatCurrency(category.budget),
       percentage: category.percentage,
-      actualHeight: parseFloat(percentageOfSpent),
-      targetHeight: percentageOfBudget,
+      actualHeight: 0,
+      targetHeight: 0,
       color: 'bg-orange-100'
-    })
+    }));
+  }
+
+  return categoriesData.value.map((category) => {
+    const targetHeight = (category.budget / maxBudget) * 90;
+    const actualHeight = (category.spent / maxBudget) * 90;
+
+    return {
+      icon: categoriesEmojis[`code_${category.categoryId}` as keyof typeof categoriesEmojis] || '',
+      value: shortFormatCurrency(category.spent),
+      targetValue: shortFormatCurrency(category.budget),
+      percentage: category.percentage,
+      actualHeight: parseFloat(actualHeight.toFixed(2)),
+      targetHeight: parseFloat(targetHeight.toFixed(2)),
+      color: 'bg-orange-100',
+    }
   })
 })
 
