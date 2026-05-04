@@ -2,7 +2,7 @@
 import Container from '~/components/Container.vue'
 import FloatingButton from '~/components/FloatingButton.vue'
 import type { ItemProps } from '~/components/ListItem.vue'
-import ProgressBarChart from '~/components/ProgressBarChart.vue'
+import BarCharSummary from './modules/BarCharSummary.vue'
 import CreateMovementForm from './modules/CreateMovementForm.vue'
 import Toast from '~/components/Toast/Toast.vue'
 import { useShowScreen } from '~/composables/useShowScreen'
@@ -108,7 +108,7 @@ const handleClick = (item: ItemProps) => {
         <h2 class="text-2xl font-bold tracking-tight text-heading text-center text-gray-500">Gasto del mes</h2>
       </header>
       <article class="w-full">
-        <progress-bar-chart />
+        <bar-char-summary :current-month="currentMonth"   />
       </article>
       <article class="w-full">
         <h2 class="text-2xl font-bold tracking-tight text-heading">Hoy: </h2>
