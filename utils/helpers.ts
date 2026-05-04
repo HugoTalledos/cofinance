@@ -1,3 +1,5 @@
+import type { CategoryInput } from "~/types";
+
 export const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat('es-CO', {
     style: 'currency',
@@ -24,4 +26,11 @@ export const shortFormatCurrency = (amount: number): string => {
     short = amount.toString();
   }
   return `$${short}`;
+}
+
+
+export const getCategoryCode = (category: CategoryInput) => {
+  const categoryName = category.name
+  const formatedName = categoryName.trim().toLocaleLowerCase().replace(" ", "_")
+  return `code_${formatedName}`
 }
