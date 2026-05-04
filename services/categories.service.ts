@@ -41,6 +41,7 @@ export const createCategory = async (data: CategoryInput): Promise<ApiResponse<s
 
     const categoryData = {
       ...data,
+      categoryCode: getCategoryCode(data),
       createdAt: getCurrentTimestamp()
     }
 
