@@ -324,8 +324,8 @@ export const useTransactions = () => {
     return transactions.value.map(transaction => {
       return {
         id: transaction.id,
-        title: transaction.categoryName,
-        description: transaction.description,
+        title: transaction.description,
+        description: transaction.categoryName,
         icon: { icon: '💰', color: 'bg-orange-100' },
         amount: { value: formatCurrency(transaction.amount), short: shortFormatCurrency(transaction.amount) },
         author: transaction.username,
