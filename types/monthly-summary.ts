@@ -11,7 +11,6 @@ export interface CategorySummary {
 export interface MonthlySummary {
   /** ID compuesto: userId + month (ej: user123_2026-04) */
   id: string
-  userId: string
   /** Mes en formato YYYY-MM */
   month: string
   /** Resumen por categoría, indexado por categoryId */
