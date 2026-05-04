@@ -125,13 +125,16 @@ export const useSummary = () => {
   const categoriesData = computed(() => {
     if (!currentSummary.value) return []
     
-    return Object.entries(currentSummary.value.categories).map(([categoryId, data]) => ({
+    return Object.entries(currentSummary.value.categories)
+    .map(([categoryId, data]) => ({
       categoryId,
       ...data,
       percentage: data.budget > 0 ? Math.round((data.spent / data.budget) * 100) : 0,
       remaining: data.budget - data.spent,
-      isOverBudget: data.spent > data.budget
+      isOverBudget: data.spent > data.budget,
     }))
+    .sort((a, b) => b.budget - a.budget);
+  
   })
 
   /**
