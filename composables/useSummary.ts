@@ -16,6 +16,9 @@ import {
   isOverBudget as isOverBudgetHelper
 } from '~/types'
 
+
+const currentSummary: Ref<MonthlySummary | null> = ref(null)
+
 /**
  * Composable para gestión de resúmenes mensuales
  * 
@@ -32,7 +35,6 @@ import {
  */
 export const useSummary = () => {
   // Estado reactivo
-  const currentSummary: Ref<MonthlySummary | null> = ref(null)
   const summaries: Ref<MonthlySummary[]> = ref([])
   const loading: Ref<boolean> = ref(false)
   const error: Ref<string | null> = ref(null)
