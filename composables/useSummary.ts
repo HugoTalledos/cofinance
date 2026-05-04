@@ -144,12 +144,12 @@ export const useSummary = () => {
   /**
    * Obtiene el resumen de un mes específico
    */
-  const fetchSummary = async (userId: string, month: string): Promise<boolean> => {
+  const fetchSummary = async (month: string): Promise<boolean> => {
     loading.value = true
     error.value = null
 
     try {
-      const result = await getMonthlySummaryService(userId, month)
+      const result = await getMonthlySummaryService(month)
       
       if (result.error) {
         error.value = result.error
@@ -171,9 +171,9 @@ export const useSummary = () => {
   /**
    * Obtiene el resumen del mes actual
    */
-  const fetchCurrentMonthSummary = async (userId: string): Promise<boolean> => {
+  const fetchCurrentMonthSummary = async (): Promise<boolean> => {
     const month = getCurrentMonth()
-    return await fetchSummary(userId, month)
+    return await fetchSummary(month)
   }
 
   /**
@@ -226,7 +226,7 @@ export const useSummary = () => {
       }
 
       // Recargar el resumen después de recalcular
-      await fetchSummary(userId, month)
+      await fetchSummary(month)
       return true
 
     } catch (err) {
@@ -339,9 +339,9 @@ export const useSummary = () => {
   /**
    * Recarga el resumen actual (útil después de cambios)
    */
-  const refreshSummary = async (userId: string, month?: string): Promise<boolean> => {
+  const refreshSummary = async (month?: string): Promise<boolean> => {
     const targetMonth = month || currentMonth.value
-    return await fetchSummary(userId, targetMonth)
+    return await fetchSummary(targetMonth)
   }
 
   return {
