@@ -91,8 +91,8 @@ export const isOverBudget = (spent: number, budget: number): boolean => {
 /**
  * Genera un ID para monthly_summary
  */
-export const generateMonthlySummaryId = (userId: string, month: string): string => {
-  return `${userId}_${month}`
+export const generateMonthlySummaryId = (month: string): string => {
+  return `summary_${month}`
 }
 
 /**
