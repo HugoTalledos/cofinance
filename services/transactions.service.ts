@@ -31,8 +31,6 @@ export const createTransaction = async (data: TransactionInput): Promise<ApiResp
   try {
     const db = useFirestoreDb();
     const transactionId = await runTransaction(db, async (transaction) => {
-      const summaryRef = doc(db, COLLECTIONS.MONTHLY_SUMMARY, `${data.userId}_${data.month}`);
-      const summaryDoc = await transaction.get(summaryRef);
       const transactionsRef = collection(db, COLLECTIONS.TRANSACTIONS);
       const newTransactionRef = doc(transactionsRef);
       const transactionData = {
@@ -41,32 +39,7 @@ export const createTransaction = async (data: TransactionInput): Promise<ApiResp
       };
       transaction.set(newTransactionRef, transactionData);
 
-      if (summaryDoc.exists()) {
-        const summaryData = summaryDoc.data();
-        const categories = summaryData.categories || {};
-        const categoryData = categories[data.categoryId] || { budget: 0, spent: 0 };
-
-        transaction.update(summaryRef, {
-          [`categories.${data.categoryId}.spent`]: categoryData.spent + data.amount,
-          totalSpent: (summaryData.totalSpent || 0) + data.amount,
-          updatedAt: getCurrentTimestamp()
-        });
-      } else {
-        transaction.set(summaryRef, {
-          id: `${data.userId}_${data.month}`,
-          userId: data.userId,
-          month: data.month,
-          categories: {
-            [data.categoryId]: {
-              budget: 0,
-              spent: data.amount
-            }
-          },
-          totalSpent: data.amount,
-          updatedAt: getCurrentTimestamp()
-        });
-      }
-
+      updateMonthlySummaryIncremental(data.month, data.categoryId, data.amount);
       return newTransactionRef.id;
     });
 
