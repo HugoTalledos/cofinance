@@ -50,8 +50,9 @@ async function createMovement() {
   }
   const success = await addTransaction(body);
   if (success) {
+    showToast("Registro agregado")
     closeBottomSheet()
-    await refreshSummary()
+    setTimeout(async () => await refreshSummary(), 500)
     return
   }
 
