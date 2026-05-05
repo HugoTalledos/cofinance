@@ -1,60 +1,72 @@
 <script setup lang="ts">
+import { ref, computed } from 'vue'
 import InputCurrency from '~/components/InputForm/InputCurrency.vue'
+import InputForm from '~/components/InputForm/InputForm.vue'
+import ColorSelector from '~/components/ColorSelector.vue'
+import EmojiSelector from '~/components/EmojiSelector.vue'
+import Card from '~/components/Card.vue'
 import { useToast } from '~/components/Toast/useToast'
-
+import { useCategories } from '~/composables/useCategories'
 
 const { addCategory, loading } = useCategories()
 const { showToast } = useToast()
 
 const formData = ref({
   name: '',
-  budget: 0
+  budget: 0,
+  color: 'bg-orange-100',
+  icon: '🍔'
 })
 
 const userId = ref('user123')
 
-// Validación del formulario
 const isFormValid = computed(() => {
-  return formData.value.name.trim().length > 0 && formData.value.budget > 0
+  return (
+    formData.value.name.trim().length > 0 &&
+    formData.value.budget > 0 &&
+    !!formData.value.color &&
+    !!formData.value.icon
+  )
 })
 
-// Crear nueva categoría
 const handleCreateCategory = async () => {
   if (!isFormValid.value) return
 
   const categoryId = await addCategory({
     userId: userId.value,
     name: formData.value.name.trim(),
-    budget: formData.value.budget
+    budget: formData.value.budget,
+    color: formData.value.color,
+    icon: formData.value.icon
   })
 
   if (categoryId) {
     showToast(`Categoría "${formData.value.name}" creada exitosamente`, 'success')
     formData.value = {
       name: '',
-      budget: 0
+      budget: 0,
+      color: 'bg-orange-100',
+      icon: '🍔'
     }
   }
 }
 </script>
+
 <template>
   <card title="Nueva Categoría">
     <template #content>
-      <form @submit.prevent="handleCreateCategory" class="space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Name Input -->
-          <input-form
-            v-model="formData.name"
-            label="Nombre"
-            id="name"
-            type="text"
-            placeholder="Ej: Comida, Transporte"
-          />
-          <input-currency v-model="formData.budget" label="Presupuesto Mensual" id="budget" />
-        </div>
-
-        <!-- Submit Button -->
-        <div class="flex justify-end">
+      <form @submit.prevent="handleCreateCategory" class="space-y-6">
+      <input-form
+          v-model="formData.name"
+          label="Nombre"
+          id="name"
+          type="text"
+          placeholder="Ej: Comida, Transporte"
+        />
+        <input-currency v-model="formData.budget" label="Presupuesto Mensual" id="budget" />
+        <emoji-selector label="Icono" v-model="formData.icon" />
+        <color-selector label="Color" v-model="formData.color" />
+        <div class="flex justify-end pt-4">
           <button
             type="submit"
             :disabled="!isFormValid || loading"
