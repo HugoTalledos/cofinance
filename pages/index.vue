@@ -14,7 +14,6 @@ const { showScreen: showBottomSheet, openScreen: openBottomSheet, closeScreen: c
 const { showScreen: showLateralSheet, openScreen: openLateralSheet, closeScreen: closeLateralSheet } = useShowScreen()
 const { signInWithGoogle, user } = useAuth()
 const { showToast } = useToast()
-const totalMonthlyExpenses = ref<number>(0)
 const { sortedCategories, fetchCategories } = useCategories()
 const {
   transactionsList,
@@ -22,15 +21,15 @@ const {
   currentMonth,
   addTransaction,
   fetchRecentTransactions,
-  getMonthTotal
 } = useTransactions()
+
+const { totalSpent, refreshSummary } = useSummary()
 const movementFormRef = ref<InstanceType<typeof CreateMovementForm> | null>(null);
 
 
 onMounted(async () => {
   await fetchCategories()
   await fetchRecentTransactions(50)
-  totalMonthlyExpenses.value = await getMonthTotal(currentMonth.value)
 })
 
 async function createMovement() {
@@ -52,7 +51,7 @@ async function createMovement() {
   const success = await addTransaction(body);
   if (success) {
     closeBottomSheet()
-    totalMonthlyExpenses.value = await getMonthTotal(currentMonth.value)
+    await refreshSummary()
     return
   }
 
@@ -104,7 +103,7 @@ const handleClick = (item: ItemProps) => {
   <main class="flex flex-col items-center min-h-screen mt-24">
     <container class="flex flex-col items-center justify-center gap-5">
       <header class="flex flex-col justify-center align-center gap-2">
-        <h1 class="text-5xl font-bold tracking-tight text-heading text-center">{{ formatCurrency(totalMonthlyExpenses) }}</h1>
+        <h1 class="text-5xl font-bold tracking-tight text-heading text-center">{{ formatCurrency(totalSpent) }}</h1>
         <h2 class="text-2xl font-bold tracking-tight text-heading text-center text-gray-500">Gasto del mes</h2>
       </header>
       <article class="w-full">
