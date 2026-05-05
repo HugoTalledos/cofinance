@@ -45,10 +45,10 @@ export const updateMonthlySummaryIncremental = async (
     const db = useFirestoreDb()
     const summaryId = generateMonthlySummaryId(month)
     const summaryRef = doc(db, COLLECTIONS.MONTHLY_SUMMARY, summaryId)
+    const category = await getCategoryById(categoryId);
 
     await runTransaction(db, async (transaction) => {
       const summaryDoc = await transaction.get(summaryRef)
-      const category = await getCategoryById(categoryId);
       const categoryBudget = category.data?.budget || 0
       const categoryIcon = category.data?.icon || '👋'
       const categoryColor = category.data?.color || 'bg-orange-100'
@@ -62,16 +62,12 @@ export const updateMonthlySummaryIncremental = async (
         transaction.update(summaryRef, {
           [`categories.${categoryId}.spent`]: categoryData.spent + amount,
           [`categories.${categoryId}.budget`]: categoryBudget || categoryData.budget,
-          [`categories.${categoryId}.icon`]: categoryBudget || categoryData.budget,
-          [`categories.${categoryId}.color`]: categoryBudget || categoryData.budget,
+          [`categories.${categoryId}.icon`]: categoryIcon,
+          [`categories.${categoryId}.color`]: categoryColor,
           totalSpent: (summaryData.totalSpent || 0) + amount,
           updatedAt: getCurrentTimestamp()
         })
       } else {
-        // Crear nuevo resumen
-
-    
-
         category.data?.budget
         const newSummary: MonthlySummaryInput = {
           id: summaryId,
