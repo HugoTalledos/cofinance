@@ -16,6 +16,7 @@ export interface Transaction {
   /** Mes en formato YYYY-MM para indexación */
   month: string
   createdAt: number
+  category?: Record<string, any>
 }
 
 /**
