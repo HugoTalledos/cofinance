@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import ProgressBarChart from '~/components/ProgressBarChart.vue';
 import { useSummary } from '#imports';
-import { categoriesEmojis } from '#imports';
 
 
 const props = defineProps<{ currentMonth: string }>()
@@ -16,13 +15,13 @@ const formatedData = computed(() => {
 
   if (maxBudget === 0) {
     return categoriesData.value.map(category => ({
-      icon: categoriesEmojis[`code_${category.categoryId}` as keyof typeof categoriesEmojis] || '',
+      icon: category.icon || '👋',
       value: shortFormatCurrency(category.spent),
       targetValue: shortFormatCurrency(category.budget),
       percentage: category.percentage,
       actualHeight: 0,
       targetHeight: 0,
-      color: 'bg-orange-100'
+      color: category.color || 'bg-orange-100'
     }));
   }
 
@@ -31,13 +30,13 @@ const formatedData = computed(() => {
     const actualHeight = (category.spent / maxBudget) * 90;
 
     return {
-      icon: categoriesEmojis[`code_${category.categoryId}` as keyof typeof categoriesEmojis] || '',
+      icon: category.icon || '👋',
       value: shortFormatCurrency(category.spent),
       targetValue: shortFormatCurrency(category.budget),
       percentage: category.percentage,
       actualHeight: parseFloat(actualHeight.toFixed(2)),
       targetHeight: parseFloat(targetHeight.toFixed(2)),
-      color: 'bg-orange-100',
+      color: category.color || 'bg-orange-100'
     }
   })
 })
