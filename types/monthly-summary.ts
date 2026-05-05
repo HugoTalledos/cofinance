@@ -6,6 +6,8 @@
 export interface CategorySummary {
   budget: number
   spent: number
+  color?: string
+  icon?: string
 }
 
 export interface MonthlySummary {
