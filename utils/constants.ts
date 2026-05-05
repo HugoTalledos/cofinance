@@ -1,5 +1,4 @@
 import type { ItemProps } from '~/components/ListItem.vue'
-import type { Transaction } from '~/types'
 
 export const LOGIN_OPTION_ID = 'lateral-option-3'
 export const LATERAL_OPTIONS: ItemProps[] = [
@@ -39,10 +38,4 @@ export const USER_UNAUTHENTICATED_OPTION = {
 export const ROUTES_OPTIONS = {
   'lateral-option-1': '/transactions',
   'lateral-option-2': '/categories'
-}
-
-
-export const categoriesEmojis = {
-  'code_comida': '🍔',
-  'code_mascotas': '🐕‍🦺'
 }
