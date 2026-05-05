@@ -50,6 +50,8 @@ export const updateMonthlySummaryIncremental = async (
       const summaryDoc = await transaction.get(summaryRef)
       const category = await getCategoryById(categoryId);
       const categoryBudget = category.data?.budget || 0
+      const categoryIcon = category.data?.icon || '👋'
+      const categoryColor = category.data?.color || 'bg-orange-100'
 
       if (summaryDoc.exists()) {
         // Actualizar resumen existente
@@ -60,6 +62,8 @@ export const updateMonthlySummaryIncremental = async (
         transaction.update(summaryRef, {
           [`categories.${categoryId}.spent`]: categoryData.spent + amount,
           [`categories.${categoryId}.budget`]: categoryBudget || categoryData.budget,
+          [`categories.${categoryId}.icon`]: categoryBudget || categoryData.budget,
+          [`categories.${categoryId}.color`]: categoryBudget || categoryData.budget,
           totalSpent: (summaryData.totalSpent || 0) + amount,
           updatedAt: getCurrentTimestamp()
         })
@@ -75,7 +79,9 @@ export const updateMonthlySummaryIncremental = async (
           categories: {
             [categoryId]: {
               budget: categoryBudget,
-              spent: amount
+              spent: amount,
+              color: categoryColor,
+              icon: categoryIcon,
             }
           },
           totalSpent: amount
