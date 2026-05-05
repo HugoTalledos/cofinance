@@ -5,12 +5,14 @@ import {
   getRecentTransactions as getRecentTransactionsService,
   getCategorySpentInMonth as getCategorySpentInMonthService,
   getMonthlyTotal as getMonthlyTotalService,
-  countTransactions as countTransactionsService
+  countTransactions as countTransactionsService,
+  getCategories
 } from '~/services'
 import type {
   Transaction,
   TransactionInput,
-  TransactionFilters
+  TransactionFilters,
+  Category
 } from '~/types'
 import {
   getCurrentMonth,
@@ -105,13 +107,16 @@ export const useTransactions = () => {
 
     try {
       const result = await getTransactionsService(filters)
-      
+      const categories = await getCategoriesMap()
       if (result.error) {
         error.value = result.error
         return false
       }
 
-      transactions.value = result.data || []
+      transactions.value = (result.data || []).map((transaction) => ({
+        ...transaction,
+        category: categories[transaction.categoryId],
+      }))
       
       // Actualizar mes actual si se especificó en los filtros
       if (filters.month) {
@@ -139,13 +144,17 @@ export const useTransactions = () => {
 
     try {
       const result = await getRecentTransactionsService(limit)
+      const categories = await getCategoriesMap()
       
       if (result.error) {
         error.value = result.error
         return false
       }
 
-      transactions.value = result.data || []
+      transactions.value = (result.data || []).map((transaction) => ({
+        ...transaction,
+        category: categories[transaction.categoryId],
+      }))
       return true
 
     } catch (err) {
@@ -326,7 +335,7 @@ export const useTransactions = () => {
         id: transaction.id,
         title: transaction.description,
         description: transaction.categoryName,
-        icon: { icon: '💰', color: 'bg-orange-100' },
+        icon: { icon: transaction.category?.icon , color: transaction.category?.color },
         amount: { value: formatCurrency(transaction.amount), short: shortFormatCurrency(transaction.amount) },
         author: transaction.username,
         date: formatDateToString(new Date(transaction.date)),
@@ -334,6 +343,16 @@ export const useTransactions = () => {
       }
     })
   })
+
+
+  async function getCategoriesMap(): Promise<Record<string, Category>> {
+    const categories = await getCategories();
+    return (categories.data || []).reduce((map, category) => {
+      (map as Record<string, typeof category>)[category.id] = category;
+ 
+      return map;
+    }, {});
+  }
 
   return {
     // Estado
