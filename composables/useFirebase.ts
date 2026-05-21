@@ -40,6 +40,9 @@ import { getCurrentTimestamp } from '~/types'
  */
 export const useFirebaseCollection = <T extends DocumentData>(collectionName: string) => {
   const db = useFirestoreDb()
+  if (!db) {
+    throw new Error('Firestore database not initialized');
+  }
   const collectionRef = collection(db, collectionName)
 
   /**

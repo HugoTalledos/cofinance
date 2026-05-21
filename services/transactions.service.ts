@@ -30,6 +30,9 @@ export const createTransaction = async (data: TransactionInput): Promise<ApiResp
 
   try {
     const db = useFirestoreDb();
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
     const transactionId = await runTransaction(db, async (transaction) => {
       const transactionsRef = collection(db, COLLECTIONS.TRANSACTIONS);
       const newTransactionRef = doc(transactionsRef);
@@ -67,6 +70,9 @@ export const getTransactions = async (
 
   try {
     const db = useFirestoreDb()
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
     const transactionsRef = collection(db, COLLECTIONS.TRANSACTIONS)
 
     // Construir constraints dinámicamente
@@ -125,6 +131,9 @@ export const getRecentTransactions = async (
 
   try {
     const db = useFirestoreDb()
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
     const transactionsRef = collection(db, COLLECTIONS.TRANSACTIONS)
 
     const { limit } = await import('firebase/firestore')

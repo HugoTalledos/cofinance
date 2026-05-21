@@ -71,6 +71,9 @@ export const updateCategory = async (
 
   try {
     const db = useFirestoreDb()
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
     const categoryRef = doc(db, COLLECTIONS.CATEGORIES, categoryId)
 
     await updateDoc(categoryRef, data as Record<string, any>)
@@ -97,6 +100,9 @@ export const deleteCategory = async (categoryId: string): Promise<ApiResponse<bo
 
   try {
     const db = useFirestoreDb()
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
     const categoryRef = doc(db, COLLECTIONS.CATEGORIES, categoryId)
 
     await deleteDoc(categoryRef)
@@ -122,6 +128,9 @@ export const getCategories = async (): Promise<ApiResponse<Category[]>> => {
 
   try {
     const db = useFirestoreDb()
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
     const categoriesRef = collection(db, COLLECTIONS.CATEGORIES)
 
     const constraints: QueryConstraint[] = [
@@ -158,6 +167,9 @@ export const getCategoryById = async (categoryId: string): Promise<ApiResponse<C
 
   try {
     const db = useFirestoreDb()
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
     const categoryRef = doc(db, COLLECTIONS.CATEGORIES, categoryId)
     
     const { getDoc } = await import('firebase/firestore')
@@ -186,6 +198,9 @@ export const getCategoryById = async (categoryId: string): Promise<ApiResponse<C
 export const categoryHasTransactions = async (categoryId: string): Promise<boolean> => {
   try {
     const db = useFirestoreDb()
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
     const transactionsRef = collection(db, COLLECTIONS.TRANSACTIONS)
 
     const q = query(
