@@ -60,7 +60,7 @@ export const useFirebaseCollection = <T extends DocumentData>(collectionName: st
       const documents = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      })) as T[]
+      })) as unknown as T[]
 
       response.data = documents
     } catch (error) {
@@ -89,7 +89,7 @@ export const useFirebaseCollection = <T extends DocumentData>(collectionName: st
         response.data = {
           id: docSnap.id,
           ...docSnap.data()
-        } as T
+        } as unknown as T
       } else {
         response.error = 'Documento no encontrado'
       }
@@ -117,7 +117,7 @@ export const useFirebaseCollection = <T extends DocumentData>(collectionName: st
       const documents = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      })) as T[]
+      })) as unknown as T[]
 
       response.data = documents
     } catch (error) {
