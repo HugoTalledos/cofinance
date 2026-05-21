@@ -4,4 +4,7 @@
     <string name="title_activity_main">cofinance</string>
     <string name="package_name">com.cofinance.app</string>
     <string name="custom_url_scheme">com.cofinance.app</string>
+    
+    <!-- Web Client ID para Google Sign-In -->
+    <string name="server_client_id">841369038490-n4v8ldh9rbj4l9fpi2kdkgaiup42mtol.apps.googleusercontent.com</string>
 </resources>
