@@ -19,6 +19,7 @@ export interface MonthlySummary {
   categories: Record<string, CategorySummary>
   totalSpent: number
   updatedAt: number
+  userId?: string
 }
 
 /**
