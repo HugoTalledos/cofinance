@@ -1,7 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   // SSR habilitado explícitamente
-  ssr: true,
+  ssr: false,
   
   devtools: { enabled: true },
   
