@@ -3,7 +3,7 @@ import ProgressBarChart from '~/components/ProgressBarChart.vue';
 import { useSummary } from '#imports';
 
 
-const props = defineProps<{ currentMonth: string }>()
+defineProps<{ currentMonth: string }>()
 const { fetchCurrentMonthSummary, categoriesData } = useSummary()
 
 const formatedData = computed(() => {

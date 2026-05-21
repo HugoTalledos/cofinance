@@ -11,7 +11,7 @@ import SelectForm from '~/components/SelectForm.vue'
 
 const { showToast } = useToast()
 
-const props = defineProps({
+defineProps({
   categories: {
     type: Array as PropType<Category[]>,
     required: true
@@ -35,7 +35,6 @@ const submit = (): MovementPayload | null => {
   formError.value = null;
 
   if (!isValid.value) {
-    console.log('AAAAAAAA')
     showToast('Porfavor, completa los campos requeridos', 'error')
     return null;
   }
