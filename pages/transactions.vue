@@ -65,7 +65,7 @@ const sortedDates = computed(() => {
 // Cargar datos iniciales
 onMounted(async () => {
   await Promise.all([
-    categories.fetchCategories(userId.value),
+    categories.fetchCategories(),
     loadTransactions()
   ])
 })
