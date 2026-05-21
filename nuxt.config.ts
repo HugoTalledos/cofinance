@@ -1,22 +1,16 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  // SSR habilitado explícitamente
   ssr: false,
-  
   devtools: { enabled: true },
-  
   modules: [
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt'
   ],
-  
   typescript: {
     strict: true,
     typeCheck: true
   },
-  
   css: ['~/assets/css/main.css'],
-  
   runtimeConfig: {
     public: {
       firebaseApiKey: process.env.NUXT_PUBLIC_FIREBASE_API_KEY,
@@ -27,16 +21,12 @@ export default defineNuxtConfig({
       firebaseAppId: process.env.NUXT_PUBLIC_FIREBASE_APP_ID
     }
   },
-  
-  // Optimizaciones para SSR
   nitro: {
-    compressPublicAssets: true,
+    compressPublicAssets: false, 
   },
-  
-  // Renderizado de rutas para mejor SEO
   routeRules: {
     '/': { prerender: true },
-    '/categories': { ssr: true },
-    '/transactions': { ssr: true }
+    '/categories': { prerender: true },
+    '/transactions': { prerender: true }
   }
 })
