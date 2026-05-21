@@ -43,6 +43,9 @@ export const updateMonthlySummaryIncremental = async (
 
   try {
     const db = useFirestoreDb()
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
     const summaryId = generateMonthlySummaryId(month)
     const summaryRef = doc(db, COLLECTIONS.MONTHLY_SUMMARY, summaryId)
     const category = await getCategoryById(categoryId);
@@ -114,6 +117,9 @@ export const getMonthlySummary = async (
 
   try {
     const db = useFirestoreDb()
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
     const summaryId = generateMonthlySummaryId(month)
     const summaryRef = doc(db, COLLECTIONS.MONTHLY_SUMMARY, summaryId)
 
@@ -157,6 +163,9 @@ export const getMonthlySummaries = async (
 
   try {
     const db = useFirestoreDb()
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
     const summariesRef = collection(db, COLLECTIONS.MONTHLY_SUMMARY)
 
     const constraints = [
@@ -230,7 +239,6 @@ export const calculateSummaryStats = (summary: MonthlySummary): MonthlySummarySt
  * Útil cuando se actualiza el presupuesto de una categoría
  */
 export const syncCategoryBudget = async (
-  userId: string,
   categoryId: string,
   newBudget: number,
   months: string[]
@@ -246,10 +254,13 @@ export const syncCategoryBudget = async (
 
     // Actualizar cada mes en batch
     const { writeBatch } = await import('firebase/firestore')
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
     const batch = writeBatch(db)
 
     for (const month of months) {
-      const summaryId = generateMonthlySummaryId(userId, month)
+      const summaryId = generateMonthlySummaryId(month)
       const summaryRef = doc(db, COLLECTIONS.MONTHLY_SUMMARY, summaryId)
 
       batch.update(summaryRef, {
@@ -286,7 +297,9 @@ export const recalculateMonthlySummary = async (
 
   try {
     const db = useFirestoreDb()
-    
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
     // Obtener todas las transacciones del mes
     const transactionsRef = collection(db, COLLECTIONS.TRANSACTIONS)
     const q = query(
@@ -318,7 +331,7 @@ export const recalculateMonthlySummary = async (
     })
 
     // Actualizar o crear el resumen
-    const summaryId = generateMonthlySummaryId(userId, month)
+    const summaryId = generateMonthlySummaryId(month)
     const summaryRef = doc(db, COLLECTIONS.MONTHLY_SUMMARY, summaryId)
 
     const summaryData: Partial<MonthlySummary> = {
@@ -346,7 +359,6 @@ export const recalculateMonthlySummary = async (
  * CUIDADO: Solo usar si se eliminan todas las transacciones del mes
  */
 export const deleteMonthlySummary = async (
-  userId: string,
   month: string
 ): Promise<ApiResponse<boolean>> => {
   const response: ApiResponse<boolean> = {
@@ -357,7 +369,10 @@ export const deleteMonthlySummary = async (
 
   try {
     const db = useFirestoreDb()
-    const summaryId = generateMonthlySummaryId(userId, month)
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
+    const summaryId = generateMonthlySummaryId(month)
     const summaryRef = doc(db, COLLECTIONS.MONTHLY_SUMMARY, summaryId)
 
     const { deleteDoc } = await import('firebase/firestore')
