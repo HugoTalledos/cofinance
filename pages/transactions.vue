@@ -2,7 +2,12 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { useTransactions, useCategories } from '~/composables'
 import FloatingButton from '~/components/FloatingButton.vue'
-import { getCurrentMonth } from '~/types'
+import {
+  getCurrentBillingPeriodKey,
+  getBillingPeriodRangeFromKey,
+  getRecentBillingPeriodKeys,
+  formatBillingPeriodLabel,
+} from '~/types'
 import type { TransactionFilters } from '~/types'
 
 // Mock userId - en producción vendría de autenticación
@@ -15,33 +20,12 @@ const categories = useCategories()
 // Estado de filtros
 const filters = ref({
   categoryId: '',
-  month: getCurrentMonth()
+  periodKey: getCurrentBillingPeriodKey()
 })
 
 const successMessage = ref<string | null>(null)
 
-
-// Lista de meses disponibles (últimos 12 meses)
-const availableMonths = computed(() => {
-  const months: string[] = []
-  const today = new Date()
-  
-  for (let i = 0; i < 12; i++) {
-    const date = new Date(today.getFullYear(), today.getMonth() - i, 1)
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    months.push(`${year}-${month}`)
-  }
-  
-  return months
-})
-
-// Formato de mes para display
-const formatMonth = (month: string): string => {
-  const [year, monthNum] = month.split('-')
-  const date = new Date(parseInt(year), parseInt(monthNum) - 1, 1)
-  return date.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })
-}
+const availablePeriods = computed(() => getRecentBillingPeriodKeys(12))
 
 // Transacciones agrupadas por fecha
 const groupedTransactions = computed(() => {
@@ -72,9 +56,13 @@ onMounted(async () => {
 
 // Cargar transacciones con filtros
 const loadTransactions = async () => {
+  const { startDate, endDate } = getBillingPeriodRangeFromKey(filters.value.periodKey)
+
   const transactionFilters: TransactionFilters = {
     userId: userId.value,
-    month: filters.value.month
+    dateFrom: startDate,
+    dateTo: endDate,
+    periodKey: filters.value.periodKey,
   }
   
   if (filters.value.categoryId) {
@@ -85,7 +73,7 @@ const loadTransactions = async () => {
 }
 
 // Watch filtros para recargar
-watch(() => filters.value.month, () => {
+watch(() => filters.value.periodKey, () => {
   loadTransactions()
 })
 
@@ -113,7 +101,7 @@ const getDayTotal = (date: string): number => {
 const clearFilters = () => {
   filters.value = {
     categoryId: '',
-    month: getCurrentMonth()
+    periodKey: getCurrentBillingPeriodKey()
   }
 }
 
@@ -186,22 +174,22 @@ const closeSuccessMessage = () => {
           <div class="bg-white shadow rounded-lg p-6">
             <h2 class="text-xl font-semibold text-gray-900 mb-4">Filtros</h2>
             <div class="flex gap-2">
-              <!-- Month Filter -->
+              <!-- Period Filter -->
               <div>
-                <label for="filterMonth" class="block text-sm font-medium text-gray-700 mb-1">
-                  Mes
+                <label for="filterPeriod" class="block text-sm font-medium text-gray-700 mb-1">
+                  Periodo
                 </label>
                 <select
-                  id="filterMonth"
-                  v-model="filters.month"
+                  id="filterPeriod"
+                  v-model="filters.periodKey"
                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 >
                   <option
-                    v-for="month in availableMonths"
-                    :key="month"
-                    :value="month"
+                    v-for="period in availablePeriods"
+                    :key="period"
+                    :value="period"
                   >
-                    {{ formatMonth(month) }}
+                    {{ formatBillingPeriodLabel(period) }}
                   </option>
                 </select>
               </div>
@@ -240,7 +228,7 @@ const closeSuccessMessage = () => {
 
           <!-- Summary Card -->
           <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 shadow rounded-lg p-6 text-white">
-            <h3 class="text-lg font-medium mb-2">Total del Mes</h3>
+            <h3 class="text-lg font-medium mb-2">Total del Periodo</h3>
             <p class="text-3xl font-bold">
               {{ transactions.totalAmountFormatted.value }}
             </p>
@@ -258,7 +246,7 @@ const closeSuccessMessage = () => {
                 Historial de Gastos
               </h2>
               <p class="text-sm text-gray-600 mt-1">
-                {{ formatMonth(filters.month) }}
+                {{ formatBillingPeriodLabel(filters.periodKey) }}
               </p>
             </div>
 
