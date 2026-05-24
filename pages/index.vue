@@ -121,7 +121,7 @@ const handleClick = (item: ItemProps) => {
       <container class="flex flex-col items-center justify-center gap-5">
         <header class="flex flex-col justify-center align-center gap-2">
           <h1 class="text-5xl font-bold tracking-tight text-heading text-center">{{ formatCurrency(totalSpent) }}</h1>
-          <h2 class="text-2xl font-bold tracking-tight text-heading text-center text-gray-500">Gasto del mes</h2>
+          <h2 class="text-2xl font-bold tracking-tight text-heading text-center text-gray-500">Gasto del periodo</h2>
         </header>
 
         <article class="w-full">
