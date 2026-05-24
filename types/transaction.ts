@@ -40,6 +40,8 @@ export interface TransactionFilters {
   /** Rango de fechas */
   dateFrom?: string
   dateTo?: string
+  /** Periodo de facturación (YYYY-MM del mes de inicio), para estado del UI */
+  periodKey?: string
 }
 
 /**
