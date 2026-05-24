@@ -3,17 +3,23 @@ import {
   getMonthlySummary as getMonthlySummaryService,
   getMonthlySummaries as getMonthlySummariesService,
   calculateSummaryStats as calculateSummaryStatsService,
-  recalculateMonthlySummary as recalculateMonthlySummaryService
+  recalculateMonthlySummary as recalculateMonthlySummaryService,
+  getTransactions,
+  getCategories,
 } from '~/services'
 import type {
   MonthlySummary,
   MonthlySummaryFilters,
   MonthlySummaryStats,
-  CategorySummary
+  CategorySummary,
+  Transaction,
+  Category,
 } from '~/types'
 import {
-  getCurrentMonth,
-  isOverBudget as isOverBudgetHelper
+  getCurrentBillingPeriodKey,
+  getBillingPeriodRangeFromKey,
+  isOverBudget as isOverBudgetHelper,
+  getCurrentTimestamp,
 } from '~/types'
 
 
@@ -38,7 +44,73 @@ export const useSummary = () => {
   const summaries: Ref<MonthlySummary[]> = ref([])
   const loading: Ref<boolean> = ref(false)
   const error: Ref<string | null> = ref(null)
-  const currentMonth: Ref<string> = ref(getCurrentMonth())
+  const currentMonth: Ref<string> = ref(getCurrentBillingPeriodKey())
+
+  const buildSummaryFromTransactions = (
+    periodKey: string,
+    transactions: Transaction[],
+    categories: Category[]
+  ): MonthlySummary => {
+    const categoriesMap: Record<string, CategorySummary> = {}
+
+    for (const cat of categories) {
+      categoriesMap[cat.id] = {
+        budget: cat.budget,
+        spent: 0,
+        icon: cat.icon,
+        color: cat.color,
+      }
+    }
+
+    let totalSpent = 0
+    for (const tx of transactions) {
+      totalSpent += tx.amount
+      if (!categoriesMap[tx.categoryId]) {
+        categoriesMap[tx.categoryId] = { budget: 0, spent: 0 }
+      }
+      categoriesMap[tx.categoryId].spent += tx.amount
+    }
+
+    return {
+      id: `billing_${periodKey}`,
+      month: periodKey,
+      categories: categoriesMap,
+      totalSpent,
+      updatedAt: getCurrentTimestamp(),
+    }
+  }
+
+  const fetchBillingPeriodSummary = async (periodKey: string): Promise<boolean> => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const { startDate, endDate } = getBillingPeriodRangeFromKey(periodKey)
+      const [txResult, catResult] = await Promise.all([
+        getTransactions({ dateFrom: startDate, dateTo: endDate }),
+        getCategories(),
+      ])
+
+      if (txResult.error) {
+        error.value = txResult.error
+        return false
+      }
+
+      currentSummary.value = buildSummaryFromTransactions(
+        periodKey,
+        txResult.data || [],
+        catResult.data || []
+      )
+      currentMonth.value = periodKey
+      return true
+
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Error al cargar resumen'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
 
   // Computed - Estadísticas del resumen actual
   const stats = computed<MonthlySummaryStats | null>(() => {
@@ -174,11 +246,10 @@ export const useSummary = () => {
   }
 
   /**
-   * Obtiene el resumen del mes actual
+   * Obtiene el resumen del periodo de facturación actual
    */
   const fetchCurrentMonthSummary = async (): Promise<boolean> => {
-    const month = getCurrentMonth()
-    return await fetchSummary(month)
+    return await fetchBillingPeriodSummary(getCurrentBillingPeriodKey())
   }
 
   /**
@@ -342,11 +413,11 @@ export const useSummary = () => {
   }
 
   /**
-   * Recarga el resumen actual (útil después de cambios)
+   * Recarga el resumen del periodo actual (útil después de cambios)
    */
-  const refreshSummary = async (month?: string): Promise<boolean> => {
-    const targetMonth = month || currentMonth.value
-    return await fetchSummary(targetMonth)
+  const refreshSummary = async (periodKey?: string): Promise<boolean> => {
+    const target = periodKey || currentMonth.value || getCurrentBillingPeriodKey()
+    return await fetchBillingPeriodSummary(target)
   }
 
   return {
@@ -376,6 +447,7 @@ export const useSummary = () => {
     // Métodos de datos
     fetchSummary,
     fetchCurrentMonthSummary,
+    fetchBillingPeriodSummary,
     fetchSummaries,
     recalculateSummary,
     
