@@ -165,7 +165,7 @@ export const getNextMonth = (month: string): string => {
 }
 
 /** Día de inicio del mes de facturación (futuro: config del usuario en Firestore) */
-export const BILLING_START_DAY = 25
+export const BILLING_START_DAY = 24
 
 export interface BillingPeriodRange {
   startDate: string
