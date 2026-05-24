@@ -163,3 +163,93 @@ export const getNextMonth = (month: string): string => {
   
   return `${nextYear}-${String(nextMonth).padStart(2, '0')}`
 }
+
+/** Día de inicio del mes de facturación (futuro: config del usuario en Firestore) */
+export const BILLING_START_DAY = 25
+
+export interface BillingPeriodRange {
+  startDate: string
+  endDate: string
+  /** YYYY-MM del mes en que empieza el periodo */
+  periodKey: string
+}
+
+/**
+ * Periodo de facturación que contiene referenceDate.
+ * Ej. startDay=25 y hoy=15 may → 2026-04-25 a 2026-05-24
+ */
+export const getBillingPeriodRange = (
+  referenceDate: Date = new Date(),
+  startDay: number = BILLING_START_DAY
+): BillingPeriodRange => {
+  const year = referenceDate.getFullYear()
+  const month = referenceDate.getMonth()
+  const day = referenceDate.getDate()
+
+  const periodStart = day < startDay
+    ? new Date(year, month - 1, startDay)
+    : new Date(year, month, startDay)
+
+  const periodEnd = day < startDay
+    ? new Date(year, month, startDay - 1)
+    : new Date(year, month + 1, startDay - 1)
+
+  return {
+    startDate: formatDateToString(periodStart),
+    endDate: formatDateToString(periodEnd),
+    periodKey: formatDateToString(periodStart).substring(0, 7),
+  }
+}
+
+/** Rango a partir del periodKey (YYYY-MM del mes de inicio del periodo) */
+export const getBillingPeriodRangeFromKey = (
+  periodKey: string,
+  startDay: number = BILLING_START_DAY
+): BillingPeriodRange => {
+  const [year, monthNum] = periodKey.split('-').map(Number)
+  const periodStart = new Date(year, monthNum - 1, startDay)
+  const periodEnd = new Date(year, monthNum, startDay - 1)
+
+  return {
+    startDate: formatDateToString(periodStart),
+    endDate: formatDateToString(periodEnd),
+    periodKey,
+  }
+}
+
+export const getCurrentBillingPeriodKey = (): string =>
+  getBillingPeriodRange().periodKey
+
+/** Últimos N periodos de facturación (para selectores) */
+export const getRecentBillingPeriodKeys = (
+  count: number = 12,
+  startDay: number = BILLING_START_DAY
+): string[] => {
+  const keys: string[] = []
+  let ref = new Date()
+
+  while (keys.length < count) {
+    const { periodKey, startDate } = getBillingPeriodRange(ref, startDay)
+    if (!keys.includes(periodKey)) {
+      keys.push(periodKey)
+    }
+    const prev = parseDateString(startDate)
+    prev.setDate(prev.getDate() - 1)
+    ref = prev
+  }
+
+  return keys
+}
+
+/** Etiqueta legible del periodo, ej. "25 abr – 24 may 2026" */
+export const formatBillingPeriodLabel = (
+  periodKey: string,
+  startDay: number = BILLING_START_DAY
+): string => {
+  const { startDate, endDate } = getBillingPeriodRangeFromKey(periodKey, startDay)
+  const start = parseDateString(startDate)
+  const end = parseDateString(endDate)
+  const startStr = start.toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })
+  const endStr = end.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })
+  return `${startStr} – ${endStr}`
+}
