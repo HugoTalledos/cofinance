@@ -11,6 +11,7 @@ import { useShowScreen } from '~/composables/useShowScreen'
 import { useAuth } from '~/composables/useLogin'
 import { useCategories } from '~/composables/useCategories'
 import { useToast } from '~/components/Toast/useToast'
+import { formatBillingPeriodLabel, getCurrentBillingPeriodKey } from '~/types'
 
 const { showScreen: showBottomSheet, openScreen: openBottomSheet, closeScreen: closeBottomSheet } = useShowScreen()
 const { showScreen: showLateralSheet, openScreen: openLateralSheet, closeScreen: closeLateralSheet } = useShowScreen()
@@ -20,11 +21,14 @@ const { sortedCategories, fetchCategories } = useCategories()
 const {
   transactionsList,
   error: transactionError,
-  currentMonth,
   addTransaction,
   fetchRecentTransactions,
 } = useTransactions()
-const { totalSpent, refreshSummary } = useSummary()
+const { totalSpent, refreshSummary, currentMonth } = useSummary()
+
+const periodLabel = computed(() =>
+  formatBillingPeriodLabel(currentMonth.value || getCurrentBillingPeriodKey())
+)
 
 const movementFormRef = ref<InstanceType<typeof CreateMovementForm> | null>(null);
 
@@ -119,9 +123,12 @@ const handleClick = (item: ItemProps) => {
   <template v-if="user">
     <main class="flex flex-col items-center min-h-screen mt-24">
       <container class="flex flex-col items-center justify-center gap-5">
-        <header class="flex flex-col justify-center align-center gap-2">
+        <header class="flex flex-col justify-center align-center gap-1">
           <h1 class="text-5xl font-bold tracking-tight text-heading text-center">{{ formatCurrency(totalSpent) }}</h1>
-          <h2 class="text-2xl font-bold tracking-tight text-heading text-center text-gray-500">Gasto del periodo</h2>
+          <h2 class="text-2xl font-bold tracking-tight text-heading text-center text-gray-500">
+            Gasto del periodo
+          </h2>
+          <h3 class="font-normal text-gray-400 text-center">{{ periodLabel }}</h3>
         </header>
 
         <article class="w-full">
