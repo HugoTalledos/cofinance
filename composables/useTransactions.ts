@@ -15,7 +15,7 @@ import type {
   Category
 } from '~/types'
 import {
-  getCurrentMonth,
+  getCurrentBillingPeriodKey,
   extractMonthFromDate,
   formatDateToString,
 } from '~/types'
@@ -39,7 +39,7 @@ export const useTransactions = () => {
   const transactions: Ref<Transaction[]> = ref([])
   const loading: Ref<boolean> = ref(false)
   const error: Ref<string | null> = ref(null)
-  const currentMonth: Ref<string> = ref(getCurrentMonth())
+  const currentMonth: Ref<string> = ref(getCurrentBillingPeriodKey())
 
   // Computed
   const hasTransactions = computed(() => transactions.value.length > 0)
@@ -118,8 +118,9 @@ export const useTransactions = () => {
         category: categories[transaction.categoryId],
       }))
       
-      // Actualizar mes actual si se especificó en los filtros
-      if (filters.month) {
+      if (filters.periodKey) {
+        currentMonth.value = filters.periodKey
+      } else if (filters.month) {
         currentMonth.value = filters.month
       }
 
