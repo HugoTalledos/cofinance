@@ -94,5 +94,6 @@ export const useFirebaseAuth = (): Auth | null => {
 export const COLLECTIONS = {
   CATEGORIES: 'categories',
   TRANSACTIONS: 'transactions',
-  MONTHLY_SUMMARY: 'monthly_summary'
+  MONTHLY_SUMMARY: 'monthly_summary',
+  RECURRING_EXPENSES: 'recurring_expenses'
 } as const
