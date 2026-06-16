@@ -142,7 +142,13 @@ const handleClick = (item: ItemProps) => {
       </container>
     </main>
 
-    <floating-button label="Agregar" color="blue" size="md" @click="openBottomSheet" />
+    <floating-action-menu
+      :options="[
+        { label: 'Agregar gasto', icon: '💸', color: 'bg-green-500' },
+        { label: 'Pagos recurrentes', icon: '🔁', color: 'bg-purple-500' },
+      ]"
+      @option-click="(i) => i === 0 ? openBottomSheet() : navigateTo('/recurring')"
+    />
 
     <bottom-sheet 
       title="Agregar Movimiento" 
