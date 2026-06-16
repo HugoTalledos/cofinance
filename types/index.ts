@@ -6,6 +6,7 @@
 export * from './category'
 export * from './transaction'
 export * from './monthly-summary'
+export * from './recurring-expense'
 
 // Exportar funciones helper
 export * from './helpers'
