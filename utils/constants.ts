@@ -22,6 +22,16 @@ export const LATERAL_OPTIONS: ItemProps[] = [
         color: 'bg-blue-100'
     },
     clickable: true
+  },
+  {
+    id: 'lateral-option-5',
+    title: 'Pagos recurrentes',
+    description: '',
+    icon: {
+      icon: '🔁',
+      color: 'bg-purple-100'
+    },
+    clickable: true
   }
 ]
 
@@ -50,5 +60,6 @@ export const LOGOUT_OPTION = {
 
 export const ROUTES_OPTIONS = {
   'lateral-option-1': '/transactions',
-  'lateral-option-2': '/categories'
+  'lateral-option-2': '/categories',
+  'lateral-option-5': '/recurring'
 }
