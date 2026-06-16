@@ -25,6 +25,14 @@ export {
   countTransactions
 } from './transactions.service'
 
+// Servicios de gastos recurrentes
+export {
+  createRecurringExpense,
+  updateRecurringExpense,
+  deleteRecurringExpense,
+  getRecurringExpenses,
+} from './recurring-expenses.service'
+
 // Servicios de resúmenes mensuales
 export {
   updateMonthlySummaryIncremental,
