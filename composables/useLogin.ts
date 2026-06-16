@@ -10,21 +10,20 @@ import {
 } from "firebase/auth";
 import { useFirebaseAuth } from '../services/firebase';
 
-let FirebaseAuthentication: any = null;
-let Capacitor: any = null;
-
-if (process.client) {
-  import('@capacitor-firebase/authentication').then((module) => {
-    FirebaseAuthentication = module.FirebaseAuthentication;
-  }).catch((error) => {
-    console.warn('No se pudo cargar @capacitor-firebase/authentication:', error);
-  });
-  
-  import('@capacitor/core').then((module) => {
-    Capacitor = module.Capacitor;
-  }).catch((error) => {
-    console.warn('No se pudo cargar @capacitor/core:', error);
-  });
+async function getCapacitorModules() {
+  if (!process.client) return { FirebaseAuthentication: null, Capacitor: null };
+  try {
+    const [authModule, coreModule] = await Promise.all([
+      import('@capacitor-firebase/authentication'),
+      import('@capacitor/core'),
+    ]);
+    return {
+      FirebaseAuthentication: authModule.FirebaseAuthentication,
+      Capacitor: coreModule.Capacitor,
+    };
+  } catch {
+    return { FirebaseAuthentication: null, Capacitor: null };
+  }
 }
 
 const auth = useFirebaseAuth();
@@ -57,19 +56,20 @@ export function useAuth() {
         console.error("Firebase Auth no disponible");
         return;
       }
-      
+
+      const { FirebaseAuthentication, Capacitor } = await getCapacitorModules();
       const isNative = Capacitor?.isNativePlatform?.() || false;
       console.log('Plataforma nativa detectada:', isNative);
-      
+
       if (isNative && FirebaseAuthentication) {
         console.log('Iniciando flujo de autenticación nativo...');
         const result = await FirebaseAuthentication.signInWithGoogle();
         console.log('Resultado de Google Sign-In nativo:', result);
-        
+
         const credential = GoogleAuthProvider.credential(
           result.credential?.idToken
         );
-        
+
         await signInWithCredential(auth, credential);
         console.log('Autenticación con Firebase completada');
       } else {
@@ -92,8 +92,9 @@ export function useAuth() {
 
   const signOut = async () => {
     try {
+      const { FirebaseAuthentication, Capacitor } = await getCapacitorModules();
       const isNative = Capacitor?.isNativePlatform?.() || false;
-      
+
       if (isNative && FirebaseAuthentication) {
         console.log('Cerrando sesión en plugin nativo...');
         await FirebaseAuthentication.signOut();
