@@ -24,14 +24,14 @@ const {
   loading,
   isPaid,
   paidAmount,
+  paidAt,
   paidCount,
   fetchExpenses,
   addExpense,
   editExpense,
   removeExpense,
   markPaid,
-  markUnpaid,
-} = useRecurringExpenses(user.value?.uid)
+} = useRecurringExpenses()
 
 // ── Formulario de crear/editar ───────────────────────────────────────────────
 const { showScreen: showForm, openScreen: openForm, closeScreen: closeForm } = useShowScreen()
@@ -63,40 +63,44 @@ function openEditForm(expense: RecurringExpense) {
 }
 
 async function submitForm() {
-  const cat = formCategory.value as Category
-  if (!formName.value.trim()) {
-    showToast('El nombre es requerido', 'error')
-    return
+  try {
+    const cat = formCategory.value as Category
+    if (!formName.value.trim()) {
+      showToast('El nombre es requerido', 'error')
+      return
+    }
+    if (!cat?.id) {
+      showToast('La categoría es requerida', 'error')
+      return
+    }
+    const amount = formHasFixed.value ? formFixedAmount.value : null
+    if (editingExpense.value) {
+      const ok = await editExpense(editingExpense.value.id, {
+        name: formName.value.trim(),
+        description: formDescription.value.trim() || '',
+        fixedAmount: amount,
+        categoryId: cat.id,
+        categoryName: cat.name,
+      })
+      if (ok) showToast('Gasto actualizado')
+      else showToast('Error al actualizar', 'error')
+    } else {
+      if (!user.value?.uid) return
+      const id = await addExpense({
+        userId: user.value.uid,
+        name: formName.value.trim(),
+        description: formDescription.value.trim() || '',
+        fixedAmount: amount,
+        categoryId: cat.id,
+        categoryName: cat.name,
+      })
+      if (id) showToast('Gasto agregado')
+      else showToast('Error al agregar', 'error')
+    }
+    closeForm()
+  } catch (error) {
+    console.log(error)
   }
-  if (!cat?.id) {
-    showToast('La categoría es requerida', 'error')
-    return
-  }
-  const amount = formHasFixed.value ? formFixedAmount.value : null
-  if (editingExpense.value) {
-    const ok = await editExpense(editingExpense.value.id, {
-      name: formName.value.trim(),
-      description: formDescription.value.trim() || undefined,
-      fixedAmount: amount,
-      categoryId: cat.id,
-      categoryName: cat.name,
-    })
-    if (ok) showToast('Gasto actualizado')
-    else showToast('Error al actualizar', 'error')
-  } else {
-    if (!user.value?.uid) return
-    const id = await addExpense({
-      userId: user.value.uid,
-      name: formName.value.trim(),
-      description: formDescription.value.trim() || undefined,
-      fixedAmount: amount,
-      categoryId: cat.id,
-      categoryName: cat.name,
-    })
-    if (id) showToast('Gasto agregado')
-    else showToast('Error al agregar', 'error')
-  }
-  closeForm()
 }
 
 async function handleDelete() {
@@ -110,6 +114,7 @@ async function handleDelete() {
 // ── Crear transacción al marcar como pagado ──────────────────────────────────
 async function createTransactionFromExpense(expense: RecurringExpense, amount: number) {
   if (!user.value?.uid || amount <= 0) return
+  const today = new Date().toISOString().split('T')[0]
   await addTransaction({
     userId: user.value.uid,
     username: user.value.displayName || '',
@@ -117,8 +122,8 @@ async function createTransactionFromExpense(expense: RecurringExpense, amount: n
     categoryName: expense.categoryName,
     amount,
     description: expense.name,
-    date: new Date().toISOString(),
-    month: '',
+    date: today,
+    month: today.substring(0, 7),
   })
 }
 
@@ -128,10 +133,7 @@ const pendingExpenseId = ref<string | null>(null)
 const popupAmount = ref<number | null>(null)
 
 async function handleTap(expense: RecurringExpense) {
-  if (isPaid.value(expense.id)) {
-    markUnpaid(expense.id)
-    return
-  }
+  if (isPaid.value(expense.id)) return
   if (expense.fixedAmount !== null) {
     markPaid(expense.id, expense.fixedAmount)
     await createTransactionFromExpense(expense, expense.fixedAmount)
@@ -143,12 +145,14 @@ async function handleTap(expense: RecurringExpense) {
 }
 
 async function confirmVariableAmount() {
-  if (!pendingExpenseId.value || !popupAmount.value) return
-  const expense = expenses.value.find(e => e.id === pendingExpenseId.value)
-  markPaid(pendingExpenseId.value, popupAmount.value)
-  if (expense) await createTransactionFromExpense(expense, popupAmount.value)
+  if (!pendingExpenseId.value || popupAmount.value === null) return
+  const id = pendingExpenseId.value
+  const amount = popupAmount.value
+  const expense = expenses.value.find(e => e.id === id)
+  markPaid(id, amount)
   pendingExpenseId.value = null
   closeAmountPopup()
+  if (expense) await createTransactionFromExpense(expense, amount)
 }
 
 function cancelAmountPopup() {
@@ -250,6 +254,11 @@ onMounted(async () => {
               <template v-else>
                 Monto variable
               </template>
+            </p>
+
+            <!-- Fecha de pago -->
+            <p v-if="isPaid(expense.id) && paidAt(expense.id)" class="text-xs text-gray-400 mt-0.5">
+              Pagado el {{ new Date(paidAt(expense.id)!).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' }) }}
             </p>
           </div>
 
