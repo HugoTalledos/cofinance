@@ -6,7 +6,6 @@ import {
   deleteDoc,
   getDocs,
   query,
-  where,
   orderBy,
 } from 'firebase/firestore'
 import { useFirestoreDb, COLLECTIONS } from './firebase'
@@ -58,13 +57,13 @@ export const deleteRecurringExpense = async (id: string): Promise<ApiResponse<bo
   return response
 }
 
-export const getRecurringExpenses = async (userId: string): Promise<ApiResponse<RecurringExpense[]>> => {
+export const getRecurringExpenses = async (): Promise<ApiResponse<RecurringExpense[]>> => {
   const response: ApiResponse<RecurringExpense[]> = { data: null, error: null, loading: false }
   try {
     const db = useFirestoreDb()
     if (!db) throw new Error('Firestore no disponible')
     const ref = collection(db, COLLECTIONS.RECURRING_EXPENSES)
-    const q = query(ref, where('userId', '==', userId), orderBy('createdAt', 'asc'))
+    const q = query(ref, orderBy('createdAt', 'asc'))
     const snapshot = await getDocs(q)
     response.data = snapshot.docs.map(d => ({ id: d.id, ...d.data() })) as RecurringExpense[]
   } catch (error) {
