@@ -16,6 +16,7 @@ export type RecurringExpenseUpdate = Partial<Omit<RecurringExpense, 'id' | 'user
 export interface RecurringExpenseCheck {
   paid: boolean
   amount: number | null
+  paidAt?: number
 }
 
 /** Record<expenseId, checkState> — guardado en localStorage por periodo */
