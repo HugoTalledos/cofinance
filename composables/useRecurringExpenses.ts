@@ -1,4 +1,4 @@
-import { ref, computed, type Ref } from 'vue'
+import { ref, computed, watchEffect, type Ref } from 'vue'
 import {
   createRecurringExpense,
   updateRecurringExpense,
@@ -12,6 +12,7 @@ import type {
   RecurringChecklist,
 } from '~/types'
 import { getCurrentBillingPeriodKey } from '~/types'
+import { useAuth } from '~/composables/useLogin'
 
 const expenses: Ref<RecurringExpense[]> = ref([])
 const loading: Ref<boolean> = ref(false)
@@ -35,21 +36,29 @@ const saveChecklist = (userId: string, state: RecurringChecklist) => {
   localStorage.setItem(checklistKey(userId), JSON.stringify(state))
 }
 
-export const useRecurringExpenses = (userId?: string) => {
-  const checklist: Ref<RecurringChecklist> = ref(userId ? loadChecklist(userId) : {})
+export const useRecurringExpenses = () => {
+  const { user } = useAuth()
+  const checklist: Ref<RecurringChecklist> = ref({})
+
+  // Carga el checklist en cuanto el usuario esté disponible
+  watchEffect(() => {
+    const uid = user.value?.uid
+    if (uid) checklist.value = loadChecklist(uid)
+    else checklist.value = {}
+  })
 
   const fetchExpenses = async (): Promise<boolean> => {
-    if (!userId) return false
     loading.value = true
     error.value = null
     try {
-      const result = await getRecurringExpenses(userId)
+      const result = await getRecurringExpenses()
       if (result.error) {
         error.value = result.error
         return false
       }
       expenses.value = result.data || []
-      checklist.value = loadChecklist(userId)
+      const uid = user.value?.uid
+      if (uid) checklist.value = loadChecklist(uid)
       return true
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Error al cargar'
@@ -111,11 +120,12 @@ export const useRecurringExpenses = (userId?: string) => {
         return false
       }
       expenses.value = expenses.value.filter(e => e.id !== id)
-      if (userId) {
+      const uid = user.value?.uid
+      if (uid) {
         const updated = { ...checklist.value }
         delete updated[id]
         checklist.value = updated
-        saveChecklist(userId, updated)
+        saveChecklist(uid, updated)
       }
       return true
     } catch (err) {
@@ -127,27 +137,19 @@ export const useRecurringExpenses = (userId?: string) => {
   }
 
   const markPaid = (id: string, amount: number | null) => {
-    if (!userId) return
+    const uid = user.value?.uid
+    if (!uid) return
     const updated: RecurringChecklist = {
       ...checklist.value,
-      [id]: { paid: true, amount },
+      [id]: { paid: true, amount, paidAt: Date.now() },
     }
     checklist.value = updated
-    saveChecklist(userId, updated)
-  }
-
-  const markUnpaid = (id: string) => {
-    if (!userId) return
-    const updated: RecurringChecklist = {
-      ...checklist.value,
-      [id]: { paid: false, amount: null },
-    }
-    checklist.value = updated
-    saveChecklist(userId, updated)
+    saveChecklist(uid, updated)
   }
 
   const isPaid = computed(() => (id: string) => checklist.value[id]?.paid === true)
   const paidAmount = computed(() => (id: string) => checklist.value[id]?.amount ?? null)
+  const paidAt = computed(() => (id: string) => checklist.value[id]?.paidAt ?? null)
 
   const paidCount = computed(() =>
     expenses.value.filter(e => checklist.value[e.id]?.paid).length
@@ -160,12 +162,12 @@ export const useRecurringExpenses = (userId?: string) => {
     error,
     isPaid,
     paidAmount,
+    paidAt,
     paidCount,
     fetchExpenses,
     addExpense,
     editExpense,
     removeExpense,
     markPaid,
-    markUnpaid,
   }
 }
