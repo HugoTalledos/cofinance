@@ -12,6 +12,7 @@ interface AmountProps {
 
 export interface ItemProps {
   id: string
+  categoryId?: string
   title: string
   description: string
   icon: IconProps
