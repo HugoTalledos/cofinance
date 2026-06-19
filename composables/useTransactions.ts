@@ -334,6 +334,7 @@ export const useTransactions = () => {
     return transactions.value.map(transaction => {
       return {
         id: transaction.id,
+        categoryId: transaction.categoryId,
         title: transaction.description,
         description: transaction.categoryName,
         icon: { icon: transaction.category?.icon , color: transaction.category?.color },
