@@ -11,7 +11,7 @@ import { useShowScreen } from '~/composables/useShowScreen'
 import { useAuth } from '~/composables/useLogin'
 import { useCategories } from '~/composables/useCategories'
 import { useToast } from '~/components/Toast/useToast'
-import { formatBillingPeriodLabel, getCurrentBillingPeriodKey } from '~/types'
+import { formatBillingPeriodLabel, getCurrentBillingPeriodKey, formatDateToString } from '~/types'
 
 const { showScreen: showBottomSheet, openScreen: openBottomSheet, closeScreen: closeBottomSheet } = useShowScreen()
 const { showScreen: showLateralSheet, openScreen: openLateralSheet, closeScreen: closeLateralSheet } = useShowScreen()
@@ -24,11 +24,45 @@ const {
   addTransaction,
   fetchRecentTransactions,
 } = useTransactions()
-const { totalSpent, refreshSummary, currentMonth } = useSummary()
+const { totalSpent, categoriesData, refreshSummary, currentMonth } = useSummary()
+
+const selectedCategoryId = ref<string | null>(null)
+const selectedCategoryName = ref<string>('')
+
+function handleCategoryClick(payload: { categoryId: string; categoryName: string }) {
+  if (selectedCategoryId.value === payload.categoryId) {
+    selectedCategoryId.value = null
+    selectedCategoryName.value = ''
+  } else {
+    selectedCategoryId.value = payload.categoryId
+    selectedCategoryName.value = payload.categoryName
+  }
+}
+
+const selectedCategorySpent = computed(() => {
+  if (!selectedCategoryId.value) return null
+  return categoriesData.value.find(c => c.categoryId === selectedCategoryId.value)?.spent ?? null
+})
+
+const displayedAmount = computed(() =>
+  selectedCategorySpent.value !== null ? selectedCategorySpent.value : totalSpent.value
+)
 
 const periodLabel = computed(() =>
   formatBillingPeriodLabel(currentMonth.value || getCurrentBillingPeriodKey())
 )
+
+const todayTransactionsList = computed(() => {
+  const today = formatDateToString(new Date())
+  return transactionsList.value.filter(t => t.date === today)
+})
+
+const displayedTransactionsList = computed(() => {
+  if (selectedCategoryId.value) {
+    return transactionsList.value.filter(t => t.categoryId === selectedCategoryId.value)
+  }
+  return todayTransactionsList.value
+})
 
 const movementFormRef = ref<InstanceType<typeof CreateMovementForm> | null>(null);
 
@@ -124,20 +158,26 @@ const handleClick = (item: ItemProps) => {
     <main class="flex flex-col items-center min-h-screen mt-24">
       <container class="flex flex-col items-center justify-center gap-5">
         <header class="flex flex-col justify-center align-center gap-1">
-          <h1 class="text-5xl font-bold tracking-tight text-heading text-center">{{ formatCurrency(totalSpent) }}</h1>
+          <h1 class="text-5xl font-bold tracking-tight text-heading text-center">{{ formatCurrency(displayedAmount) }}</h1>
           <h2 class="text-2xl font-bold tracking-tight text-heading text-center text-gray-500">
-            Gasto del periodo
+            Gasto del periodo<template v-if="selectedCategoryName"> · {{ selectedCategoryName }}</template>
           </h2>
           <h3 class="font-normal text-gray-400 text-center">{{ periodLabel }}</h3>
         </header>
 
         <article class="w-full">
-          <bar-char-summary :current-month="currentMonth" />
+          <bar-char-summary
+            :current-month="currentMonth"
+            :selected-category-id="selectedCategoryId ?? undefined"
+            @category-click="handleCategoryClick"
+          />
         </article>
 
         <article class="w-full">
-          <h2 class="text-2xl font-bold tracking-tight text-heading">Hoy: </h2>
-          <list :items="transactionsList" />
+          <h2 class="text-2xl font-bold tracking-tight text-heading">
+            {{ selectedCategoryName || 'Hoy' }}:
+          </h2>
+          <list :items="displayedTransactionsList" />
         </article>
       </container>
     </main>
