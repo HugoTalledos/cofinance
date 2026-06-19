@@ -1,10 +1,21 @@
 <script setup lang="ts">
 import ProgressBarChart from '~/components/ProgressBarChart.vue';
 import { useSummary } from '#imports';
+import { useCategories } from '~/composables/useCategories';
 
+defineProps<{ currentMonth: string; selectedCategoryId?: string }>()
+const emit = defineEmits<{
+  (e: 'category-click', payload: { categoryId: string; categoryName: string }): void
+}>()
 
-defineProps<{ currentMonth: string }>()
 const { fetchCurrentMonthSummary, categoriesData } = useSummary()
+const { sortedCategories } = useCategories()
+
+const categoryNameMap = computed(() => {
+  const map: Record<string, string> = {}
+  sortedCategories.value.forEach(cat => { map[cat.id] = cat.name })
+  return map
+})
 
 const formatedData = computed(() => {
   if (!categoriesData.value || categoriesData.value.length === 0) {
@@ -21,7 +32,9 @@ const formatedData = computed(() => {
       percentage: category.percentage,
       actualHeight: 0,
       targetHeight: 0,
-      color: category.color || 'bg-orange-100'
+      color: category.color || 'bg-orange-100',
+      categoryId: category.categoryId,
+      categoryName: categoryNameMap.value[category.categoryId] || category.categoryId,
     }));
   }
 
@@ -36,7 +49,9 @@ const formatedData = computed(() => {
       percentage: category.percentage,
       actualHeight: parseFloat(actualHeight.toFixed(2)),
       targetHeight: parseFloat(targetHeight.toFixed(2)),
-      color: category.color || 'bg-orange-100'
+      color: category.color || 'bg-orange-100',
+      categoryId: category.categoryId,
+      categoryName: categoryNameMap.value[category.categoryId] || category.categoryId,
     }
   })
 })
@@ -46,5 +61,9 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <progress-bar-chart :data="formatedData" />
+  <progress-bar-chart
+    :data="formatedData"
+    :selected-category-id="selectedCategoryId"
+    @bar-click="emit('category-click', $event)"
+  />
 </template>
