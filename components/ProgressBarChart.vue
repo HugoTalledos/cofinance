@@ -4,14 +4,17 @@
       <div
         v-for="(item, index) in data"
         :key="index"
-        class="relative flex flex-col items-center w-24 min-w-[120px] group"
+        class="relative flex flex-col items-center w-24 min-w-[120px] group cursor-pointer transition-opacity duration-300"
+        :class="{ 'opacity-40': selectedCategoryId && selectedCategoryId !== item.categoryId }"
+        @click="emit('bar-click', { categoryId: item.categoryId, categoryName: item.categoryName })"
       >
         <div class="relative w-full h-80 flex items-end">
           <!-- Barra de color (Gasto) -->
           <div
             :class="[
               item.color,
-              'w-full rounded-2xl z-10 transition-all duration-500 ease-out flex flex-col items-center justify-end pb-4 shadow-sm'
+              'w-full rounded-2xl z-10 transition-all duration-500 ease-out flex flex-col items-center justify-end pb-4 shadow-sm',
+              selectedCategoryId === item.categoryId ? 'ring-2 ring-gray-800 ring-offset-2' : ''
             ]"
             :style="{ height: item.actualHeight + '%' }"
           >
@@ -50,10 +53,18 @@ interface Data {
   actualHeight: number
   targetHeight: number
   color: string
+  categoryId: string
+  categoryName: string
 };
 
-defineProps<{ data: Data[] }>()
+defineProps<{
+  data: Data[]
+  selectedCategoryId?: string
+}>()
 
+const emit = defineEmits<{
+  (e: 'bar-click', payload: { categoryId: string; categoryName: string }): void
+}>()
 </script>
 
 <style scoped>
