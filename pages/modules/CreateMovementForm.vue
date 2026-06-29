@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { reactive, computed } from 'vue'
 import type { PropType } from 'vue'
-
-// Componentes que ya tienes
 import InputCurrency from '~/components/InputForm/InputCurrency.vue'
 import InputForm from '~/components/InputForm/InputForm.vue'
+import PillToggle from '~/components/PillToggle.vue'
 import type { Category, MovementPayload } from './CreateMovementForm.type'
 import { useToast } from '~/components/Toast/useToast'
 import SelectForm from '~/components/SelectForm.vue'
@@ -18,44 +17,56 @@ defineProps({
   }
 })
 
-const formError = ref<string | null>(null)
+const TOGGLE_OPTIONS = [
+  { label: 'Gasto', value: 'expense' },
+  { label: 'Ingreso', value: 'income' },
+]
+
 const form = reactive({
+  type: 'expense' as 'income' | 'expense',
   category: {} as Category,
   detail: '',
   value: null as number | null,
   date: ''
 })
 
-
 const isValid = computed(() => {
-  return form.category.id && form.detail && form.value && form.value > 0;
+  if (form.type === 'income') {
+    return Boolean(form.detail && form.value && form.value > 0)
+  }
+  return Boolean(form.category.id && form.detail && form.value && form.value > 0)
 })
 
 const submit = (): MovementPayload | null => {
-  formError.value = null;
-
   if (!isValid.value) {
     showToast('Porfavor, completa los campos requeridos', 'error')
-    return null;
+    return null
   }
 
-  const submissionDate = form.date ? new Date(form.date) : new Date();
+  const submissionDate = form.date ? new Date(form.date) : new Date()
 
   return {
     category: form.category,
     detail: form.detail,
     value: form.value || 0,
-    date: submissionDate
-  };
+    date: submissionDate,
+    type: form.type,
+  }
 }
 
-defineExpose({ submit });
+defineExpose({ submit })
 </script>
 
 <template>
   <form @submit.prevent>
     <div class="space-y-4">
+      <PillToggle
+        v-model="form.type"
+        :options="TOGGLE_OPTIONS"
+      />
+
       <SelectForm
+        v-if="form.type === 'expense'"
         label="Categoría"
         v-model="form.category"
         :options="categories"
@@ -71,7 +82,7 @@ defineExpose({ submit });
       <InputCurrency
         id="value"
         v-model="form.value"
-        label="Valor del Movimiento"
+        :label="form.type === 'income' ? 'Valor del Ingreso' : 'Valor del Movimiento'"
       />
 
       <InputForm
@@ -80,9 +91,6 @@ defineExpose({ submit });
         label="Fecha (opcional)"
         type="date"
       />
-    </div>
-    <div v-if="formError" class="mt-4 text-sm text-red-600 bg-red-50 p-3 rounded-md">
-      {{ formError }}
     </div>
   </form>
 </template>
