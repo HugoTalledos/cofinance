@@ -8,4 +8,5 @@ export interface MovementPayload {
   detail: string;
   value: number;
   date: Date;
+  type: 'income' | 'expense';
 }

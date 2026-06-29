@@ -41,8 +41,9 @@ export const createTransaction = async (data: TransactionInput): Promise<ApiResp
         createdAt: getCurrentTimestamp()
       };
       transaction.set(newTransactionRef, transactionData);
-
-      updateMonthlySummaryIncremental(data.month, data.categoryId, data.amount);
+      if (data.type !== 'income') {
+        updateMonthlySummaryIncremental(data.month, data.categoryId, data.amount);
+      }
       return newTransactionRef.id;
     });
 
