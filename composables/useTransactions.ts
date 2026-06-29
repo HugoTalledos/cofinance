@@ -335,6 +335,7 @@ export const useTransactions = () => {
       return {
         id: transaction.id,
         categoryId: transaction.categoryId,
+        type: transaction.type ?? 'expense',
         title: transaction.description,
         description: transaction.categoryName,
         icon: { icon: transaction.category?.icon , color: transaction.category?.color },

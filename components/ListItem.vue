@@ -13,6 +13,7 @@ interface AmountProps {
 export interface ItemProps {
   id: string
   categoryId?: string
+  type?: 'income' | 'expense'
   title: string
   description: string
   icon: IconProps
