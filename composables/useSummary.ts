@@ -24,6 +24,7 @@ import {
 
 
 const currentSummary: Ref<MonthlySummary | null> = ref(null)
+const currentTotalIncome: Ref<number> = ref(0)
 
 /**
  * Composable para gestión de resúmenes mensuales
@@ -62,13 +63,20 @@ export const useSummary = () => {
       }
     }
 
+    const expenseTxs = transactions.filter(tx => (tx.type ?? 'expense') === 'expense')
+    const incomeTxs = transactions.filter(tx => tx.type === 'income')
+
+    currentTotalIncome.value = incomeTxs.reduce((sum, tx) => sum + tx.amount, 0)
+
     let totalSpent = 0
-    for (const tx of transactions) {
+    for (const tx of expenseTxs) {
       totalSpent += tx.amount
-      if (!categoriesMap[tx.categoryId]) {
-        categoriesMap[tx.categoryId] = { budget: 0, spent: 0 }
+      if (tx.categoryId) {
+        if (!categoriesMap[tx.categoryId]) {
+          categoriesMap[tx.categoryId] = { budget: 0, spent: 0 }
+        }
+        categoriesMap[tx.categoryId].spent += tx.amount
       }
-      categoriesMap[tx.categoryId].spent += tx.amount
     }
 
     return {
@@ -136,6 +144,14 @@ export const useSummary = () => {
   const totalSpentFormatted = computed(() => {
     return formatCurrency(totalSpent.value)
   })
+
+  const totalIncome = computed(() => currentTotalIncome.value)
+
+  const totalIncomeFormatted = computed(() => formatCurrency(totalIncome.value))
+
+  const totalRemaining = computed(() => totalIncome.value - totalSpent.value)
+
+  const totalRemainingFormatted = computed(() => formatCurrency(totalRemaining.value))
 
   /**
    * Total de presupuesto
@@ -443,7 +459,13 @@ export const useSummary = () => {
     categoriesOverBudget,
     categoriesData,
     categoriesBySpent,
-    
+
+    // Ingresos
+    totalIncome,
+    totalIncomeFormatted,
+    totalRemaining,
+    totalRemainingFormatted,
+
     // Métodos de datos
     fetchSummary,
     fetchCurrentMonthSummary,
