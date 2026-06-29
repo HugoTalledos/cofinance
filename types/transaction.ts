@@ -16,7 +16,7 @@ export interface Transaction {
   /** Mes en formato YYYY-MM para indexación */
   month: string
   /** Tipo de movimiento */
-  type: 'income' | 'expense'
+  type?: 'income' | 'expense'
   createdAt: number
   category?: Record<string, any>
 }
