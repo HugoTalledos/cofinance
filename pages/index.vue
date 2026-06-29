@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import SummaryCard from '~/components/SummaryCard.vue'
 import Container from '~/components/Container.vue'
 import FloatingButton from '~/components/FloatingButton.vue'
 import ErrorMessage from '~/components/ErrorMessage.vue'
@@ -24,7 +25,7 @@ const {
   addTransaction,
   fetchRecentTransactions,
 } = useTransactions()
-const { totalSpent, categoriesData, refreshSummary, currentMonth } = useSummary()
+const { totalSpent, totalIncomeFormatted, totalRemainingFormatted, categoriesData, refreshSummary, currentMonth } = useSummary()
 
 const selectedCategoryId = ref<string | null>(null)
 const selectedCategoryName = ref<string>('')
@@ -44,7 +45,7 @@ const selectedCategorySpent = computed(() => {
   return categoriesData.value.find(c => c.categoryId === selectedCategoryId.value)?.spent ?? null
 })
 
-const displayedAmount = computed(() =>
+const displayedExpense = computed(() =>
   selectedCategorySpent.value !== null ? selectedCategorySpent.value : totalSpent.value
 )
 
@@ -54,7 +55,7 @@ const periodLabel = computed(() =>
 
 const todayTransactionsList = computed(() => {
   const today = formatDateToString(new Date())
-  return transactionsList.value.filter(t => t.date === today)
+  return transactionsList.value.filter(t => t.date === today && (t.type ?? 'expense') === 'expense')
 })
 
 const displayedTransactionsList = computed(() => {
@@ -93,12 +94,13 @@ async function createMovement() {
   const body = {
     userId: user.value?.uid || '',
     username: user.value?.displayName || '',
-    categoryId: payload.category.id,
-    categoryName: payload.category.name,
+    categoryId: payload.type === 'income' ? '' : payload.category.id,
+    categoryName: payload.type === 'income' ? '' : payload.category.name,
     amount: payload.value,
     description: payload.detail,
     date: payload.date.toISOString(),
-    month: ''
+    month: '',
+    type: payload.type,
   }
   const success = await addTransaction(body);
   if (success) {
@@ -157,12 +159,26 @@ const handleClick = (item: ItemProps) => {
   <template v-if="user">
     <main class="flex flex-col items-center min-h-screen mt-24">
       <container class="flex flex-col items-center justify-center gap-5">
-        <header class="flex flex-col justify-center align-center gap-1">
-          <h1 class="text-5xl font-bold tracking-tight text-heading text-center">{{ formatCurrency(displayedAmount) }}</h1>
-          <h2 class="text-2xl font-bold tracking-tight text-heading text-center text-gray-500">
-            Gasto del periodo<template v-if="selectedCategoryName"> · {{ selectedCategoryName }}</template>
-          </h2>
-          <h3 class="font-normal text-gray-400 text-center">{{ periodLabel }}</h3>
+        <header class="w-full">
+          <div class="flex overflow-x-auto gap-3 pb-2 snap-x snap-mandatory">
+            <SummaryCard
+              label="Ingresos"
+              :value="totalIncomeFormatted"
+              color="green"
+            />
+            <SummaryCard
+              label="Gastos"
+              :value="formatCurrency(displayedExpense)"
+              color="red"
+              :sublabel="selectedCategoryName || undefined"
+            />
+            <SummaryCard
+              label="Restante"
+              :value="totalRemainingFormatted"
+              color="yellow"
+            />
+          </div>
+          <p class="text-sm font-normal text-gray-400 text-center mt-1">{{ periodLabel }}</p>
         </header>
 
         <article class="w-full">
