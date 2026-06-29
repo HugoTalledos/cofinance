@@ -160,8 +160,9 @@ const handleClick = (item: ItemProps) => {
     <main class="flex flex-col items-center min-h-screen mt-24">
       <container class="flex flex-col items-center justify-center gap-5">
         <header class="w-full">
-          <div class="flex overflow-x-auto gap-3 pb-2 snap-x snap-mandatory">
+          <div class="flex overflow-x-auto gap-3 pb-2 snap-x snap-mandatory h-[120px]">
             <SummaryCard
+              v-if="!selectedCategorySpent"
               label="Ingresos"
               :value="totalIncomeFormatted"
               color="green"
@@ -173,6 +174,7 @@ const handleClick = (item: ItemProps) => {
               :sublabel="selectedCategoryName || undefined"
             />
             <SummaryCard
+              v-if="!selectedCategorySpent"
               label="Restante"
               :value="totalRemainingFormatted"
               color="yellow"
