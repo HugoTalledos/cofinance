@@ -167,9 +167,9 @@ const handleClick = (item: ItemProps) => {
       <list :items="lateralOptions" @item-click="handleClick" />
     </template>
   </lateral-sheet>
-  <floating-button label="+" color="blue" size="md" position="top-right" @click="openLateralSheet" />
+  <floating-button label="☰" color="blue" size="md" position="top-right" @click="openLateralSheet" />
   <template v-if="user">
-    <main class="flex flex-col items-center min-h-screen mt-24">
+    <main class="flex flex-col items-center min-h-screen">
       <container class="flex flex-col items-center justify-center gap-5">
         <div class="flex gap-1 bg-gray-100 rounded-full p-1">
           <button
@@ -230,13 +230,7 @@ const handleClick = (item: ItemProps) => {
       </container>
     </main>
 
-    <floating-action-menu
-      :options="[
-        { label: 'Agregar gasto', icon: '💸', color: 'bg-green-500' },
-        { label: 'Pagos recurrentes', icon: '🔁', color: 'bg-purple-500' },
-      ]"
-      @option-click="(i) => i === 0 ? openBottomSheet() : navigateTo('/recurring')"
-    />
+    <floating-button label="+ Agregar" color="blue" size="md" @click="openBottomSheet" />
 
     <bottom-sheet 
       title="Agregar Movimiento" 
