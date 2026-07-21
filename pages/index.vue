@@ -7,6 +7,7 @@ import ErrorMessage from '~/components/ErrorMessage.vue'
 import type { ItemProps } from '~/components/ListItem.vue'
 import BarCharSummary from './modules/BarCharSummary.vue'
 import CreateMovementForm from './modules/CreateMovementForm.vue'
+import ZenView from './modules/ZenView.vue'
 import Toast from '~/components/Toast/Toast.vue'
 import { useShowScreen } from '~/composables/useShowScreen'
 import { useAuth } from '~/composables/useLogin'
@@ -29,6 +30,14 @@ const { totalSpent, totalIncomeFormatted, totalRemainingFormatted, categoriesDat
 
 const selectedCategoryId = ref<string | null>(null)
 const selectedCategoryName = ref<string>('')
+
+const VIEW_MODE_KEY = 'home-view-mode'
+const viewMode = ref<'zen' | 'detail'>('zen')
+
+function setViewMode(mode: 'zen' | 'detail') {
+  viewMode.value = mode
+  localStorage.setItem(VIEW_MODE_KEY, mode)
+}
 
 function handleCategoryClick(payload: { categoryId: string; categoryName: string }) {
   if (selectedCategoryId.value === payload.categoryId) {
@@ -80,6 +89,9 @@ watch(user, (currentUser) => {
 }, { immediate: true });
 
 onMounted(async () => {
+  const savedMode = localStorage.getItem(VIEW_MODE_KEY)
+  if (savedMode === 'zen' || savedMode === 'detail') viewMode.value = savedMode
+
   await fetchCategories()
   if (user.value) {
     await fetchRecentTransactions(50)
@@ -159,44 +171,62 @@ const handleClick = (item: ItemProps) => {
   <template v-if="user">
     <main class="flex flex-col items-center min-h-screen mt-24">
       <container class="flex flex-col items-center justify-center gap-5">
-        <header class="w-full">
-          <div class="flex overflow-x-auto gap-3 pb-2 snap-x snap-mandatory h-[120px]">
-            <SummaryCard
-              v-if="!selectedCategorySpent"
-              label="Ingresos"
-              :value="totalIncomeFormatted"
-              color="green"
-            />
-            <SummaryCard
-              label="Gastos"
-              :value="formatCurrency(displayedExpense)"
-              color="red"
-              :sublabel="selectedCategoryName || undefined"
-            />
-            <SummaryCard
-              v-if="!selectedCategorySpent"
-              label="Restante"
-              :value="totalRemainingFormatted"
-              color="yellow"
-            />
-          </div>
-          <p class="text-sm font-normal text-gray-400 text-center mt-1">{{ periodLabel }}</p>
-        </header>
+        <div class="flex gap-1 bg-gray-100 rounded-full p-1">
+          <button
+            type="button"
+            class="px-4 py-1.5 rounded-full text-sm font-medium transition-all"
+            :class="viewMode === 'zen' ? 'bg-white shadow text-gray-800' : 'text-gray-400'"
+            @click="setViewMode('zen')"
+          >🧘 Simple</button>
+          <button
+            type="button"
+            class="px-4 py-1.5 rounded-full text-sm font-medium transition-all"
+            :class="viewMode === 'detail' ? 'bg-white shadow text-gray-800' : 'text-gray-400'"
+            @click="setViewMode('detail')"
+          >📊 Detalle</button>
+        </div>
 
-        <article class="w-full">
-          <bar-char-summary
-            :current-month="currentMonth"
-            :selected-category-id="selectedCategoryId ?? undefined"
-            @category-click="handleCategoryClick"
-          />
-        </article>
+        <zen-view v-if="viewMode === 'zen'" />
+        <template v-else>
+          <header class="w-full">
+            <div class="flex overflow-x-auto gap-3 pb-2 snap-x snap-mandatory h-[120px]">
+              <SummaryCard
+                v-if="!selectedCategorySpent"
+                label="Ingresos"
+                :value="totalIncomeFormatted"
+                color="green"
+              />
+              <SummaryCard
+                label="Gastos"
+                :value="formatCurrency(displayedExpense)"
+                color="red"
+                :sublabel="selectedCategoryName || undefined"
+              />
+              <SummaryCard
+                v-if="!selectedCategorySpent"
+                label="Restante"
+                :value="totalRemainingFormatted"
+                color="yellow"
+              />
+            </div>
+            <p class="text-sm font-normal text-gray-400 text-center mt-1">{{ periodLabel }}</p>
+          </header>
 
-        <article class="w-full">
-          <h2 class="text-2xl font-bold tracking-tight text-heading">
-            {{ selectedCategoryName || 'Hoy' }}:
-          </h2>
-          <list :items="displayedTransactionsList" />
-        </article>
+          <article class="w-full">
+            <bar-char-summary
+              :current-month="currentMonth"
+              :selected-category-id="selectedCategoryId ?? undefined"
+              @category-click="handleCategoryClick"
+            />
+          </article>
+
+          <article class="w-full">
+            <h2 class="text-2xl font-bold tracking-tight text-heading">
+              {{ selectedCategoryName || 'Hoy' }}:
+            </h2>
+            <list :items="displayedTransactionsList" />
+          </article>
+        </template>
       </container>
     </main>
 
