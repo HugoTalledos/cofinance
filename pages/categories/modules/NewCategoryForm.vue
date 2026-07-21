@@ -11,9 +11,9 @@ import { useCategories } from '~/composables/useCategories'
 const { addCategory, loading } = useCategories()
 const { showToast } = useToast()
 
-const formData = ref({
+const formData = ref<{ name: string; budget: number | null; color: string; icon: string }>({
   name: '',
-  budget: 0,
+  budget: null,
   color: 'bg-orange-100',
   icon: '🍔'
 })
@@ -23,7 +23,6 @@ const userId = ref('user123')
 const isFormValid = computed(() => {
   return (
     formData.value.name.trim().length > 0 &&
-    formData.value.budget > 0 &&
     !!formData.value.color &&
     !!formData.value.icon
   )
@@ -35,7 +34,7 @@ const handleCreateCategory = async () => {
   const categoryId = await addCategory({
     userId: userId.value,
     name: formData.value.name.trim(),
-    budget: formData.value.budget,
+    budget: formData.value.budget ?? 0,
     color: formData.value.color,
     icon: formData.value.icon
   })
@@ -44,7 +43,7 @@ const handleCreateCategory = async () => {
     showToast(`Categoría "${formData.value.name}" creada exitosamente`, 'success')
     formData.value = {
       name: '',
-      budget: 0,
+      budget: null,
       color: 'bg-orange-100',
       icon: '🍔'
     }
@@ -63,7 +62,7 @@ const handleCreateCategory = async () => {
           type="text"
           placeholder="Ej: Comida, Transporte"
         />
-        <input-currency v-model="formData.budget" label="Presupuesto Mensual" id="budget" />
+        <input-currency v-model="formData.budget" label="Presupuesto Mensual (opcional)" id="budget" />
         <emoji-selector label="Icono" v-model="formData.icon" />
         <color-selector label="Color" v-model="formData.color" />
         <div class="flex justify-end pt-4">

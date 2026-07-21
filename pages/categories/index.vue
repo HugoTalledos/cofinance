@@ -32,7 +32,7 @@ const { showToast } = useToast()
 
 // Estado de edición inline
 const editingId = ref<string | null>(null)
-const editingBudget = ref<number>(0)
+const editingBudget = ref<number | null>(0)
 
 const showDeleteConfirm = ref<string | null>(null)
 
@@ -60,10 +60,8 @@ const cancelEdit = () => {
 
 // Guardar presupuesto editado
 const saveEditedBudget = async (categoryId: string) => {
-  if (editingBudget.value <= 0) return
-
   const success = await updateCategory(categoryId, {
-    budget: editingBudget.value
+    budget: editingBudget.value ?? 0
   })
 
   if (success) {
@@ -171,8 +169,8 @@ const handleDeleteCategory = async (categoryId: string) => {
               <div class="flex items-center space-x-4">
                 <div v-if="editingId !== category.id" class="text-right">
                   <p class="text-sm text-gray-600">Presupuesto</p>
-                  <p class="text-xl font-bold text-gray-900">
-                    {{ formatCurrency(category.budget) }}
+                  <p class="text-xl font-bold" :class="category.budget > 0 ? 'text-gray-900' : 'text-gray-400'">
+                    {{ category.budget > 0 ? formatCurrency(category.budget) : 'Sin presupuesto' }}
                   </p>
                 </div>
   
