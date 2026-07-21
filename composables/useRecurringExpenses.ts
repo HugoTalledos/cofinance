@@ -17,6 +17,7 @@ import { useAuth } from '~/composables/useLogin'
 const expenses: Ref<RecurringExpense[]> = ref([])
 const loading: Ref<boolean> = ref(false)
 const error: Ref<string | null> = ref(null)
+const checklist: Ref<RecurringChecklist> = ref({})
 
 const checklistKey = (userId: string) =>
   `recurring-checklist-${userId}-${getCurrentBillingPeriodKey()}`
@@ -38,7 +39,6 @@ const saveChecklist = (userId: string, state: RecurringChecklist) => {
 
 export const useRecurringExpenses = () => {
   const { user } = useAuth()
-  const checklist: Ref<RecurringChecklist> = ref({})
 
   // Carga el checklist en cuanto el usuario esté disponible
   watchEffect(() => {
