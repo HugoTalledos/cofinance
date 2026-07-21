@@ -27,15 +27,18 @@ if (process.client) {
   });
 }
 
-const auth = useFirebaseAuth();
-const provider: AuthProvider | null = auth ? new GoogleAuthProvider() : null;
-
 const user = ref<User | null>(null);
+const authLoading = ref(true);
 
 export function useAuth() {
+  const auth = useFirebaseAuth();
+  const provider: AuthProvider | null = auth ? new GoogleAuthProvider() : null;
+
   if (!auth) {
+    authLoading.value = false;
     return {
       user,
+      authLoading,
       signInWithGoogle: () => console.error("Auth no disponible."),
       signOut: () => console.error("Auth no disponible.")
     };
@@ -43,6 +46,7 @@ export function useAuth() {
 
   const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
     user.value = firebaseUser;
+    authLoading.value = false;
     console.log('Estado de autenticación actualizado:', user.value?.displayName || 'No autenticado');
   });
 
@@ -110,6 +114,7 @@ export function useAuth() {
 
   return {
     user,
+    authLoading,
     signInWithGoogle,
     signOut
   };
