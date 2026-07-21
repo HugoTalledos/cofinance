@@ -7,30 +7,24 @@ import { useShowScreen } from '~/composables/useShowScreen'
 import { useAuth } from '~/composables/useLogin'
 import { useRecurringExpenses } from '~/composables/useRecurringExpenses'
 import { useCategories } from '~/composables/useCategories'
-import { useTransactions } from '~/composables/useTransactions'
 import { useToast } from '~/components/Toast/useToast'
 import Toast from '~/components/Toast/Toast.vue'
 import InputCurrency from '~/components/InputForm/InputCurrency.vue'
 import InputForm from '~/components/InputForm/InputForm.vue'
+import RecurringExpenseList from '~/components/RecurringExpenseList/RecurringExpenseList.vue'
 import type { RecurringExpense, Category } from '~/types'
 
 const { user } = useAuth()
 const { showToast } = useToast()
 const { sortedCategories, fetchCategories } = useCategories()
-const { addTransaction } = useTransactions()
 
 const {
   expenses,
-  loading,
-  isPaid,
-  paidAmount,
-  paidAt,
   paidCount,
   fetchExpenses,
   addExpense,
   editExpense,
   removeExpense,
-  markPaid,
 } = useRecurringExpenses()
 
 // ── Formulario de crear/editar ───────────────────────────────────────────────
@@ -111,64 +105,10 @@ async function handleDelete() {
   closeForm()
 }
 
-// ── Crear transacción al marcar como pagado ──────────────────────────────────
-async function createTransactionFromExpense(expense: RecurringExpense, amount: number) {
-  if (!user.value?.uid || amount <= 0) return
-  const today = new Date().toISOString().split('T')[0]
-  await addTransaction({
-    userId: user.value.uid,
-    username: user.value.displayName || '',
-    categoryId: expense.categoryId,
-    categoryName: expense.categoryName,
-    amount,
-    description: expense.name,
-    date: today,
-    month: today.substring(0, 7),
-  })
-}
-
-// ── Popup de monto variable ──────────────────────────────────────────────────
-const { showScreen: showAmountPopup, openScreen: openAmountPopup, closeScreen: closeAmountPopup } = useShowScreen()
-const pendingExpenseId = ref<string | null>(null)
-const popupAmount = ref<number | null>(null)
-
-async function handleTap(expense: RecurringExpense) {
-  if (isPaid.value(expense.id)) return
-  if (expense.fixedAmount !== null) {
-    markPaid(expense.id, expense.fixedAmount)
-    await createTransactionFromExpense(expense, expense.fixedAmount)
-    return
-  }
-  pendingExpenseId.value = expense.id
-  popupAmount.value = null
-  openAmountPopup()
-}
-
-async function confirmVariableAmount() {
-  if (!pendingExpenseId.value || popupAmount.value === null) return
-  const id = pendingExpenseId.value
-  const amount = popupAmount.value
-  const expense = expenses.value.find(e => e.id === id)
-  markPaid(id, amount)
-  pendingExpenseId.value = null
-  closeAmountPopup()
-  if (expense) await createTransactionFromExpense(expense, amount)
-}
-
-function cancelAmountPopup() {
-  pendingExpenseId.value = null
-  closeAmountPopup()
-}
-
 // ── Computed ─────────────────────────────────────────────────────────────────
 const progressLabel = computed(() =>
   `${paidCount.value} / ${expenses.value.length} pagados`
 )
-
-const pendingExpenseName = computed(() => {
-  if (!pendingExpenseId.value) return ''
-  return expenses.value.find(e => e.id === pendingExpenseId.value)?.name ?? ''
-})
 
 onMounted(async () => {
   await fetchCategories()
@@ -201,76 +141,7 @@ onMounted(async () => {
       </div>
 
       <!-- Lista de gastos -->
-      <section v-if="loading" class="flex justify-center py-8">
-        <span class="text-gray-400 text-sm">Cargando...</span>
-      </section>
-
-      <section v-else-if="expenses.length === 0" class="flex flex-col items-center gap-3 py-12 text-center">
-        <span class="text-5xl">🔁</span>
-        <p class="text-gray-500 text-sm">No tienes gastos recurrentes.<br>Agrega uno con el botón de abajo.</p>
-      </section>
-
-      <ul v-else class="flex flex-col gap-3">
-        <li
-          v-for="expense in expenses"
-          :key="expense.id"
-          class="flex items-center gap-4 p-4 rounded-xl border transition-all duration-200"
-          :class="isPaid(expense.id)
-            ? 'bg-gray-50 border-gray-100 opacity-60'
-            : 'bg-white border-gray-200 shadow-sm'"
-        >
-          <!-- Checkbox -->
-          <button
-            class="flex-shrink-0 w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all duration-200"
-            :class="isPaid(expense.id)
-              ? 'bg-gray-400 border-gray-400'
-              : 'border-purple-400 hover:border-purple-600'"
-            @click="handleTap(expense)"
-          >
-            <span v-if="isPaid(expense.id)" class="text-white text-xs font-bold">✓</span>
-          </button>
-
-          <!-- Info -->
-          <div class="flex-1 min-w-0" @click="handleTap(expense)">
-            <p
-              class="font-semibold text-gray-800 transition-all duration-200"
-              :class="{ 'line-through text-gray-400': isPaid(expense.id) }"
-            >{{ expense.name }}</p>
-
-            <p class="text-xs text-gray-400 truncate">{{ expense.categoryName }}</p>
-
-            <p v-if="expense.description" class="text-xs text-gray-400 truncate">{{ expense.description }}</p>
-
-            <!-- Monto -->
-            <p class="text-xs mt-0.5 font-medium"
-              :class="isPaid(expense.id) ? 'text-gray-400' : 'text-purple-600'"
-            >
-              <template v-if="isPaid(expense.id) && paidAmount(expense.id) !== null">
-                {{ formatCurrency(paidAmount(expense.id)!) }}
-              </template>
-              <template v-else-if="expense.fixedAmount !== null">
-                {{ formatCurrency(expense.fixedAmount) }}
-              </template>
-              <template v-else>
-                Monto variable
-              </template>
-            </p>
-
-            <!-- Fecha de pago -->
-            <p v-if="isPaid(expense.id) && paidAt(expense.id)" class="text-xs text-gray-400 mt-0.5">
-              Pagado el {{ new Date(paidAt(expense.id)!).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' }) }}
-            </p>
-          </div>
-
-          <!-- Editar -->
-          <button
-            class="flex-shrink-0 text-gray-300 hover:text-gray-500 transition-colors p-1"
-            @click.stop="openEditForm(expense)"
-          >
-            <span class="text-lg">⋯</span>
-          </button>
-        </li>
-      </ul>
+      <recurring-expense-list @edit="openEditForm" />
 
     </container>
   </main>
@@ -356,31 +227,6 @@ onMounted(async () => {
         >
           Eliminar gasto
         </button>
-      </div>
-    </template>
-  </bottom-sheet>
-
-  <!-- BottomSheet: monto variable ─────────────────────────────────────────── -->
-  <bottom-sheet
-    :title="`¿Cuánto pagaste por ${pendingExpenseName}?`"
-    allowClose
-    :visible="showAmountPopup"
-    showActionButtons
-    :actionButtons="{
-      closeButton: { label: 'Cancelar', icon: 'X', enabled: true, show: true },
-      doneButton: { label: 'Confirmar', icon: 'X', enabled: true, show: true },
-    }"
-    @modalClose="cancelAmountPopup"
-    @modalDone="confirmVariableAmount"
-    @modalCancel="cancelAmountPopup"
-  >
-    <template #modal-content>
-      <div class="pt-2">
-        <input-currency
-          id="variable-amount"
-          label="Monto pagado este periodo"
-          v-model="popupAmount"
-        />
       </div>
     </template>
   </bottom-sheet>
