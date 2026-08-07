@@ -136,15 +136,23 @@ export const useRecurringExpenses = () => {
     }
   }
 
-  const markPaid = (id: string, amount: number | null) => {
+  const markPaid = async (id: string, amount: number | null) => {
     const uid = user.value?.uid
     if (!uid) return
+    const paidAtTs = Date.now()
     const updated: RecurringChecklist = {
       ...checklist.value,
-      [id]: { paid: true, amount, paidAt: Date.now() },
+      [id]: { paid: true, amount, paidAt: paidAtTs },
     }
     checklist.value = updated
     saveChecklist(uid, updated)
+
+    // Persistimos el último pago en el gasto para que sobreviva al cambio de periodo
+    const lastPaid = { lastPaidAt: paidAtTs, lastPaidAmount: amount }
+    const idx = expenses.value.findIndex(e => e.id === id)
+    if (idx !== -1) expenses.value[idx] = { ...expenses.value[idx], ...lastPaid }
+    const result = await updateRecurringExpense(id, lastPaid)
+    if (result.error) error.value = result.error
   }
 
   const isPaid = computed(() => (id: string) => checklist.value[id]?.paid === true)

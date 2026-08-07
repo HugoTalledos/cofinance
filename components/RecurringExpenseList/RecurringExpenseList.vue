@@ -20,6 +20,9 @@ const {
   confirmVariableAmount,
   cancelAmountPopup,
 } = useRecurringList((expense, amount) => emit('paid', expense, amount))
+
+const formatShortDate = (ts: number) =>
+  new Date(ts).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' })
 </script>
 
 <template>
@@ -78,9 +81,16 @@ const {
           </template>
         </p>
 
-        <!-- Fecha de pago -->
+        <!-- Fecha de pago del periodo actual -->
         <p v-if="isPaid(expense.id) && paidAt(expense.id)" class="text-xs text-gray-400 mt-0.5">
-          Pagado el {{ new Date(paidAt(expense.id)!).toLocaleDateString('es-CO', { day: 'numeric', month: 'short' }) }}
+          Pagado el {{ formatShortDate(paidAt(expense.id)!) }}
+        </p>
+
+        <!-- Último pago registrado (periodos anteriores) -->
+        <p v-else-if="expense.lastPaidAt" class="text-xs text-gray-400 mt-0.5">
+          Último pago: {{ formatShortDate(expense.lastPaidAt) }}<template
+            v-if="expense.fixedAmount === null && expense.lastPaidAmount != null"
+          > · {{ formatCurrency(expense.lastPaidAmount) }}</template>
         </p>
       </div>
 

@@ -8,6 +8,10 @@ export interface RecurringExpense {
   categoryId: string
   categoryName: string
   createdAt: number
+  /** Timestamp del último pago registrado (persiste entre periodos) */
+  lastPaidAt?: number
+  /** Monto del último pago registrado. Útil sobre todo en montos variables */
+  lastPaidAmount?: number | null
 }
 
 export type RecurringExpenseInput = Omit<RecurringExpense, 'id' | 'createdAt'>
