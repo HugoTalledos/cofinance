@@ -41,11 +41,21 @@ export const createTransaction = async (data: TransactionInput): Promise<ApiResp
         createdAt: getCurrentTimestamp()
       };
       transaction.set(newTransactionRef, transactionData);
-      if (data.type !== 'income') {
-        updateMonthlySummaryIncremental(data.month, data.categoryId, data.amount);
-      }
       return newTransactionRef.id;
     });
+
+    // El summary es un agregado derivado: se ajusta después de confirmar la
+    // escritura y su fallo no invalida el movimiento del usuario.
+    if ((data.type ?? 'expense') === 'expense') {
+      const summaryResult = await updateMonthlySummaryIncremental(
+        data.month,
+        data.categoryId,
+        data.amount
+      );
+      if (summaryResult.error) {
+        console.error('Error ajustando el resumen mensual:', summaryResult.error);
+      }
+    }
 
     response.data = transactionId;
   } catch (error) {

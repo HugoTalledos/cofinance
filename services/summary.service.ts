@@ -71,7 +71,13 @@ export const updateMonthlySummaryIncremental = async (
           updatedAt: getCurrentTimestamp()
         })
       } else {
-        category.data?.budget
+        if (amount < 0) {
+          console.warn(
+            `Se intentó revertir ${amount} sobre el mes ${month} pero no existe summary. Ajuste ignorado.`
+          )
+          return
+        }
+
         const newSummary: MonthlySummaryInput = {
           id: summaryId,
           month,
