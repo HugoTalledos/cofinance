@@ -6,12 +6,15 @@ import {
   getCategorySpentInMonth as getCategorySpentInMonthService,
   getMonthlyTotal as getMonthlyTotalService,
   countTransactions as countTransactionsService,
-  getCategories
+  getCategories,
+  updateTransaction as updateTransactionService,
+  deleteTransaction as deleteTransactionService,
 } from '~/services'
 import type {
   Transaction,
   TransactionInput,
   TransactionFilters,
+  TransactionUpdate,
   Category
 } from '~/types'
 import {
@@ -229,6 +232,73 @@ export const useTransactions = () => {
   }
 
   /**
+   * Edita una transacción existente
+   * IMPORTANTE: También reajusta el monthly_summary automáticamente
+   */
+  const editTransaction = async (id: string, data: TransactionUpdate): Promise<boolean> => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const changes: TransactionUpdate = { ...data }
+      if (data.date) {
+        changes.month = extractMonthFromDate(data.date)
+      }
+
+      const result = await updateTransactionService(id, changes)
+      if (result.error) {
+        error.value = result.error
+        return false
+      }
+
+      const index = transactions.value.findIndex(t => t.id === id)
+      if (index !== -1) {
+        const categories = await getCategoriesMap()
+        const updated = { ...transactions.value[index], ...changes } as Transaction
+        // Se re-adjunta la categoría para no perder ícono ni color en la lista
+        transactions.value[index] = {
+          ...updated,
+          category: categories[updated.categoryId]
+        }
+      }
+
+      return true
+
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Error al editar transacción'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
+   * Elimina definitivamente una transacción
+   * IMPORTANTE: También descuenta el monto del monthly_summary
+   */
+  const removeTransaction = async (id: string): Promise<boolean> => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const result = await deleteTransactionService(id)
+      if (result.error) {
+        error.value = result.error
+        return false
+      }
+
+      transactions.value = transactions.value.filter(t => t.id !== id)
+      return true
+
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Error al eliminar transacción'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
    * Obtiene el total gastado en una categoría en un mes
    */
   const getCategorySpent = async (
@@ -402,6 +472,8 @@ export const useTransactions = () => {
     fetchTransactions,
     fetchRecentTransactions,
     addTransaction,
+    editTransaction,
+    removeTransaction,
     getCategorySpent,
     getMonthTotal,
     countTransactions,
