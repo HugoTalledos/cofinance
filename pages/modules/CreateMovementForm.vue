@@ -1,33 +1,38 @@
 <script setup lang="ts">
 import { reactive, computed } from 'vue'
-import type { PropType } from 'vue'
 import InputCurrency from '~/components/InputForm/InputCurrency.vue'
 import InputForm from '~/components/InputForm/InputForm.vue'
 import PillToggle from '~/components/PillToggle.vue'
-import type { Category, MovementPayload } from './CreateMovementForm.type'
+import type { Category, MovementPayload, MovementFormValue } from './CreateMovementForm.type'
 import { useToast } from '~/components/Toast/useToast'
 import SelectForm from '~/components/SelectForm.vue'
 
 const { showToast } = useToast()
 
-defineProps({
-  categories: {
-    type: Array as PropType<Category[]>,
-    required: true
-  }
-})
+const props = defineProps<{
+  categories: Category[]
+  initialValue?: MovementFormValue
+  lockType?: boolean
+}>()
 
 const TOGGLE_OPTIONS = [
   { label: 'Gasto', value: 'expense' },
   { label: 'Ingreso', value: 'income' },
 ]
 
+// `SelectForm` usa el objeto completo como value del <option>, así que el
+// <select> nativo compara por identidad de referencia: hay que buscar el
+// objeto dentro de `categories`, no construir uno equivalente.
+const initialCategory = props.categories.find(
+  category => category.id === props.initialValue?.categoryId
+)
+
 const form = reactive({
-  type: 'expense' as 'income' | 'expense',
-  category: {} as Category,
-  detail: '',
-  value: null as number | null,
-  date: ''
+  type: props.initialValue?.type ?? 'expense' as 'income' | 'expense',
+  category: (initialCategory ?? {}) as Category,
+  detail: props.initialValue?.detail ?? '',
+  value: props.initialValue?.value ?? null as number | null,
+  date: props.initialValue?.date ?? ''
 })
 
 const isValid = computed(() => {
@@ -63,6 +68,7 @@ defineExpose({ submit })
       <PillToggle
         v-model="form.type"
         :options="TOGGLE_OPTIONS"
+        :disabled="lockType"
       />
 
       <SelectForm

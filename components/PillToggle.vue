@@ -2,6 +2,7 @@
 defineProps<{
   options: Array<{ label: string; value: string }>
   modelValue: string
+  disabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -15,11 +16,15 @@ const emit = defineEmits<{
       v-for="option in options"
       :key="option.value"
       type="button"
+      :disabled="disabled"
       class="flex-1 py-1.5 px-4 rounded-full text-sm font-medium transition-all"
-      :class="modelValue === option.value
-        ? 'bg-white text-gray-900 shadow-sm'
-        : 'text-gray-500 hover:text-gray-700'"
-      @click="emit('update:modelValue', option.value)"
+      :class="[
+        modelValue === option.value
+          ? 'bg-white text-gray-900 shadow-sm'
+          : 'text-gray-500 hover:text-gray-700',
+        disabled ? 'opacity-50 cursor-not-allowed' : ''
+      ]"
+      @click="!disabled && emit('update:modelValue', option.value)"
     >
       {{ option.label }}
     </button>
