@@ -27,6 +27,8 @@ const props = defineProps<ItemProps>()
 const emit = defineEmits<{
   (e: 'click', id: ItemProps): void
 }>()
+
+const isIncome = computed(() => props.type === 'income')
 </script>
 <template>
   <li
@@ -41,7 +43,14 @@ const emit = defineEmits<{
       <p v-if="author && date" class="text-sm text-gray-500 ellipsis">{{ author }} - {{ date }}</p>
     </div>
     <div v-if="amount" class="flex items-center gap-2 ml-auto">
-      <span class="text-sm font-medium bg-gray-100 rounded-md p-2">{{ amount.short }}</span>
+      <span
+        class="text-sm font-medium rounded-md p-2 whitespace-nowrap"
+        :class="type
+          ? (isIncome ? 'bg-green-100 text-green-700' : 'bg-red-50 text-red-600')
+          : 'bg-gray-100'"
+      >
+        <template v-if="type">{{ isIncome ? '+' : '−' }}</template>{{ amount.short }}
+      </span>
     </div>
   </li>
 

@@ -92,9 +92,16 @@ const formatDate = (dateString: string): string => {
   })
 }
 
-// Calcular total del día
+// Un movimiento sin `type` se considera egreso (retrocompatibilidad)
+const isIncome = (transaction: { type?: 'income' | 'expense' }): boolean =>
+  transaction.type === 'income'
+
+// Balance neto del día: los ingresos suman y los egresos restan
 const getDayTotal = (date: string): number => {
-  return groupedTransactions.value[date]?.reduce((sum, t) => sum + t.amount, 0) || 0
+  return groupedTransactions.value[date]?.reduce(
+    (sum, t) => sum + (isIncome(t) ? t.amount : -t.amount),
+    0
+  ) || 0
 }
 
 // Limpiar filtros
@@ -219,11 +226,25 @@ const closeSuccessMessage = () => {
 
           <!-- Summary Card -->
           <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 shadow rounded-lg p-6 text-white">
-            <h3 class="text-lg font-medium mb-2">Total del Periodo</h3>
+            <h3 class="text-lg font-medium mb-2">Balance del Periodo</h3>
             <p class="text-3xl font-bold">
               {{ transactions.totalAmountFormatted.value }}
             </p>
-            <p class="text-sm text-indigo-100 mt-2">
+            <div class="mt-3 space-y-1 text-sm">
+              <div class="flex justify-between">
+                <span class="text-indigo-100">Ingresos</span>
+                <span class="font-semibold text-green-200">
+                  + {{ transactions.totalIncomeFormatted.value }}
+                </span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-indigo-100">Egresos</span>
+                <span class="font-semibold text-red-200">
+                  − {{ transactions.totalExpenseFormatted.value }}
+                </span>
+              </div>
+            </div>
+            <p class="text-sm text-indigo-100 mt-3">
               {{ transactions.transactionsCount.value }} transacciones
             </p>
           </div>
@@ -234,7 +255,7 @@ const closeSuccessMessage = () => {
           <div class="bg-white shadow rounded-lg overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-200">
               <h2 class="text-xl font-semibold text-gray-900">
-                Historial de Gastos
+                Historial de Movimientos
               </h2>
               <p class="text-sm text-gray-600 mt-1">
                 {{ formatBillingPeriodLabel(filters.periodKey) }}
@@ -268,8 +289,11 @@ const closeSuccessMessage = () => {
                   <h3 class="text-sm font-semibold text-gray-900 capitalize">
                     {{ formatDate(date) }}
                   </h3>
-                  <span class="text-sm font-bold text-gray-900">
-                    {{ formatCurrency(getDayTotal(date)) }}
+                  <span
+                    class="text-sm font-bold"
+                    :class="getDayTotal(date) >= 0 ? 'text-green-600' : 'text-red-600'"
+                  >
+                    {{ getDayTotal(date) >= 0 ? '+' : '−' }} {{ formatCurrency(Math.abs(getDayTotal(date))) }}
                   </span>
                 </div>
 
@@ -278,12 +302,20 @@ const closeSuccessMessage = () => {
                   <div
                     v-for="transaction in groupedTransactions[date]"
                     :key="transaction.id"
-                    class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    class="flex items-center justify-between p-3 rounded-lg border-l-4 transition-colors"
+                    :class="isIncome(transaction)
+                      ? 'bg-green-50 border-green-400 hover:bg-green-100'
+                      : 'bg-red-50 border-red-300 hover:bg-red-100'"
                   >
                     <div class="flex-1">
                       <div class="flex items-center space-x-2">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                          {{ transaction.categoryName }}
+                        <span
+                          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                          :class="isIncome(transaction)
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-indigo-100 text-indigo-800'"
+                        >
+                          {{ isIncome(transaction) ? 'Ingreso' : (transaction.categoryName || 'Sin categoría') }}
                         </span>
                       </div>
                       <p class="mt-1 text-sm text-gray-900 font-medium">
@@ -291,8 +323,11 @@ const closeSuccessMessage = () => {
                       </p>
                     </div>
                     <div class="text-right ml-4">
-                      <p class="text-lg font-bold text-gray-900">
-                        {{ formatCurrency(transaction.amount) }}
+                      <p
+                        class="text-lg font-bold whitespace-nowrap"
+                        :class="isIncome(transaction) ? 'text-green-600' : 'text-red-600'"
+                      >
+                        {{ isIncome(transaction) ? '+' : '−' }} {{ formatCurrency(transaction.amount) }}
                       </p>
                     </div>
                   </div>

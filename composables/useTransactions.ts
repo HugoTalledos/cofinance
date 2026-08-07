@@ -46,11 +46,31 @@ export const useTransactions = () => {
   const transactionsCount = computed(() => transactions.value.length)
   
   /**
-   * Total de todas las transacciones cargadas
+   * Total de ingresos de las transacciones cargadas
    */
-  const totalAmount = computed(() => {
-    return transactions.value.reduce((sum, t) => sum + t.amount, 0)
+  const totalIncome = computed(() => {
+    return transactions.value
+      .filter(t => t.type === 'income')
+      .reduce((sum, t) => sum + t.amount, 0)
   })
+
+  /**
+   * Total de egresos de las transacciones cargadas
+   * (las transacciones sin `type` se consideran egresos por retrocompatibilidad)
+   */
+  const totalExpense = computed(() => {
+    return transactions.value
+      .filter(t => (t.type ?? 'expense') === 'expense')
+      .reduce((sum, t) => sum + t.amount, 0)
+  })
+
+  /**
+   * Balance neto de las transacciones cargadas (ingresos - egresos)
+   */
+  const totalAmount = computed(() => totalIncome.value - totalExpense.value)
+
+  const totalIncomeFormatted = computed(() => formatCurrency(totalIncome.value))
+  const totalExpenseFormatted = computed(() => formatCurrency(totalExpense.value))
 
   /**
    * Total formateado como moneda
@@ -370,6 +390,10 @@ export const useTransactions = () => {
     transactionsCount,
     totalAmount,
     totalAmountFormatted,
+    totalIncome,
+    totalIncomeFormatted,
+    totalExpense,
+    totalExpenseFormatted,
     transactionsByCategory,
     transactionsByDate,
     recentTransactions,
