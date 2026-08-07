@@ -2,13 +2,16 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { useTransactions, useCategories } from '~/composables'
 import FloatingButton from '~/components/FloatingButton.vue'
+import CreateMovementForm from './modules/CreateMovementForm.vue'
+import ConfirmMessage from '~/components/ConfirmMessage/ConfirmMessage.vue'
+import { useConfirmMessage } from '~/components/ConfirmMessage/useConfirmMessage'
 import {
   getCurrentBillingPeriodKey,
   getBillingPeriodRangeFromKey,
   getRecentBillingPeriodKeys,
   formatBillingPeriodLabel,
 } from '~/types'
-import type { TransactionFilters } from '~/types'
+import type { Transaction, TransactionUpdate, TransactionFilters } from '~/types'
 
 // Mock userId - en producción vendría de autenticación
 const userId = ref('user123')
@@ -24,6 +27,33 @@ const filters = ref({
 })
 
 const successMessage = ref<string | null>(null)
+
+const { showDialog } = useConfirmMessage()
+
+const editingTransaction = ref<Transaction | null>(null)
+const editFormRef = ref<InstanceType<typeof CreateMovementForm> | null>(null)
+
+const editInitialValue = computed(() => {
+  const transaction = editingTransaction.value
+  if (!transaction) return undefined
+
+  return {
+    categoryId: transaction.categoryId,
+    detail: transaction.description,
+    value: transaction.amount,
+    // `date` puede venir como ISO completo; el input nativo pide YYYY-MM-DD
+    date: transaction.date.substring(0, 10),
+    type: transaction.type ?? 'expense'
+  }
+})
+
+const openEdit = (transaction: Transaction) => {
+  editingTransaction.value = transaction
+}
+
+const closeEdit = () => {
+  editingTransaction.value = null
+}
 
 const availablePeriods = computed(() => getRecentBillingPeriodKeys(12))
 
@@ -119,6 +149,62 @@ const closeError = () => {
 
 const closeSuccessMessage = () => {
   successMessage.value = null
+}
+
+// Si la fecha nueva saca al movimiento del periodo que se está viendo, debe
+// desaparecer de la lista. El composable no conoce el periodo; la página sí.
+const dropIfOutsidePeriod = (id: string) => {
+  const { startDate, endDate } = getBillingPeriodRangeFromKey(filters.value.periodKey)
+  const transaction = transactions.transactions.value.find(t => t.id === id)
+  if (!transaction) return
+
+  const day = transaction.date.substring(0, 10)
+  if (day < startDate || day > endDate) {
+    transactions.transactions.value = transactions.transactions.value.filter(t => t.id !== id)
+  }
+}
+
+const saveEdit = async () => {
+  if (!editFormRef.value || !editingTransaction.value) return
+
+  const payload = editFormRef.value.submit()
+  if (!payload) return
+
+  const id = editingTransaction.value.id
+  const changes: TransactionUpdate = {
+    categoryId: payload.category?.id || '',
+    categoryName: payload.category?.name || '',
+    amount: payload.value,
+    description: payload.detail,
+    date: payload.date.toISOString()
+  }
+
+  const success = await transactions.editTransaction(id, changes)
+  // En caso de error el banner rojo ya lo muestra y el sheet sigue abierto
+  // para que el usuario reintente sin perder lo que escribió.
+  if (!success) return
+
+  closeEdit()
+  successMessage.value = 'Movimiento actualizado'
+  dropIfOutsidePeriod(id)
+}
+
+const deleteEdit = async () => {
+  const transaction = editingTransaction.value
+  if (!transaction) return
+
+  const confirmed = await showDialog({
+    title: 'Eliminar movimiento',
+    message: `¿Eliminar <strong>${transaction.description}</strong> por ${formatCurrency(transaction.amount)}? Esta acción no se puede deshacer.`,
+    confirmText: 'Sí, eliminar'
+  })
+  if (!confirmed) return
+
+  const success = await transactions.removeTransaction(transaction.id)
+  if (!success) return
+
+  closeEdit()
+  successMessage.value = 'Movimiento eliminado'
 }
 </script>
 
@@ -302,10 +388,11 @@ const closeSuccessMessage = () => {
                   <div
                     v-for="transaction in groupedTransactions[date]"
                     :key="transaction.id"
-                    class="flex items-center justify-between p-3 rounded-lg border-l-4 transition-colors"
+                    class="flex items-center justify-between p-3 rounded-lg border-l-4 transition-colors cursor-pointer"
                     :class="isIncome(transaction)
                       ? 'bg-green-50 border-green-400 hover:bg-green-100'
                       : 'bg-red-50 border-red-300 hover:bg-red-100'"
+                    @click="openEdit(transaction)"
                   >
                     <div class="flex-1">
                       <div class="flex items-center space-x-2">
@@ -339,4 +426,38 @@ const closeSuccessMessage = () => {
       </div>
     </div>
   </div>
+
+  <bottom-sheet
+    title="Editar Movimiento"
+    allowClose
+    :visible="!!editingTransaction"
+    showActionButtons
+    :actionButtons="{
+      closeButton: { label: 'Cancelar', icon: 'X', enabled: true, show: true },
+      doneButton: { label: 'Guardar', icon: 'X', enabled: true, show: true },
+    }"
+    @modalClose="closeEdit"
+    @modalDone="saveEdit"
+    @modalCancel="closeEdit">
+    <template #modal-content>
+      <create-movement-form
+        v-if="editingTransaction"
+        :key="editingTransaction.id"
+        ref="editFormRef"
+        :categories="categories.sortedCategories.value"
+        :initial-value="editInitialValue"
+        lock-type
+      />
+
+      <button
+        type="button"
+        class="mt-6 w-full py-2 border border-red-300 text-red-600 rounded-md text-sm font-medium hover:bg-red-50 transition-colors"
+        @click="deleteEdit"
+      >
+        🗑️ Eliminar movimiento
+      </button>
+    </template>
+  </bottom-sheet>
+
+  <confirm-message />
 </template>
