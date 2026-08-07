@@ -18,6 +18,8 @@ export {
 // Servicios de transacciones
 export {
   createTransaction,
+  updateTransaction,
+  deleteTransaction,
   getTransactions,
   getRecentTransactions,
   getCategorySpentInMonth,

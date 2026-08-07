@@ -1,7 +1,10 @@
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
+  updateDoc,
+  deleteDoc,
   query,
   where,
   orderBy,
@@ -10,7 +13,13 @@ import {
 } from 'firebase/firestore'
 import { useFirestoreDb, COLLECTIONS } from './firebase'
 import { updateMonthlySummaryIncremental } from './summary.service'
-import type { Transaction, TransactionInput, TransactionFilters, ApiResponse } from '~/types'
+import type {
+  Transaction,
+  TransactionInput,
+  TransactionUpdate,
+  TransactionFilters,
+  ApiResponse
+} from '~/types'
 import { getCurrentTimestamp } from '~/types'
 
 /**
@@ -65,6 +74,133 @@ export const createTransaction = async (data: TransactionInput): Promise<ApiResp
 
   return response;
 };
+
+type SummaryBucket = Pick<Transaction, 'month' | 'categoryId' | 'amount' | 'type'>
+
+/**
+ * Ajusta el resumen mensual al pasar un movimiento de un estado a otro.
+ * `after` en `null` significa que el movimiento se eliminó.
+ *
+ * Solo los egresos viven en el resumen: los ingresos se ignoran en ambos lados.
+ * Un fallo aquí se registra pero no se propaga: el resumen es un agregado
+ * derivado y el movimiento ya quedó escrito.
+ */
+const adjustSummaryForChange = async (
+  before: SummaryBucket,
+  after: SummaryBucket | null
+): Promise<void> => {
+  const isExpense = (t: SummaryBucket) => (t.type ?? 'expense') === 'expense'
+  const beforeCounts = isExpense(before)
+  const afterCounts = after !== null && isExpense(after)
+
+  const apply = async (month: string, categoryId: string, amount: number) => {
+    if (amount === 0) return
+    const result = await updateMonthlySummaryIncremental(month, categoryId, amount)
+    if (result.error) {
+      console.error('Error ajustando el resumen mensual:', result.error)
+    }
+  }
+
+  // Mismo bucket (mes + categoría): un solo ajuste con la diferencia.
+  if (
+    beforeCounts &&
+    afterCounts &&
+    after.month === before.month &&
+    after.categoryId === before.categoryId
+  ) {
+    await apply(after.month, after.categoryId, after.amount - before.amount)
+    return
+  }
+
+  if (beforeCounts) {
+    await apply(before.month, before.categoryId, -before.amount)
+  }
+  if (afterCounts) {
+    await apply(after.month, after.categoryId, after.amount)
+  }
+}
+
+/**
+ * Actualiza una transacción existente y reajusta el resumen mensual.
+ * El tipo (income/expense) no es editable: si viene en `data`, se ignora.
+ */
+export const updateTransaction = async (
+  id: string,
+  data: TransactionUpdate
+): Promise<ApiResponse<boolean>> => {
+  const response: ApiResponse<boolean> = {
+    data: null,
+    error: null,
+    loading: false
+  }
+
+  try {
+    const db = useFirestoreDb()
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
+
+    const transactionRef = doc(db, COLLECTIONS.TRANSACTIONS, id)
+    const snapshot = await getDoc(transactionRef)
+
+    if (!snapshot.exists()) {
+      throw new Error('El movimiento que intentas editar ya no existe')
+    }
+
+    const before = snapshot.data() as Transaction
+    const { type: _ignoredType, ...changes } = data
+    const after = { ...before, ...changes }
+
+    await updateDoc(transactionRef, changes)
+    await adjustSummaryForChange(before, after)
+
+    response.data = true
+
+  } catch (error) {
+    console.error('Error updating transaction:', error)
+    response.error = error instanceof Error ? error.message : 'Error al actualizar la transacción'
+  }
+
+  return response
+}
+
+/**
+ * Elimina definitivamente una transacción y descuenta su monto del resumen mensual.
+ */
+export const deleteTransaction = async (id: string): Promise<ApiResponse<boolean>> => {
+  const response: ApiResponse<boolean> = {
+    data: null,
+    error: null,
+    loading: false
+  }
+
+  try {
+    const db = useFirestoreDb()
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
+
+    const transactionRef = doc(db, COLLECTIONS.TRANSACTIONS, id)
+    const snapshot = await getDoc(transactionRef)
+
+    if (!snapshot.exists()) {
+      throw new Error('El movimiento que intentas eliminar ya no existe')
+    }
+
+    const before = snapshot.data() as Transaction
+
+    await deleteDoc(transactionRef)
+    await adjustSummaryForChange(before, null)
+
+    response.data = true
+
+  } catch (error) {
+    console.error('Error deleting transaction:', error)
+    response.error = error instanceof Error ? error.message : 'Error al eliminar la transacción'
+  }
+
+  return response
+}
 
 
 /**
