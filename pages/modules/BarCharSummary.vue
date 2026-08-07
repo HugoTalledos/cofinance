@@ -22,30 +22,23 @@ const formatedData = computed(() => {
     return [];
   }
 
-  const maxBudget = categoriesData.value[0].budget;
-
-  if (maxBudget === 0) {
-    return categoriesData.value.map(category => ({
-      icon: category.icon || '👋',
-      value: shortFormatCurrency(category.spent),
-      targetValue: shortFormatCurrency(category.budget),
-      percentage: category.percentage,
-      actualHeight: 0,
-      targetHeight: 0,
-      color: category.color || 'bg-orange-100',
-      categoryId: category.categoryId,
-      categoryName: categoryNameMap.value[category.categoryId] || category.categoryId,
-    }));
-  }
+  // La escala considera presupuestos y gastos: así las barras siempre se pintan,
+  // haya o no presupuesto definido en las categorías.
+  const scale = Math.max(
+    ...categoriesData.value.map(c => Math.max(c.budget || 0, c.spent || 0)),
+    0
+  );
 
   return categoriesData.value.map((category) => {
-    const targetHeight = (category.budget / maxBudget) * 90;
-    const actualHeight = (category.spent / maxBudget) * 90;
+    const hasBudget = category.budget > 0;
+    const targetHeight = scale > 0 && hasBudget ? (category.budget / scale) * 90 : 0;
+    const actualHeight = scale > 0 ? (category.spent / scale) * 90 : 0;
 
     return {
       icon: category.icon || '👋',
       value: shortFormatCurrency(category.spent),
-      targetValue: shortFormatCurrency(category.budget),
+      targetValue: hasBudget ? shortFormatCurrency(category.budget) : '',
+      hasBudget,
       percentage: category.percentage,
       actualHeight: parseFloat(actualHeight.toFixed(2)),
       targetHeight: parseFloat(targetHeight.toFixed(2)),

@@ -22,13 +22,14 @@
             <div class="text-center font-bold text-gray-800 leading-tight">
               {{ item.value }}
             </div>
-            <div class="text-xs font-medium text-gray-400">
+            <div v-if="item.hasBudget" class="text-xs font-medium text-gray-400">
               {{ item.percentage }}%
             </div>
           </div>
 
-          <!-- Contenedor de la línea punteada (Presupuesto) -->
+          <!-- Contenedor de la línea punteada (Presupuesto) — solo si hay presupuesto -->
           <div
+            v-if="item.hasBudget"
             class="absolute z-20 bottom-0 w-full border-2 border-dashed border-gray-300 rounded-2xl"
             :style="{ height: item.targetHeight + '%' }"
           >
@@ -49,6 +50,8 @@ interface Data {
   icon: string
   value: string
   targetValue: string
+  /** Si la categoría no tiene presupuesto, no se pinta la línea punteada de referencia */
+  hasBudget: boolean
   percentage: number
   actualHeight: number
   targetHeight: number
