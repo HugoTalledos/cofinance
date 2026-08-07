@@ -48,6 +48,7 @@ const editInitialValue = computed(() => {
 })
 
 const openEdit = (transaction: Transaction) => {
+  successMessage.value = null
   editingTransaction.value = transaction
 }
 
@@ -151,6 +152,15 @@ const closeSuccessMessage = () => {
   successMessage.value = null
 }
 
+// El banner se limpia solo para que no quede pegado leyéndose como si nada
+// hubiera pasado tras una segunda acción (editar y luego eliminar, etc.)
+const showSuccess = (message: string) => {
+  successMessage.value = message
+  setTimeout(() => {
+    successMessage.value = null
+  }, 3000)
+}
+
 // Si la fecha nueva saca al movimiento del periodo que se está viendo, debe
 // desaparecer de la lista. El composable no conoce el periodo; la página sí.
 const dropIfOutsidePeriod = (id: string) => {
@@ -185,7 +195,7 @@ const saveEdit = async () => {
   if (!success) return
 
   closeEdit()
-  successMessage.value = 'Movimiento actualizado'
+  showSuccess('Movimiento actualizado')
   dropIfOutsidePeriod(id)
 }
 
@@ -204,7 +214,7 @@ const deleteEdit = async () => {
   if (!success) return
 
   closeEdit()
-  successMessage.value = 'Movimiento eliminado'
+  showSuccess('Movimiento eliminado')
 }
 </script>
 

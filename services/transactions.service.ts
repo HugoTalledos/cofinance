@@ -20,7 +20,7 @@ import type {
   TransactionFilters,
   ApiResponse
 } from '~/types'
-import { getCurrentTimestamp } from '~/types'
+import { getCurrentTimestamp, extractMonthFromDate } from '~/types'
 
 /**
  * Servicio para gestión de transacciones en Firestore
@@ -84,6 +84,8 @@ type SummaryBucket = Pick<Transaction, 'month' | 'categoryId' | 'amount' | 'type
  * Solo los egresos viven en el resumen: los ingresos se ignoran en ambos lados.
  * Un fallo aquí se registra pero no se propaga: el resumen es un agregado
  * derivado y el movimiento ya quedó escrito.
+ * Hoy este agregado tampoco alimenta ninguna vista: los agregados de la UI
+ * se recalculan desde las transacciones en `useSummary`.
  */
 const adjustSummaryForChange = async (
   before: SummaryBucket,
@@ -149,6 +151,9 @@ export const updateTransaction = async (
 
     const before = snapshot.data() as Transaction
     const { type: _ignoredType, ...changes } = data
+    if (changes.date) {
+      changes.month = extractMonthFromDate(changes.date)
+    }
     const after = { ...before, ...changes }
 
     await updateDoc(transactionRef, changes)

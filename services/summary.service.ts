@@ -41,6 +41,14 @@ export const updateMonthlySummaryIncremental = async (
     loading: false
   }
 
+  if (!categoryId) {
+    console.warn(
+      `Ajuste ${amount} sobre ${month} sin categoryId. Ignorado.`
+    )
+    response.data = true
+    return response
+  }
+
   try {
     const db = useFirestoreDb()
     if (!db) {
@@ -62,8 +70,16 @@ export const updateMonthlySummaryIncremental = async (
         const categories = summaryData.categories || {}
         const categoryData = categories[categoryId] || { budget: categoryBudget, spent: 0 }
 
+        const nextSpent = categoryData.spent + amount
+        if (nextSpent < 0) {
+          console.warn(
+            `Ajuste ${amount} sobre ${month}/${categoryId} dejaría spent negativo (${nextSpent}). Ignorado.`
+          )
+          return
+        }
+
         transaction.update(summaryRef, {
-          [`categories.${categoryId}.spent`]: categoryData.spent + amount,
+          [`categories.${categoryId}.spent`]: nextSpent,
           [`categories.${categoryId}.budget`]: categoryBudget || categoryData.budget,
           [`categories.${categoryId}.icon`]: categoryIcon,
           [`categories.${categoryId}.color`]: categoryColor,
@@ -73,7 +89,7 @@ export const updateMonthlySummaryIncremental = async (
       } else {
         if (amount < 0) {
           console.warn(
-            `Se intentó revertir ${amount} sobre el mes ${month} pero no existe summary. Ajuste ignorado.`
+            `Se intentó revertir ${amount} sobre ${month}/${categoryId} pero no existe summary. Ajuste ignorado.`
           )
           return
         }
