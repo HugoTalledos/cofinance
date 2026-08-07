@@ -254,7 +254,10 @@ export const useTransactions = () => {
       const index = transactions.value.findIndex(t => t.id === id)
       if (index !== -1) {
         const categories = await getCategoriesMap()
-        const updated = { ...transactions.value[index], ...changes } as Transaction
+        // Descartar 'type' del merge local: el tipo no es editable,
+        // así el estado local refleja exactamente lo que se escribió en Firestore
+        const { type: _ignoredType, ...localChanges } = changes
+        const updated = { ...transactions.value[index], ...localChanges } as Transaction
         // Se re-adjunta la categoría para no perder ícono ni color en la lista
         transactions.value[index] = {
           ...updated,
