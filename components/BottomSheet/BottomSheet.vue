@@ -12,18 +12,21 @@ const done = () => emit('modalDone');
     <transition name="modal-overlay" appear>
       <div v-if="visible" class="fixed inset-0 flex md:hidden items-center justify-center z-[1001] h-screen w-full">
         <transition name="modal-backdrop" appear>
-          <div v-if="allowClose" class="absolute inset-0 bg-gray-900 bg-opacity-50" @click.self="close" />
+          <div v-if="allowClose" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" @click.self="close" />
         </transition>
         <transition name="modal-slide-up" appear>
           <main
-            class="flex flex-col bg-white rounded-t-2xl z-10 mt-auto p-[30px] gap-[8px] max-h-[90vh] w-full overflow-y-auto relative"
+            class="flex flex-col bg-white rounded-t-3xl z-10 mt-auto px-6 pt-3 pb-8 gap-2 max-h-[90vh] w-full overflow-y-auto relative"
           >
+            <div class="mx-auto mb-3 h-1.5 w-10 rounded-full bg-outline-variant" />
             <button
               v-if="allowClose"
-              class="absolute top-4 right-4 size-3 md:size-4 z-10 hover:opacity-70 transition-opacity"
+              type="button"
+              aria-label="Cerrar"
+              class="absolute top-4 right-4 size-8 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center z-10 active:scale-95 transition-transform"
               @click="close"
             >
-              <span class="text-2xl font-bold">X</span>
+              ✕
             </button>
             <div
               v-if="title || $slots['title-prefix']"
@@ -31,20 +34,20 @@ const done = () => emit('modalDone');
             >
               <slot name="title-prefix" />
               <div class="flex items-center w-full justify-center">
-                <h1 class="font-quicksand font-semibold text-xl">
+                <h1 class="font-display font-bold tracking-tight text-headline-sm text-center px-10">
                   {{ title }}
                 </h1>
               </div>
             </div>
 
-            <div class="overflow-y-auto mb-[20px]">
+            <div class="overflow-y-auto mb-5">
               <slot name="modal-content" />
             </div>
 
-            <div v-if="showActionButtons" class="mt-auto flex gap-4 justify-center">
+            <div v-if="showActionButtons" class="mt-auto flex gap-3 justify-center">
               <button
                 v-if="actionButtons.closeButton.show"
-                class="!w-full !h-[40px] text-[14px] !cursor-pointer bg-gray-200 text-gray-800 rounded-md"
+                class="w-full h-12 font-semibold bg-surface-container text-on-surface rounded-xl active:scale-[0.98] transition-transform disabled:opacity-50"
                 :disabled="!actionButtons.closeButton.enabled"
                 @click="close">
                 {{ actionButtons.closeButton.label }}
@@ -52,7 +55,7 @@ const done = () => emit('modalDone');
                
               <button
                 v-if="actionButtons.doneButton.show"
-                class="!w-full !h-[40px] text-[14px] !cursor-pointer bg-blue-500 text-white rounded-md"
+                class="w-full h-12 font-semibold bg-black text-white rounded-xl active:scale-[0.98] transition-transform disabled:opacity-50"
                 :disabled="!actionButtons.doneButton.enabled"
                 @click="done">
                 {{ actionButtons.doneButton.label }}

@@ -26,8 +26,7 @@ export default defineNuxtConfig({
   },
   routeRules: {
     '/': { prerender: true },
-    '/categories': { prerender: true },
-    '/transactions': { prerender: true },
-    '/recurring': { prerender: true }
+    '/registrar': { prerender: true },
+    '/recurrentes': { prerender: true }
   }
 })

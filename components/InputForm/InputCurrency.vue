@@ -41,14 +41,14 @@ function handleFocus(event: FocusEvent) {
       El 'label' usa el prop 'id' en su atributo 'for' para
       vincularse directamente al input. Esto es clave para la accesibilidad.
     -->
-    <label :for="props.id" class="block text-sm font-medium leading-6 text-gray-900">
+    <label :for="props.id" class="block text-sm font-medium leading-6 text-on-surface-variant">
       {{ props.label }}
     </label>
 
     <!-- Se añade un pequeño margen superior para separar el input del label -->
-    <div class="relative mt-2 rounded-md shadow-sm">
-      <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-        <span class="text-gray-500 sm:text-sm">$</span>
+    <div class="relative mt-2">
+      <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+        <span class="text-outline">$</span>
       </div>
 
       <input
@@ -58,7 +58,7 @@ function handleFocus(event: FocusEvent) {
         inputmode="numeric"
         placeholder="0"
         @focus="handleFocus"
-        class="block w-full rounded-md border-0 py-2 pl-8 pr-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+        class="block w-full rounded-xl border-0 bg-surface-container-lowest py-3 pl-8 pr-4 text-lg font-semibold tabular-nums text-on-surface ring-1 ring-inset ring-outline-variant placeholder:text-outline focus:ring-2 focus:ring-inset focus:ring-black"
       />
     </div>
   </div>

@@ -1,254 +1,178 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
-import SummaryCard from '~/components/SummaryCard.vue'
-import Container from '~/components/Container.vue'
-import FloatingButton from '~/components/FloatingButton.vue'
-import ErrorMessage from '~/components/ErrorMessage.vue'
-import type { ItemProps } from '~/components/ListItem.vue'
-import BarCharSummary from './modules/BarCharSummary.vue'
-import CreateMovementForm from './modules/CreateMovementForm.vue'
-import ZenView from './modules/ZenView.vue'
-import Toast from '~/components/Toast/Toast.vue'
-import { useShowScreen } from '~/composables/useShowScreen'
-import { useAuth } from '~/composables/useLogin'
-import { useCategories } from '~/composables/useCategories'
-import { useToast } from '~/components/Toast/useToast'
-import { formatBillingPeriodLabel, getCurrentBillingPeriodKey, formatDateToString } from '~/types'
+import AppShell from '~/components/AppShell/AppShell.vue'
+import { useSummary } from '~/composables/useSummary'
+import { useRecurringExpenses } from '~/composables/useRecurringExpenses'
+import { formatBillingPeriodLabel, getCurrentBillingPeriodKey } from '~/types'
 
-const { showScreen: showBottomSheet, openScreen: openBottomSheet, closeScreen: closeBottomSheet } = useShowScreen()
-const { showScreen: showLateralSheet, openScreen: openLateralSheet, closeScreen: closeLateralSheet } = useShowScreen()
-const { signInWithGoogle, signOut, user } = useAuth()
-const { showToast } = useToast()
-const { sortedCategories, fetchCategories } = useCategories()
 const {
-  transactionsList,
-  error: transactionError,
-  addTransaction,
-  fetchRecentTransactions,
-} = useTransactions()
-const { totalSpent, totalIncomeFormatted, totalRemainingFormatted, categoriesData, refreshSummary, currentMonth } = useSummary()
+  totalIncome,
+  totalSpent,
+  totalSaved,
+  totalRemaining,
+  fetchCurrentMonthSummary,
+  currentMonth,
+} = useSummary()
+const { pendingTotal, fetchExpenses } = useRecurringExpenses()
 
-const selectedCategoryId = ref<string | null>(null)
-const selectedCategoryName = ref<string>('')
-
-const VIEW_MODE_KEY = 'home-view-mode'
-const viewMode = ref<'zen' | 'detail'>('zen')
-
-function setViewMode(mode: 'zen' | 'detail') {
-  viewMode.value = mode
-  localStorage.setItem(VIEW_MODE_KEY, mode)
-}
-
-function handleCategoryClick(payload: { categoryId: string; categoryName: string }) {
-  if (selectedCategoryId.value === payload.categoryId) {
-    selectedCategoryId.value = null
-    selectedCategoryName.value = ''
-  } else {
-    selectedCategoryId.value = payload.categoryId
-    selectedCategoryName.value = payload.categoryName
-  }
-}
-
-const selectedCategorySpent = computed(() => {
-  if (!selectedCategoryId.value) return null
-  return categoriesData.value.find(c => c.categoryId === selectedCategoryId.value)?.spent ?? null
+onMounted(async () => {
+  await Promise.all([fetchCurrentMonthSummary(), fetchExpenses()])
 })
-
-const displayedExpense = computed(() =>
-  selectedCategorySpent.value !== null ? selectedCategorySpent.value : totalSpent.value
-)
 
 const periodLabel = computed(() =>
   formatBillingPeriodLabel(currentMonth.value || getCurrentBillingPeriodKey())
 )
 
-const todayTransactionsList = computed(() => {
-  const today = formatDateToString(new Date())
-  return transactionsList.value.filter(t => t.date === today && (t.type ?? 'expense') === 'expense')
-})
+type SectionKey = 'free' | 'pending' | 'spent' | 'saved'
 
-const displayedTransactionsList = computed(() => {
-  if (selectedCategoryId.value) {
-    return transactionsList.value.filter(t => t.categoryId === selectedCategoryId.value)
-  }
-  return todayTransactionsList.value
-})
-
-const movementFormRef = ref<InstanceType<typeof CreateMovementForm> | null>(null);
-
-const isErrorVisible = ref(false);
-const errorMessage = ref('');
-
-watch(user, (currentUser) => {
-  if (!currentUser) {
-    errorMessage.value = 'Para usar la aplicación, primero debes iniciar sesión.';
-    isErrorVisible.value = true;
-  } else {
-    isErrorVisible.value = false;
-  }
-}, { immediate: true });
-
-onMounted(async () => {
-  const savedMode = localStorage.getItem(VIEW_MODE_KEY)
-  if (savedMode === 'zen' || savedMode === 'detail') viewMode.value = savedMode
-
-  await fetchCategories()
-  if (user.value) {
-    await fetchRecentTransactions(50)
-  }
-})
-
-async function createMovement() {
-  if (!movementFormRef.value) return;
-  const payload = movementFormRef.value.submit();
-  if (!payload) return;
-
-  const body = {
-    userId: user.value?.uid || '',
-    username: user.value?.displayName || '',
-    categoryId: payload.type === 'income' ? '' : payload.category.id,
-    categoryName: payload.type === 'income' ? '' : payload.category.name,
-    amount: payload.value,
-    description: payload.detail,
-    date: payload.date.toISOString(),
-    month: '',
-    type: payload.type,
-  }
-  const success = await addTransaction(body);
-  if (success) {
-    showToast("Registro agregado")
-    closeBottomSheet()
-    setTimeout(async () => await refreshSummary(), 500)
-    return
-  }
-  showToast(transactionError.value || '', 'error')
+const COLORS = {
+  free: '#0F172A',
+  pending: '#920028',
+  spent: '#64748B',
+  saved: '#059669',
+  track: '#F1F5F9',
 }
 
-const lateralOptions = computed(() => {
-  if (user.value) {
-    return [{
-      id: 'user-info',
-      title: `¡Hola, ${user.value?.displayName}!`,
-      description: '',
-      icon: {
-        icon: '👋',
-        color: 'bg-green-100'
-      },
-      clickable: false
-    }, ...LATERAL_OPTIONS, LOGOUT_OPTION]
+// Lo libre es el restante que no está comprometido en pagos recurrentes pendientes
+const totalFree = computed(() => totalRemaining.value - pendingTotal.value)
+
+// Cada sección es un tramo del anillo; las cuatro suman los ingresos del periodo
+const sections = computed(() => [
+  { key: 'free' as const, label: 'Libre', value: totalFree.value, valueClass: totalFree.value >= 0 ? 'text-slate-900' : 'text-error' },
+  { key: 'pending' as const, label: 'Por pagar', value: pendingTotal.value, valueClass: 'text-debt' },
+  { key: 'spent' as const, label: 'Gastado', value: totalSpent.value, valueClass: 'text-slate-900' },
+  { key: 'saved' as const, label: 'Apartado', value: totalSaved.value, valueClass: 'text-[#059669]' },
+])
+
+// Sección resaltada al tocar el anillo o la leyenda; sin selección el centro muestra el restante
+const selectedKey = ref<SectionKey | null>(null)
+
+function toggleSection(key: SectionKey) {
+  selectedKey.value = selectedKey.value === key ? null : key
+}
+
+const centerSection = computed(() => {
+  const selected = sections.value.find(section => section.key === selectedKey.value)
+  if (selected) return { label: selected.label, value: selected.value, valueClass: selected.valueClass }
+  return {
+    label: 'Dinero restante',
+    value: totalRemaining.value,
+    valueClass: totalRemaining.value >= 0 ? 'text-slate-900' : 'text-error',
   }
-  return [...LATERAL_OPTIONS, USER_UNAUTHENTICATED_OPTION]
 })
 
-const handleClick = (item: ItemProps) => {
-  const { id } = item
-  if (id === LOGIN_OPTION_ID) {
-    signInWithGoogle()
-    closeLateralSheet()
-    return;
-  }
-  if (id === LOGOUT_OPTION_ID) {
-    signOut()
-    closeLateralSheet()
-    return;
-  }
-  const routeToRedirect = ROUTES_OPTIONS[id as keyof typeof ROUTES_OPTIONS]
-  if (routeToRedirect) {
-    navigateTo(routeToRedirect)
-  }
-}
+const centerValueLabel = computed(() => formatCurrency(centerSection.value.value))
+
+// Anillo sobre el total de ingresos: gastado + por pagar + libre + apartado
+const RADIUS = 62
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS
+
+const ringSegments = computed(() => {
+  const income = totalIncome.value
+  if (income <= 0) return []
+
+  // Se recorta en orden para que, si los egresos superan los ingresos, el anillo no se desborde
+  const spent = Math.min(totalSpent.value, income)
+  const saved = Math.min(totalSaved.value, income - spent)
+  const pending = Math.min(pendingTotal.value, income - spent - saved)
+  const free = income - spent - saved - pending
+
+  let start = 0
+  return [
+    { key: 'spent' as const, value: spent },
+    { key: 'pending' as const, value: pending },
+    { key: 'free' as const, value: free },
+    { key: 'saved' as const, value: saved },
+  ]
+    .filter(segment => segment.value > 0)
+    .map(segment => {
+      const length = (segment.value / income) * CIRCUMFERENCE
+      const arc = {
+        key: segment.key,
+        color: COLORS[segment.key],
+        dasharray: `${length} ${CIRCUMFERENCE}`,
+        dashoffset: -start,
+      }
+      start += length
+      return arc
+    })
+})
+
+const isDimmed = (key: SectionKey) => selectedKey.value !== null && selectedKey.value !== key
 </script>
 
 <template>
-  <toast />
-
-  <lateral-sheet title="Más opciones" :isOpen="showLateralSheet" @sidebar-close="closeLateralSheet">
-    <template #content>
-      <list :items="lateralOptions" @item-click="handleClick" />
-    </template>
-  </lateral-sheet>
-  <floating-button label="☰" color="blue" size="md" position="top-right" @click="openLateralSheet" />
-  <template v-if="user">
-    <main class="flex flex-col items-center min-h-screen">
-      <container class="flex flex-col items-center justify-center gap-5">
-        <div class="flex gap-1 bg-gray-100 rounded-full p-1">
-          <button
-            type="button"
-            class="px-4 py-1.5 rounded-full text-sm font-medium transition-all"
-            :class="viewMode === 'zen' ? 'bg-white shadow text-gray-800' : 'text-gray-400'"
-            @click="setViewMode('zen')"
-          >🧘 Simple</button>
-          <button
-            type="button"
-            class="px-4 py-1.5 rounded-full text-sm font-medium transition-all"
-            :class="viewMode === 'detail' ? 'bg-white shadow text-gray-800' : 'text-gray-400'"
-            @click="setViewMode('detail')"
-          >📊 Detalle</button>
+  <app-shell>
+    <section class="mt-2 bg-surface-container-lowest border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col items-center">
+      <div class="relative flex items-center justify-center w-64 h-64 my-1">
+        <svg class="w-full h-full -rotate-90" viewBox="0 0 160 160">
+          <circle cx="80" cy="80" :r="RADIUS" fill="transparent" :stroke="COLORS.track" stroke-width="12" />
+          <circle
+            v-for="segment in ringSegments"
+            :key="segment.key"
+            cx="80"
+            cy="80"
+            :r="RADIUS"
+            fill="transparent"
+            :stroke="segment.color"
+            :stroke-width="selectedKey === segment.key ? 16 : 12"
+            :stroke-dasharray="segment.dasharray"
+            :stroke-dashoffset="segment.dashoffset"
+            :opacity="isDimmed(segment.key) ? 0.25 : 1"
+            class="cursor-pointer transition-all duration-300"
+            @click="toggleSection(segment.key)"
+          />
+        </svg>
+        <div class="absolute inset-[16%] flex flex-col items-center justify-center text-center pointer-events-none">
+          <span class="text-label-sm text-on-surface-variant uppercase mb-0.5">{{ centerSection.label }}</span>
+          <span
+            class="font-display font-bold tracking-tight tabular-nums leading-tight"
+            :class="[
+              centerSection.valueClass,
+              centerValueLabel.length > 11 ? 'text-xl' : 'text-headline-lg'
+            ]"
+          >{{ centerValueLabel }}</span>
+          <span class="text-[11px] text-slate-500 mt-0.5">{{ periodLabel }}</span>
         </div>
+      </div>
 
-        <zen-view v-if="viewMode === 'zen'" />
-        <template v-else>
-          <header class="w-full">
-            <div class="flex overflow-x-auto gap-3 pb-2 snap-x snap-mandatory h-[120px]">
-              <SummaryCard
-                v-if="!selectedCategorySpent"
-                label="Ingresos"
-                :value="totalIncomeFormatted"
-                color="green"
-              />
-              <SummaryCard
-                label="Gastos"
-                :value="formatCurrency(displayedExpense)"
-                color="red"
-                :sublabel="selectedCategoryName || undefined"
-              />
-              <SummaryCard
-                v-if="!selectedCategorySpent"
-                label="Restante"
-                :value="totalRemainingFormatted"
-                color="yellow"
-              />
-            </div>
-            <p class="text-sm font-normal text-gray-400 text-center mt-1">{{ periodLabel }}</p>
-          </header>
+      <div class="w-full grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-100">
+        <button
+          v-for="section in sections"
+          :key="section.key"
+          type="button"
+          :aria-pressed="selectedKey === section.key"
+          class="flex items-center gap-2 p-1.5 rounded-lg text-left transition-all duration-300"
+          :class="[
+            selectedKey === section.key
+              ? 'bg-surface-container-lowest ring-2 ring-black shadow-sm'
+              : 'bg-surface-container-low',
+            isDimmed(section.key) ? 'opacity-50' : ''
+          ]"
+          @click="toggleSection(section.key)"
+        >
+          <span class="w-2.5 h-2.5 rounded-full shrink-0" :style="{ backgroundColor: COLORS[section.key] }" />
+          <div class="flex flex-col min-w-0">
+            <span class="text-[11px] text-on-surface-variant leading-none">{{ section.label }}</span>
+            <span
+              class="text-body-md font-semibold leading-tight tabular-nums truncate"
+              :class="section.valueClass"
+            >{{ formatCurrency(section.value) }}</span>
+          </div>
+        </button>
 
-          <article class="w-full">
-            <bar-char-summary
-              :current-month="currentMonth"
-              :selected-category-id="selectedCategoryId ?? undefined"
-              @category-click="handleCategoryClick"
-            />
-          </article>
+        <div class="col-span-2 flex items-center justify-between px-2.5 py-2 rounded-lg border border-slate-100">
+          <span class="text-[11px] text-on-surface-variant">Ingresos del periodo</span>
+          <span class="text-body-md font-semibold tabular-nums text-slate-900">{{ formatCurrency(totalIncome) }}</span>
+        </div>
+      </div>
+    </section>
 
-          <article class="w-full">
-            <h2 class="text-2xl font-bold tracking-tight text-heading">
-              {{ selectedCategoryName || 'Hoy' }}:
-            </h2>
-            <list :items="displayedTransactionsList" />
-          </article>
-        </template>
-      </container>
-    </main>
-
-    <floating-button label="+ Agregar" color="blue" size="md" @click="openBottomSheet" />
-
-    <bottom-sheet 
-      title="Agregar Movimiento" 
-      allowClose 
-      :visible="showBottomSheet" 
-      showActionButtons
-      :actionButtons="{
-        closeButton: { label: 'Cancelar', icon: 'X', enabled: true, show: true },
-        doneButton: { label: 'Guardar', icon: 'X', enabled: true, show: true },
-      }" 
-      @modalClose="closeBottomSheet" 
-      @modalDone="createMovement" 
-      @modalCancel="closeBottomSheet">
-      <template #modal-content>
-        <create-movement-form ref="movementFormRef" :categories="sortedCategories" />
-      </template>
-    </bottom-sheet>
-  </template>
-
-  <error-message :message="errorMessage" v-model:visible="isErrorVisible" />
+    <NuxtLink
+      to="/registrar"
+      class="w-full h-12 bg-black text-white rounded-lg text-body-md font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition-transform duration-150 shadow-sm"
+    >
+      <app-icon name="add" />
+      Registrar Movimiento
+    </NuxtLink>
+  </app-shell>
 </template>

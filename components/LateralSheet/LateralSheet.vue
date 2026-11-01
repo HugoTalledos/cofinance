@@ -29,8 +29,13 @@ const close = () => {
     <aside class="sidebar-aside">
       <div class="sidebar-aside__header">
         <p>{{ title }}</p>
-        <button class="size-3 md:size-4" @click="close">
-          <span class="text-2xl font-bold">X</span>
+        <button
+          type="button"
+          aria-label="Cerrar"
+          class="size-8 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center active:scale-95 transition-transform"
+          @click="close"
+        >
+          ✕
         </button>
       </div>
       <div v-if="subtitle" class="sidebar-aside__subtitle">

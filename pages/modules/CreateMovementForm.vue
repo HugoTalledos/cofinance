@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { reactive, computed } from 'vue'
-import InputCurrency from '~/components/InputForm/InputCurrency.vue'
-import InputForm from '~/components/InputForm/InputForm.vue'
-import PillToggle from '~/components/PillToggle.vue'
+import { reactive, computed, ref } from 'vue'
 import type { Category, MovementPayload, MovementFormValue } from './CreateMovementForm.type'
 import { useToast } from '~/components/Toast/useToast'
-import SelectForm from '~/components/SelectForm.vue'
+import { formatDateToString } from '~/types'
 
 const { showToast } = useToast()
 
@@ -15,31 +12,56 @@ const props = defineProps<{
   lockType?: boolean
 }>()
 
-const TOGGLE_OPTIONS = [
-  { label: 'Gasto', value: 'expense' },
-  { label: 'Ingreso', value: 'income' },
-]
+const TYPE_OPTIONS = [
+  { label: 'Egreso', value: 'expense', icon: 'arrow-up-right' },
+  { label: 'Ingreso', value: 'income', icon: 'arrow-down' },
+] as const
 
-// `SelectForm` usa el objeto completo como value del <option>, así que el
-// <select> nativo compara por identidad de referencia: hay que buscar el
-// objeto dentro de `categories`, no construir uno equivalente.
-const initialCategory = props.categories.find(
-  category => category.id === props.initialValue?.categoryId
-)
-
-const form = reactive({
+const initialState = () => ({
   type: props.initialValue?.type ?? 'expense' as 'income' | 'expense',
-  category: (initialCategory ?? {}) as Category,
+  categoryId: props.initialValue?.categoryId ?? '',
   detail: props.initialValue?.detail ?? '',
   value: props.initialValue?.value ?? null as number | null,
   date: props.initialValue?.date ?? ''
+})
+
+const form = reactive(initialState())
+
+const selectedCategory = computed(() =>
+  props.categories.find(category => category.id === form.categoryId)
+)
+
+const categorySearch = ref('')
+
+const filteredCategories = computed(() => {
+  const query = categorySearch.value.trim().toLowerCase()
+  if (!query) return props.categories
+  return props.categories.filter(category => category.name.toLowerCase().includes(query))
+})
+
+const formattedValue = computed({
+  get() {
+    return form.value === null ? '' : new Intl.NumberFormat('es-CO').format(form.value)
+  },
+  set(raw: string) {
+    const numericValue = parseInt(raw.replace(/\D/g, ''), 10)
+    form.value = isNaN(numericValue) ? null : numericValue
+  }
+})
+
+const dateLabel = computed(() => {
+  const today = formatDateToString(new Date())
+  const date = form.date || today
+  const [year, month, day] = date.split('-').map(Number)
+  const label = new Date(year, month - 1, day).toLocaleDateString('es-CO', { day: 'numeric', month: 'long' })
+  return date === today ? `Hoy, ${label}` : label
 })
 
 const isValid = computed(() => {
   if (form.type === 'income') {
     return Boolean(form.detail && form.value && form.value > 0)
   }
-  return Boolean(form.category.id && form.detail && form.value && form.value > 0)
+  return Boolean(selectedCategory.value && form.detail && form.value && form.value > 0)
 })
 
 const submit = (): MovementPayload | null => {
@@ -51,7 +73,7 @@ const submit = (): MovementPayload | null => {
   const submissionDate = form.date ? new Date(form.date) : new Date()
 
   return {
-    category: form.category,
+    category: selectedCategory.value ?? { id: '', name: '' },
     detail: form.detail,
     value: form.value || 0,
     date: submissionDate,
@@ -59,44 +81,134 @@ const submit = (): MovementPayload | null => {
   }
 }
 
-defineExpose({ submit })
+const reset = () => {
+  Object.assign(form, initialState())
+  categorySearch.value = ''
+}
+
+defineExpose({ submit, reset })
 </script>
 
 <template>
-  <form @submit.prevent>
-    <div class="space-y-4">
-      <PillToggle
-        v-model="form.type"
-        :options="TOGGLE_OPTIONS"
+  <form class="flex flex-col gap-4" @submit.prevent>
+    <section aria-label="Tipo de movimiento" class="bg-surface-container p-1 rounded-xl flex items-center gap-1 shadow-sm">
+      <button
+        v-for="option in TYPE_OPTIONS"
+        :key="option.value"
+        type="button"
+        :aria-pressed="form.type === option.value"
         :disabled="lockType"
-      />
+        class="flex-1 py-2 px-3 rounded-lg text-title-md transition-all duration-200 flex items-center justify-center gap-1.5 disabled:cursor-not-allowed"
+        :class="form.type === option.value
+          ? 'bg-black text-white shadow-sm'
+          : 'text-on-surface-variant hover:text-on-surface'"
+        @click="form.type = option.value"
+      >
+        <app-icon :name="option.icon" :size="18" />
+        {{ option.label }}
+      </button>
+    </section>
 
-      <SelectForm
-        v-if="form.type === 'expense'"
-        label="Categoría"
-        v-model="form.category"
-        :options="categories"
-      />
+    <section class="p-4 bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm text-center">
+      <label for="amount" class="block text-label-sm uppercase text-outline mb-1">
+        {{ form.type === 'income' ? 'Monto del ingreso' : 'Monto del egreso' }}
+      </label>
+      <div class="flex items-center justify-center gap-1">
+        <span class="font-display text-currency-display text-outline select-none">$</span>
+        <input
+          id="amount"
+          v-model="formattedValue"
+          type="text"
+          inputmode="numeric"
+          placeholder="0"
+          class="font-display text-currency-display font-bold text-on-surface text-center bg-transparent border-0 p-0 w-48 tracking-tight tabular-nums outline-none focus:ring-0"
+          @focus="($event.target as HTMLInputElement).select()"
+        />
+      </div>
+      <span class="inline-flex mt-1 px-2 py-0.5 rounded-full text-label-sm bg-surface-container text-on-surface-variant">
+        COP / Pesos
+      </span>
+    </section>
 
-      <InputForm
-        id="detail"
-        v-model="form.detail"
-        label="Detalle"
-        placeholder="Ej: Almuerzo de trabajo"
-      />
+    <section v-if="form.type === 'expense'" class="flex flex-col gap-2">
+      <div class="flex items-center justify-between">
+        <p class="text-label-sm uppercase text-outline">Categoría</p>
+        <span class="text-label-md text-on-surface-variant">
+          {{ selectedCategory?.name ?? `${categories.length} disponibles` }}
+        </span>
+      </div>
 
-      <InputCurrency
-        id="value"
-        v-model="form.value"
-        :label="form.type === 'income' ? 'Valor del Ingreso' : 'Valor del Movimiento'"
-      />
+      <!-- Card de altura fija: con muchas categorías hace scroll dentro y no empuja el resto del formulario -->
+      <div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-3 shadow-sm flex flex-col h-60 overflow-hidden">
+        <div class="relative mb-2.5 shrink-0">
+          <app-icon
+            name="search"
+            :size="16"
+            class="absolute left-2.5 top-1/2 -translate-y-1/2 text-outline pointer-events-none"
+          />
+          <input
+            v-model="categorySearch"
+            type="search"
+            placeholder="Buscar o filtrar categoría..."
+            class="w-full pl-8 pr-3 py-1.5 bg-surface-container-low rounded-lg text-[13px] leading-[18px] text-on-surface placeholder:text-outline border border-transparent focus:border-black focus:bg-surface-container-lowest focus:ring-0 outline-none transition-all"
+          />
+        </div>
 
-      <InputForm
-        id="date"
+        <div class="overflow-y-auto overscroll-contain flex-1 pr-1 grid grid-cols-4 auto-rows-min gap-2 pb-1 select-none">
+          <button
+            v-for="category in filteredCategories"
+            :key="category.id"
+            type="button"
+            class="flex flex-col items-center justify-center p-2 rounded-xl transition-all active:scale-[0.98]"
+            :class="form.categoryId === category.id
+              ? 'border-2 border-black bg-surface-container-low shadow-sm'
+              : 'border border-outline-variant bg-surface-container-lowest hover:bg-surface-container-low'"
+            @click="form.categoryId = category.id"
+          >
+            <span
+              class="w-10 h-10 rounded-full flex items-center justify-center mb-1 text-[20px]"
+              :class="form.categoryId === category.id ? 'bg-surface-container' : 'bg-surface-container-low'"
+            >{{ category.icon || category.name.charAt(0) }}</span>
+            <span
+              class="text-label-sm text-on-surface truncate w-full text-center"
+              :class="form.categoryId === category.id ? 'font-bold' : 'font-semibold'"
+            >{{ category.name }}</span>
+          </button>
+          <p
+            v-if="filteredCategories.length === 0"
+            class="col-span-4 py-6 text-center text-body-md text-on-surface-variant"
+          >Ninguna categoría coincide</p>
+        </div>
+      </div>
+    </section>
+
+    <label class="relative flex items-center gap-4 p-3 bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm">
+      <span class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant shrink-0">
+        <app-icon name="calendar" />
+      </span>
+      <span class="flex flex-col">
+        <span class="text-label-md text-on-surface-variant">Fecha del registro</span>
+        <span class="text-title-md text-on-surface">{{ dateLabel }}</span>
+      </span>
+      <!-- Input nativo invisible encima de la tarjeta: abre el selector del sistema -->
+      <input
         v-model="form.date"
-        label="Fecha (opcional)"
         type="date"
+        aria-label="Fecha del registro"
+        class="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
       />
-    </div>
+    </label>
+
+    <label class="flex items-center gap-4 p-3 bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm focus-within:border-black">
+      <span class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant shrink-0">
+        <app-icon name="note" />
+      </span>
+      <input
+        v-model="form.detail"
+        type="text"
+        placeholder="Descripción corta (ej: Almuerzo)"
+        class="flex-1 min-w-0 bg-transparent border-0 p-0 text-title-md font-normal text-on-surface placeholder:text-on-surface-variant/70 outline-none focus:ring-0"
+      />
+    </label>
   </form>
 </template>
