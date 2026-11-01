@@ -95,5 +95,6 @@ export const COLLECTIONS = {
   CATEGORIES: 'categories',
   TRANSACTIONS: 'transactions',
   MONTHLY_SUMMARY: 'monthly_summary',
-  RECURRING_EXPENSES: 'recurring_expenses'
+  RECURRING_EXPENSES: 'recurring_expenses',
+  CREDIT_CARDS: 'credit_cards'
 } as const

@@ -3,12 +3,13 @@ import { reactive, computed, ref } from 'vue'
 import type { Category, MovementPayload, MovementFormValue } from './CreateMovementForm.type'
 import { useToast } from '~/components/Toast/useToast'
 import { formatDateToString } from '~/types'
-import type { PaymentMethod } from '~/types'
+import type { PaymentMethod, CreditCard } from '~/types'
 
 const { showToast } = useToast()
 
 const props = defineProps<{
   categories: Category[]
+  creditCards: CreditCard[]
   initialValue?: MovementFormValue
   lockType?: boolean
 }>()
@@ -29,13 +30,25 @@ const initialState = () => ({
   detail: props.initialValue?.detail ?? '',
   value: props.initialValue?.value ?? null as number | null,
   date: props.initialValue?.date ?? '',
-  paymentMethod: props.initialValue?.paymentMethod ?? 'credit_card' as PaymentMethod
+  paymentMethod: props.initialValue?.paymentMethod ?? 'credit_card' as PaymentMethod,
+  creditCardId: props.initialValue?.creditCardId ?? ''
 })
 
 const form = reactive(initialState())
 
 const selectedCategory = computed(() =>
   props.categories.find(category => category.id === form.categoryId)
+)
+
+// Con una sola tarjeta no hay nada que elegir: se usa esa
+const selectedCreditCard = computed(() =>
+  props.creditCards.length === 1
+    ? props.creditCards[0]
+    : props.creditCards.find(card => card.id === form.creditCardId)
+)
+
+const requiresCreditCard = computed(() =>
+  form.type === 'expense' && form.paymentMethod === 'credit_card' && props.creditCards.length > 0
 )
 
 const categorySearch = ref('')
@@ -68,6 +81,7 @@ const isValid = computed(() => {
   if (form.type === 'income') {
     return Boolean(form.detail && form.value && form.value > 0)
   }
+  if (requiresCreditCard.value && !selectedCreditCard.value) return false
   return Boolean(selectedCategory.value && form.detail && form.value && form.value > 0)
 })
 
@@ -86,6 +100,9 @@ const submit = (): MovementPayload | null => {
     date: submissionDate,
     type: form.type,
     ...(form.type === 'expense' && { paymentMethod: form.paymentMethod }),
+    ...(requiresCreditCard.value && selectedCreditCard.value && {
+      creditCard: { id: selectedCreditCard.value.id, bank: selectedCreditCard.value.bank }
+    }),
   }
 }
 
@@ -206,6 +223,27 @@ defineExpose({ submit, reset })
           @click="form.paymentMethod = option.value"
         >
           {{ option.label }}
+        </button>
+      </div>
+      <div
+        v-if="requiresCreditCard"
+        role="radiogroup"
+        aria-label="Tarjeta de crédito"
+        class="flex flex-wrap gap-2"
+      >
+        <button
+          v-for="card in creditCards"
+          :key="card.id"
+          type="button"
+          role="radio"
+          :aria-checked="selectedCreditCard?.id === card.id"
+          class="px-3 py-1.5 rounded-full text-label-md font-semibold transition-all active:scale-[0.98]"
+          :class="selectedCreditCard?.id === card.id
+            ? 'bg-black text-white'
+            : 'border border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:text-on-surface'"
+          @click="form.creditCardId = card.id"
+        >
+          {{ card.bank }}
         </button>
       </div>
     </section>

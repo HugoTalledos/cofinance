@@ -4,7 +4,7 @@ export interface Category {
   icon?: string;
 }
 
-import type { PaymentMethod } from '~/types'
+import type { PaymentMethod, CreditCard } from '~/types'
 
 export interface MovementPayload {
   category: Category;
@@ -14,6 +14,8 @@ export interface MovementPayload {
   type: 'income' | 'expense';
   /** Solo en egresos */
   paymentMethod?: PaymentMethod;
+  /** Solo en egresos con crédito */
+  creditCard?: Pick<CreditCard, 'id' | 'bank'>;
 }
 
 /**
@@ -27,4 +29,5 @@ export interface MovementFormValue {
   date: string;
   type: 'income' | 'expense';
   paymentMethod?: PaymentMethod;
+  creditCardId?: string;
 }

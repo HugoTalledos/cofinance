@@ -7,6 +7,7 @@ export * from './category'
 export * from './transaction'
 export * from './monthly-summary'
 export * from './recurring-expense'
+export * from './credit-card'
 
 // Exportar funciones helper
 export * from './helpers'

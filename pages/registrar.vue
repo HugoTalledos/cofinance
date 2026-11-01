@@ -3,11 +3,13 @@ import AppShell from '~/components/AppShell/AppShell.vue'
 import CreateMovementForm from './modules/CreateMovementForm.vue'
 import { useAuth } from '~/composables/useLogin'
 import { useCategories } from '~/composables/useCategories'
+import { useCreditCards } from '~/composables/useCreditCards'
 import { useToast } from '~/components/Toast/useToast'
 
 const { user } = useAuth()
 const { showToast } = useToast()
 const { sortedCategories, fetchCategories } = useCategories()
+const { creditCards, fetchCreditCards } = useCreditCards()
 const { error: transactionError, addTransaction } = useTransactions()
 const { refreshSummary } = useSummary()
 
@@ -15,7 +17,7 @@ const movementFormRef = ref<InstanceType<typeof CreateMovementForm> | null>(null
 const saving = ref(false)
 
 onMounted(async () => {
-  await fetchCategories()
+  await Promise.all([fetchCategories(), fetchCreditCards()])
 })
 
 async function createMovement() {
@@ -35,6 +37,10 @@ async function createMovement() {
     type: payload.type,
     // Firestore rechaza campos undefined: en ingresos el campo no se envía
     ...(payload.paymentMethod && { paymentMethod: payload.paymentMethod }),
+    ...(payload.creditCard && {
+      creditCardId: payload.creditCard.id,
+      creditCardBank: payload.creditCard.bank,
+    }),
   }
   saving.value = true
   const success = await addTransaction(body)
@@ -76,6 +82,7 @@ async function createMovement() {
       <create-movement-form
         ref="movementFormRef"
         :categories="sortedCategories"
+        :credit-cards="creditCards"
       />
     </div>
 

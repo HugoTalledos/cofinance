@@ -22,6 +22,10 @@ export interface Transaction {
   type?: 'income' | 'expense'
   /** Solo en egresos registrados desde el formulario; ausente en los anteriores */
   paymentMethod?: PaymentMethod
+  /** Solo en egresos con crédito: id del doc en 'credit_cards' */
+  creditCardId?: string
+  /** Banco de la tarjeta, denormalizado para leer sin otra consulta */
+  creditCardBank?: string
   createdAt: number
   category?: Record<string, any>
 }

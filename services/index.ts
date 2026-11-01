@@ -35,6 +35,9 @@ export {
   getRecurringExpenses,
 } from './recurring-expenses.service'
 
+// Servicios de tarjetas de crédito (solo lectura)
+export { getCreditCards } from './credit-cards.service'
+
 // Servicios de resúmenes mensuales
 export {
   updateMonthlySummaryIncremental,
