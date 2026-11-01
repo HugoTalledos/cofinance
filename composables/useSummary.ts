@@ -25,6 +25,7 @@ import {
 
 const currentSummary: Ref<MonthlySummary | null> = ref(null)
 const currentTotalIncome: Ref<number> = ref(0)
+const currentTotalSaved: Ref<number> = ref(0)
 
 /**
  * Composable para gestión de resúmenes mensuales
@@ -68,9 +69,17 @@ export const useSummary = () => {
 
     currentTotalIncome.value = incomeTxs.reduce((sum, tx) => sum + tx.amount, 0)
 
+    // Los egresos en categorías de ahorro se apartan: no cuentan como gastado
+    const savingCategoryIds = new Set(categories.filter(cat => cat.isSaving).map(cat => cat.id))
+
     let totalSpent = 0
+    let totalSaved = 0
     for (const tx of expenseTxs) {
-      totalSpent += tx.amount
+      if (tx.categoryId && savingCategoryIds.has(tx.categoryId)) {
+        totalSaved += tx.amount
+      } else {
+        totalSpent += tx.amount
+      }
       if (tx.categoryId) {
         if (!categoriesMap[tx.categoryId]) {
           categoriesMap[tx.categoryId] = { budget: 0, spent: 0 }
@@ -78,6 +87,8 @@ export const useSummary = () => {
         categoriesMap[tx.categoryId].spent += tx.amount
       }
     }
+
+    currentTotalSaved.value = totalSaved
 
     return {
       id: `billing_${periodKey}`,
@@ -149,7 +160,10 @@ export const useSummary = () => {
 
   const totalIncomeFormatted = computed(() => formatCurrency(totalIncome.value))
 
-  const totalRemaining = computed(() => totalIncome.value - totalSpent.value)
+  /** Dinero apartado en categorías de ahorro: no disponible, pero tampoco gastado */
+  const totalSaved = computed(() => currentTotalSaved.value)
+
+  const totalRemaining = computed(() => totalIncome.value - totalSpent.value - totalSaved.value)
 
   const totalRemainingFormatted = computed(() => formatCurrency(totalRemaining.value))
 
@@ -463,6 +477,7 @@ export const useSummary = () => {
     // Ingresos
     totalIncome,
     totalIncomeFormatted,
+    totalSaved,
     totalRemaining,
     totalRemainingFormatted,
 

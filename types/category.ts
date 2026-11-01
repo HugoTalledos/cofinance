@@ -10,6 +10,11 @@ export interface Category {
   createdAt: number
   icon?: string
   color?: string
+  /**
+   * Categoría de ahorro (ej: Ahorro, Emergencias). Sus egresos se restan del
+   * dinero restante pero no cuentan como gastado. Ausente equivale a false.
+   */
+  isSaving?: boolean
 }
 
 /**
