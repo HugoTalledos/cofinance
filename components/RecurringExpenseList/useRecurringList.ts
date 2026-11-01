@@ -38,7 +38,7 @@ export const useRecurringList = (
   async function handleTap(expense: RecurringExpense) {
     if (isPaid.value(expense.id)) return
     if (expense.fixedAmount !== null) {
-      await markPaid(expense.id, expense.fixedAmount)
+      if (!await markPaid(expense.id, expense.fixedAmount)) return
       await createTransactionFromExpense(expense, expense.fixedAmount)
       onPaid?.(expense, expense.fixedAmount)
       return
@@ -55,7 +55,7 @@ export const useRecurringList = (
     const expense = expenses.value.find(e => e.id === id)
     pendingExpenseId.value = null
     showAmountPopup.value = false
-    await markPaid(id, amount)
+    if (!await markPaid(id, amount)) return
     if (expense) {
       await createTransactionFromExpense(expense, amount)
       onPaid?.(expense, amount)

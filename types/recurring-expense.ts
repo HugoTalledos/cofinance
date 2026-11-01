@@ -16,12 +16,3 @@ export interface RecurringExpense {
 
 export type RecurringExpenseInput = Omit<RecurringExpense, 'id' | 'createdAt'>
 export type RecurringExpenseUpdate = Partial<Omit<RecurringExpense, 'id' | 'userId' | 'createdAt'>>
-
-export interface RecurringExpenseCheck {
-  paid: boolean
-  amount: number | null
-  paidAt?: number
-}
-
-/** Record<expenseId, checkState> — guardado en localStorage por periodo */
-export type RecurringChecklist = Record<string, RecurringExpenseCheck>
