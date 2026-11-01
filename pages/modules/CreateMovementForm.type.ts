@@ -4,12 +4,16 @@ export interface Category {
   icon?: string;
 }
 
+import type { PaymentMethod } from '~/types'
+
 export interface MovementPayload {
   category: Category;
   detail: string;
   value: number;
   date: Date;
   type: 'income' | 'expense';
+  /** Solo en egresos */
+  paymentMethod?: PaymentMethod;
 }
 
 /**
@@ -22,4 +26,5 @@ export interface MovementFormValue {
   value: number;
   date: string;
   type: 'income' | 'expense';
+  paymentMethod?: PaymentMethod;
 }

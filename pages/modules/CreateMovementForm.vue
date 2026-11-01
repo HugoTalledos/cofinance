@@ -3,6 +3,7 @@ import { reactive, computed, ref } from 'vue'
 import type { Category, MovementPayload, MovementFormValue } from './CreateMovementForm.type'
 import { useToast } from '~/components/Toast/useToast'
 import { formatDateToString } from '~/types'
+import type { PaymentMethod } from '~/types'
 
 const { showToast } = useToast()
 
@@ -17,12 +18,18 @@ const TYPE_OPTIONS = [
   { label: 'Ingreso', value: 'income', icon: 'arrow-down' },
 ] as const
 
+const PAYMENT_METHOD_OPTIONS: { label: string; value: PaymentMethod }[] = [
+  { label: 'Crédito', value: 'credit_card' },
+  { label: 'Débito', value: 'debit_card' },
+]
+
 const initialState = () => ({
   type: props.initialValue?.type ?? 'expense' as 'income' | 'expense',
   categoryId: props.initialValue?.categoryId ?? '',
   detail: props.initialValue?.detail ?? '',
   value: props.initialValue?.value ?? null as number | null,
-  date: props.initialValue?.date ?? ''
+  date: props.initialValue?.date ?? '',
+  paymentMethod: props.initialValue?.paymentMethod ?? 'credit_card' as PaymentMethod
 })
 
 const form = reactive(initialState())
@@ -78,6 +85,7 @@ const submit = (): MovementPayload | null => {
     value: form.value || 0,
     date: submissionDate,
     type: form.type,
+    ...(form.type === 'expense' && { paymentMethod: form.paymentMethod }),
   }
 }
 
@@ -179,6 +187,26 @@ defineExpose({ submit, reset })
             class="col-span-4 py-6 text-center text-body-md text-on-surface-variant"
           >Ninguna categoría coincide</p>
         </div>
+      </div>
+    </section>
+
+    <section v-if="form.type === 'expense'" class="flex flex-col gap-2">
+      <p class="text-label-sm uppercase text-outline">Medio de pago</p>
+      <div role="radiogroup" aria-label="Medio de pago" class="bg-surface-container p-1 rounded-xl flex items-center gap-1">
+        <button
+          v-for="option in PAYMENT_METHOD_OPTIONS"
+          :key="option.value"
+          type="button"
+          role="radio"
+          :aria-checked="form.paymentMethod === option.value"
+          class="flex-1 py-2 px-3 rounded-lg text-body-md font-semibold transition-all duration-200"
+          :class="form.paymentMethod === option.value
+            ? 'bg-surface-container-lowest text-on-surface shadow-sm'
+            : 'text-on-surface-variant hover:text-on-surface'"
+          @click="form.paymentMethod = option.value"
+        >
+          {{ option.label }}
+        </button>
       </div>
     </section>
 

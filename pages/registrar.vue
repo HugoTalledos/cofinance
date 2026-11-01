@@ -33,6 +33,8 @@ async function createMovement() {
     date: payload.date.toISOString(),
     month: '',
     type: payload.type,
+    // Firestore rechaza campos undefined: en ingresos el campo no se envía
+    ...(payload.paymentMethod && { paymentMethod: payload.paymentMethod }),
   }
   saving.value = true
   const success = await addTransaction(body)

@@ -3,6 +3,9 @@
  * Optimizada para alto volumen de escritura y consultas por mes/categoría
  */
 
+/** Medio de pago de un egreso. Los códigos se guardan tal cual en Firestore */
+export type PaymentMethod = 'credit_card' | 'debit_card'
+
 export interface Transaction {
   id: string
   userId: string
@@ -17,6 +20,8 @@ export interface Transaction {
   month: string
   /** Tipo de movimiento */
   type?: 'income' | 'expense'
+  /** Solo en egresos registrados desde el formulario; ausente en los anteriores */
+  paymentMethod?: PaymentMethod
   createdAt: number
   category?: Record<string, any>
 }
