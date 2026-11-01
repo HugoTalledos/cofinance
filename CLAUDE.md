@@ -31,7 +31,7 @@ pages/*.vue  →  composables/*.ts  →  services/*.service.ts  →  Firebase/Fi
                stores/*.ts (Pinia, global state)
 ```
 
-- **`pages/`** — Route pages. Complex page-level logic lives in `pages/modules/` (e.g., `BarCharSummary.vue`, `CreateMovementForm.vue`).
+- **`pages/`** — Route pages. Complex page-level logic lives in `pages/modules/` (e.g., `CreateMovementForm.vue`).
 - **`components/`** — Reusable UI components. Complex ones are split into a folder with a companion `use*.ts` (e.g., `BottomSheet/`, `Toast/`).
 - **`composables/`** — Business logic composables that wrap services and manage reactive state (loading, error, data). All exported from `composables/index.ts`. Key composables: `useTransactions`, `useCategories`, `useSummary`, `useAuth` (from `useLogin.ts`), `useRecurringExpenses`.
 - **`services/`** — Direct Firestore operations. Each service returns `{ data, error }`. Never call Firestore directly from components or composables — always go through a service.
