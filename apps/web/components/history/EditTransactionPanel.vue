@@ -78,7 +78,10 @@ const selectMethod = (method: PaymentMethod) => {
   if (method !== 'credit_card') form.value.creditCardId = null
 }
 
-const close = () => emit('close')
+const close = () => {
+  if (saving.value) return
+  emit('close')
+}
 
 const save = async () => {
   const tx = props.transaction
@@ -128,6 +131,7 @@ const inputClass =
           type="button"
           class="p-1 rounded-lg text-outline hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
           title="Cerrar ventana"
+          :disabled="saving"
           @click="close"
         >
           <span class="material-symbols-outlined text-xl">close</span>
@@ -207,7 +211,8 @@ const inputClass =
       <div class="px-5 py-3 border-t border-outline-variant/30 bg-neutral-50/70 flex items-center justify-end gap-2.5">
         <button
           type="button"
-          class="px-3.5 py-1.5 rounded-lg border border-outline-variant/40 text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 transition-colors text-body-sm active:scale-95"
+          class="px-3.5 py-1.5 rounded-lg border border-outline-variant/40 text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 transition-colors text-body-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="saving"
           @click="close"
         >
           Cancelar

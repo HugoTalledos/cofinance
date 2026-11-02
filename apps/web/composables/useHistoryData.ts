@@ -17,9 +17,11 @@ export function useHistoryData(periodKey: Ref<string>) {
   const creditCards = ref<CreditCard[]>([])
 
   // Categorías y tarjetas se cargan una sola vez
+  let staticError: string | null = null
   const staticLoad = Promise.all([getCategories(), getCreditCards()]).then(([cats, cards]) => {
     categories.value = cats.data ?? []
     creditCards.value = cards.data ?? []
+    staticError = cats.error ?? cards.error ?? null
   })
 
   // Evita que una respuesta antigua pise a una más reciente
@@ -34,7 +36,7 @@ export function useHistoryData(periodKey: Ref<string>) {
     await staticLoad
     if (id !== requestId) return
     transactions.value = [...(result.data ?? [])].sort((a, b) => b.date.localeCompare(a.date))
-    error.value = result.error
+    error.value = result.error ?? staticError
     loading.value = false
   }
 

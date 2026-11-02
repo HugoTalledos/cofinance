@@ -6,6 +6,9 @@ export function usePagination<T>(items: Ref<T[]>, pageSize: number, resetOn: Wat
 
   const total = computed(() => items.value.length)
   const pageCount = computed(() => Math.max(1, Math.ceil(total.value / pageSize)))
+  // Si los elementos se reducen, acota la página a la última válida
+  watch(pageCount, (count) => { if (page.value > count) page.value = count })
+
   const from = computed(() => (total.value === 0 ? 0 : (page.value - 1) * pageSize + 1))
   const to = computed(() => Math.min(page.value * pageSize, total.value))
   const pageItems = computed(() => items.value.slice((page.value - 1) * pageSize, page.value * pageSize))
