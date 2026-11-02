@@ -145,7 +145,7 @@ Gestiona el estado y operaciones relacionadas con transacciones.
 ```vue
 <script setup lang="ts">
 import { useTransactions } from '~/composables'
-import { getCurrentDate, extractMonthFromDate } from '~/types'
+import { getCurrentDate, extractMonthFromDate } from '@cofinance/core'
 
 const userId = 'user123'
 
@@ -251,7 +251,7 @@ Gestiona el estado y operaciones relacionadas con resúmenes mensuales.
 ```vue
 <script setup lang="ts">
 import { useSummary } from '~/composables'
-import { getCurrentMonth } from '~/types'
+import { getCurrentMonth } from '@cofinance/core'
 
 const userId = 'user123'
 
@@ -503,10 +503,10 @@ Los composables son fáciles de testear porque:
 
 ```typescript
 import { useCategories } from '~/composables'
-import * as services from '~/services'
+import * as services from '@cofinance/core'
 
 // Mock del servicio
-vi.mock('~/services', () => ({
+vi.mock('@cofinance/core', () => ({
   getCategories: vi.fn().mockResolvedValue({
     data: [{ id: '1', name: 'Test', budget: 100, userId: 'user1', createdAt: Date.now() }],
     error: null

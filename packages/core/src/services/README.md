@@ -29,12 +29,12 @@ services/
 
 ```typescript
 // Importar servicios específicos
-import { createCategory, getCategories } from '~/services'
-import { createTransaction, getTransactions } from '~/services'
-import { getMonthlySummary } from '~/services'
+import { createCategory, getCategories } from '@cofinance/core'
+import { createTransaction, getTransactions } from '@cofinance/core'
+import { getMonthlySummary } from '@cofinance/core'
 
 // O importar todo
-import * as FirebaseServices from '~/services'
+import * as FirebaseServices from '@cofinance/core'
 ```
 
 ## Servicios de Categorías
@@ -44,8 +44,8 @@ import * as FirebaseServices from '~/services'
 Crea una nueva categoría.
 
 ```typescript
-import { createCategory } from '~/services'
-import type { CategoryInput } from '~/types'
+import { createCategory } from '@cofinance/core'
+import type { CategoryInput } from '@cofinance/core'
 
 const newCategory: CategoryInput = {
   userId: 'user123',
@@ -67,7 +67,7 @@ if (result.error) {
 Actualiza una categoría existente.
 
 ```typescript
-import { updateCategory } from '~/services'
+import { updateCategory } from '@cofinance/core'
 
 const result = await updateCategory('categoryId123', {
   budget: 6000,
@@ -80,7 +80,7 @@ const result = await updateCategory('categoryId123', {
 Elimina una categoría.
 
 ```typescript
-import { deleteCategory, categoryHasTransactions } from '~/services'
+import { deleteCategory, categoryHasTransactions } from '@cofinance/core'
 
 // Verificar primero si tiene transacciones
 const hasTransactions = await categoryHasTransactions('categoryId123')
@@ -95,7 +95,7 @@ if (!hasTransactions) {
 Obtiene todas las categorías de un usuario.
 
 ```typescript
-import { getCategories } from '~/services'
+import { getCategories } from '@cofinance/core'
 
 const result = await getCategories('user123')
 
@@ -113,9 +113,9 @@ Crea una nueva transacción y actualiza automáticamente el resumen mensual.
 **Importante**: Esta operación es atómica usando transacciones de Firestore.
 
 ```typescript
-import { createTransaction } from '~/services'
-import type { TransactionInput } from '~/types'
-import { getCurrentDate, extractMonthFromDate } from '~/types'
+import { createTransaction } from '@cofinance/core'
+import type { TransactionInput } from '@cofinance/core'
+import { getCurrentDate, extractMonthFromDate } from '@cofinance/core'
 
 const today = getCurrentDate()
 
@@ -142,8 +142,8 @@ if (result.data) {
 Obtiene transacciones con filtros opcionales.
 
 ```typescript
-import { getTransactions } from '~/services'
-import type { TransactionFilters } from '~/types'
+import { getTransactions } from '@cofinance/core'
+import type { TransactionFilters } from '@cofinance/core'
 
 // Filtrar por mes (más eficiente)
 const filters: TransactionFilters = {
@@ -177,7 +177,7 @@ const rangeResult = await getTransactions(rangeFilters)
 Obtiene las N transacciones más recientes.
 
 ```typescript
-import { getRecentTransactions } from '~/services'
+import { getRecentTransactions } from '@cofinance/core'
 
 const result = await getRecentTransactions('user123', 10)
 
@@ -193,7 +193,7 @@ import {
   getCategorySpentInMonth,
   getMonthlyTotal,
   countTransactions 
-} from '~/services'
+} from '@cofinance/core'
 
 // Total gastado en una categoría en un mes
 const categorySpent = await getCategorySpentInMonth('user123', 'cat456', '2026-04')
@@ -212,7 +212,7 @@ const count = await countTransactions({ userId: 'user123', month: '2026-04' })
 Obtiene el resumen de un mes específico.
 
 ```typescript
-import { getMonthlySummary, calculateSummaryStats } from '~/services'
+import { getMonthlySummary, calculateSummaryStats } from '@cofinance/core'
 
 const result = await getMonthlySummary('user123', '2026-04')
 
@@ -233,7 +233,7 @@ if (result.data) {
 Obtiene múltiples resúmenes con filtros.
 
 ```typescript
-import { getMonthlySummaries } from '~/services'
+import { getMonthlySummaries } from '@cofinance/core'
 
 // Últimos 6 meses
 const result = await getMonthlySummaries({
@@ -256,7 +256,7 @@ Actualiza un resumen mensual de forma incremental.
 **Nota**: Esta función es llamada automáticamente por `createTransaction`, normalmente no necesitas llamarla directamente.
 
 ```typescript
-import { updateMonthlySummaryIncremental } from '~/services'
+import { updateMonthlySummaryIncremental } from '@cofinance/core'
 
 // Incrementar gasto de una categoría
 await updateMonthlySummaryIncremental(
@@ -275,8 +275,8 @@ Recalcula completamente un resumen desde las transacciones.
 Útil para corregir inconsistencias o después de eliminar transacciones.
 
 ```typescript
-import { recalculateMonthlySummary } from '~/services'
-import { getCategories } from '~/services'
+import { recalculateMonthlySummary } from '@cofinance/core'
+import { getCategories } from '@cofinance/core'
 
 // Obtener presupuestos actuales
 const categoriesResult = await getCategories('user123')
@@ -295,8 +295,8 @@ await recalculateMonthlySummary('user123', '2026-04', budgetsMap)
 Sincroniza el presupuesto de una categoría en múltiples meses.
 
 ```typescript
-import { syncCategoryBudget } from '~/services'
-import { getMonthRange, getCurrentMonth } from '~/types'
+import { syncCategoryBudget } from '@cofinance/core'
+import { getMonthRange, getCurrentMonth } from '@cofinance/core'
 
 // Actualizar presupuesto en los últimos 6 meses
 const months = getMonthRange('2025-11', getCurrentMonth())
@@ -348,7 +348,7 @@ interface ApiResponse<T> {
 ### Patrón recomendado
 
 ```typescript
-import { createCategory } from '~/services'
+import { createCategory } from '@cofinance/core'
 
 async function handleCreateCategory() {
   const result = await createCategory(categoryData)
@@ -392,7 +392,7 @@ Para múltiples operaciones, considera usar batch writes:
 
 ```typescript
 import { writeBatch, doc } from 'firebase/firestore'
-import { useFirestoreDb, COLLECTIONS } from '~/services'
+import { useFirestoreDb, COLLECTIONS } from '@cofinance/core'
 
 const db = useFirestoreDb()
 const batch = writeBatch(db)

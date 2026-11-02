@@ -34,7 +34,7 @@ interface Category {
 #### Ejemplo de Uso
 
 ```typescript
-import { Category, CategoryInput } from '~/types'
+import { Category, CategoryInput } from '@cofinance/core'
 
 // Crear una nueva categoría
 const newCategory: CategoryInput = {
@@ -76,7 +76,7 @@ import {
   formatDateToString,
   extractMonthFromDate,
   getCurrentTimestamp
-} from '~/types'
+} from '@cofinance/core'
 
 // Crear una nueva transacción
 const today = new Date()
@@ -126,7 +126,7 @@ import {
   generateMonthlySummaryId,
   getCurrentMonth,
   getCurrentTimestamp
-} from '~/types'
+} from '@cofinance/core'
 
 // Crear resumen mensual
 const userId = 'user123'
@@ -174,7 +174,7 @@ import {
   getCurrentMonth,
   isValidDateString,
   isValidMonthString
-} from '~/types'
+} from '@cofinance/core'
 
 // Formatear fecha
 const today = new Date()
@@ -198,7 +198,7 @@ const currentMonth = getCurrentMonth()  // "2026-04"
 import {
   calculateBudgetPercentage,
   isOverBudget,
-} from '~/types'
+} from '@cofinance/core'
 
 // Calcular porcentaje
 const percentage = calculateBudgetPercentage(3250, 5000)  // 65
@@ -217,7 +217,7 @@ import {
   getMonthRange,
   getPreviousMonth,
   getNextMonth
-} from '~/types'
+} from '@cofinance/core'
 
 // Obtener rango de meses
 const months = getMonthRange('2026-01', '2026-03')
@@ -234,7 +234,7 @@ const next = getNextMonth('2026-04')      // "2026-05"
 
 ```typescript
 import { useFirebaseCollection } from '~/composables/useFirebase'
-import type { Transaction, TransactionFilters } from '~/types'
+import type { Transaction, TransactionFilters } from '@cofinance/core'
 import { where } from 'firebase/firestore'
 
 const transactionsCollection = useFirebaseCollection<Transaction>('transactions')
@@ -272,7 +272,7 @@ const constraints = [
 ### Obtener resumen mensual
 
 ```typescript
-import { generateMonthlySummaryId } from '~/types'
+import { generateMonthlySummaryId } from '@cofinance/core'
 
 const summaryId = generateMonthlySummaryId('user123', '2026-04')
 const summaryCollection = useFirebaseCollection<MonthlySummary>('monthly_summary')
@@ -284,7 +284,7 @@ const result = await summaryCollection.getById(summaryId)
 ### Validar transacción antes de crear
 
 ```typescript
-import { isValidDateString, isValidMonthString } from '~/types'
+import { isValidDateString, isValidMonthString } from '@cofinance/core'
 
 function validateTransaction(data: TransactionInput): boolean {
   if (!data.userId || !data.categoryId) return false
