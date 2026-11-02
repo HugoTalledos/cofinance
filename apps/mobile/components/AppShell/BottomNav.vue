@@ -4,7 +4,6 @@ import type { IconName } from '~/components/AppIcon.vue'
 const TABS: { to: string; label: string; icon: IconName }[] = [
   { to: '/', label: 'Resumen', icon: 'dashboard' },
   { to: '/registrar', label: 'Registrar', icon: 'add-circle' },
-  { to: '/tarjetas', label: 'Tarjetas', icon: 'wallet' },
   { to: '/recurrentes', label: 'Recurrentes', icon: 'sync' },
 ]
 
