@@ -1,3 +1,5 @@
+import type { PaymentMethod } from './transaction'
+
 export interface RecurringExpense {
   id: string
   userId: string
@@ -7,6 +9,11 @@ export interface RecurringExpense {
   fixedAmount: number | null
   categoryId: string
   categoryName: string
+  paymentMethod?: PaymentMethod
+  creditCardId?: string
+  creditCardBank?: string
+  /** Solo se guarda; no se usa todavía */
+  reminderDay?: number
   createdAt: number
   /** Timestamp del último pago registrado (persiste entre periodos) */
   lastPaidAt?: number
@@ -16,3 +23,5 @@ export interface RecurringExpense {
 
 export type RecurringExpenseInput = Omit<RecurringExpense, 'id' | 'createdAt'>
 export type RecurringExpenseUpdate = Partial<Omit<RecurringExpense, 'id' | 'userId' | 'createdAt'>>
+
+export type RemovableRecurringField = 'creditCardId' | 'creditCardBank' | 'reminderDay' | 'description'
