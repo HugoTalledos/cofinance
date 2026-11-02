@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Aura Wealth - Historial de Transacciones</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "secondary-fixed": "#d5e3fd",
+          "secondary-container": "#d5e3fd",
+          "on-error-container": "#93000a",
+          "tertiary-fixed": "#c9e6ff",
+          "inverse-on-surface": "#eaf1ff",
+          "surface-container-low": "#eff4ff",
+          "surface-bright": "#f8f9ff",
+          "surface-tint": "#565e74",
+          "error": "#ba1a1a",
+          "background": "#f8f9ff",
+          "surface": "#f8f9ff",
+          "on-tertiary-fixed": "#001e2f",
+          "primary-container": "#131b2e",
+          "tertiary-fixed-dim": "#89ceff",
+          "on-primary": "#ffffff",
+          "on-tertiary-container": "#008cc7",
+          "on-tertiary": "#ffffff",
+          "outline-variant": "#c6c6cd",
+          "surface-container-highest": "#d3e4fe",
+          "secondary-fixed-dim": "#b9c7e0",
+          "surface-container-lowest": "#ffffff",
+          "primary-fixed-dim": "#bec6e0",
+          "tertiary-container": "#001e2f",
+          "on-tertiary-fixed-variant": "#004c6e",
+          "error-container": "#ffdad6",
+          "surface-variant": "#d3e4fe",
+          "on-error": "#ffffff",
+          "surface-container-high": "#dce9ff",
+          "secondary": "#515f74",
+          "on-surface": "#0b1c30",
+          "on-primary-container": "#7c839b",
+          "outline": "#76777d",
+          "surface-dim": "#cbdbf5",
+          "on-secondary-container": "#57657b",
+          "on-secondary-fixed": "#0d1c2f",
+          "primary": "#000000",
+          "on-primary-fixed-variant": "#3f465c",
+          "surface-container": "#e5eeff",
+          "on-background": "#0b1c30",
+          "on-secondary-fixed-variant": "#3a485c",
+          "on-surface-variant": "#45464d",
+          "primary-fixed": "#dae2fd",
+          "on-secondary": "#ffffff",
+          "tertiary": "#000000",
+          "inverse-primary": "#bec6e0",
+          "inverse-surface": "#213145",
+          "on-primary-fixed": "#131b2e"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.125rem",
+          "lg": "0.25rem",
+          "xl": "0.5rem",
+          "full": "0.75rem"
+        },
+        "spacing": {
+          "space-md": "0.75rem",
+          "space-xl": "2rem",
+          "margin": "1rem",
+          "space-lg": "1.25rem",
+          "space-xs": "0.25rem",
+          "gutter": "1.25rem",
+          "margin-desktop": "3rem",
+          "gutter-desktop": "1.5rem",
+          "space-sm": "0.5rem",
+          "margin-tablet": "2rem"
+        },
+        "fontFamily": {
+          "headline-md": ["Geist"],
+          "headline-lg": ["Geist"],
+          "display-mobile": ["Geist"],
+          "display": ["Geist"],
+          "body-lg": ["Geist"],
+          "body-sm": ["Geist"],
+          "numeric-md": ["JetBrains Mono"],
+          "numeric-lg": ["JetBrains Mono"],
+          "body-md": ["Geist"],
+          "label-sm": ["JetBrains Mono"],
+          "headline-lg-mobile": ["Geist"],
+          "headline-sm": ["Geist"],
+          "label-md": ["JetBrains Mono"]
+        },
+        "fontSize": {
+          "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "500" }],
+          "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+          "display-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+          "display": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.03em", "fontWeight": "600" }],
+          "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+          "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+          "numeric-md": ["15px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+          "numeric-lg": ["24px", { "lineHeight": "30px", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+          "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+          "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+          "headline-lg-mobile": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.015em", "fontWeight": "500" }],
+          "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+          "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "500" }]
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f8f9ff;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #c6c6cd;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #76777d;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased selection:bg-neutral-900 selection:text-white font-body-md overflow-x-hidden min-h-screen">
+<!-- ==================== SIDENAV (MINIMALIST) ==================== -->
+<aside class="fixed top-0 left-0 h-screen w-64 flex flex-col justify-between bg-surface-container-lowest border-r border-outline-variant/40 p-space-md z-40">
+<div class="flex flex-col gap-space-md">
+<!-- Header User / Brand -->
+<div class="flex items-center gap-3 px-2 py-1.5">
+<div class="relative w-9 h-9 rounded-full overflow-hidden border border-outline-variant/50 bg-surface-container-low shrink-0">
+<img class="w-full h-full object-cover" data-alt="A portrait of an executive wealth investor looking confidently into the camera in a moody architectural office with soft ambient electric indigo lighting, deep slate background tones, and cinematic focus creating a high precision editorial feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcSuth7szP0C3ky8nNkyD_BAuqbaQRawo6Y7gFKdYsxrGBeLgh9Pa4dFqexa3eNk4PKwiIi1FN3zvpsyjjPvXHnUnAJ483IdQFAOaSfU7FoC6D-yCW9NrVs77zE4wwERDPGPtgjTAd0sfDn4qDeYjBtb7gdsJaRDzf-4KTwk7nHcrMqI3kJlWvwyoYteEmNrRabIxC_Bw5t-27G-8TD2tJF0V_6NFcXKmtMOm43qg"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-body-md font-semibold text-neutral-900 tracking-tight truncate">Aura Wealth</span>
+<span class="text-label-sm text-outline truncate">Obsidian Ledger</span>
+</div>
+</div>
+<!-- Quick CTA -->
+<button class="w-full mt-1 flex items-center justify-center gap-2 bg-neutral-900 hover:bg-neutral-800 text-white py-2 px-3 rounded-lg text-body-sm font-medium transition-all active:scale-[0.99]" onclick="openCreateModal()">
+<span class="material-symbols-outlined text-base" data-icon="add">add</span>
+<span>Nueva Transacción</span>
+</button>
+<!-- Navigation Links -->
+<nav class="flex flex-col gap-0.5 mt-2">
+<!-- 0: Dashboard General (Inactive) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-body-sm text-on-surface-variant hover:text-neutral-900 hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="dashboard">dashboard</span>
+<span>Dashboard General</span>
+</a>
+<!-- 1: Historial de Transacciones (ACTIVE MATCH) -->
+<a class="flex items-center gap-3 px-3 py-2 text-body-sm text-neutral-900 font-medium bg-neutral-100 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-lg text-neutral-900" data-icon="receipt_long">receipt_long</span>
+<span>Historial de Transacciones</span>
+</a>
+<!-- 2: Tarjetas & Pagos Recurrentes (Inactive) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-body-sm text-on-surface-variant hover:text-neutral-900 hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="credit_card">credit_card</span>
+<span>Tarjetas &amp; Pagos Recurrentes</span>
+</a>
+<!-- 3: Categorías & Presupuestos (Inactive) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-body-sm text-on-surface-variant hover:text-neutral-900 hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="pie_chart">pie_chart</span>
+<span>Categorías &amp; Presupuestos</span>
+</a>
+<!-- 4: Configuración (Inactive) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-body-sm text-on-surface-variant hover:text-neutral-900 hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="settings">settings</span>
+<span>Configuración</span>
+</a>
+</nav>
+</div>
+<div class="px-2 py-3 border-t border-outline-variant/30 flex items-center justify-between text-label-sm text-outline">
+<span>v2.4.0 — Minimalist</span>
+<span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+</div>
+</aside>
+<!-- ==================== TOP NAV BAR (MINIMALIST) ==================== -->
+<header class="sticky top-0 right-0 w-full z-30 bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant/40 pl-64">
+<div class="flex justify-between items-center h-14 px-space-lg w-full">
+<!-- Title & Context Breadcrumb -->
+<div class="flex items-center gap-2">
+<h1 class="text-body-lg font-semibold text-neutral-900 tracking-tight">Historial de Transacciones</h1>
+<span class="text-outline text-xs">•</span>
+<span class="text-body-sm text-on-surface-variant">Libro Mayor</span>
+</div>
+<!-- Action Cluster -->
+<div class="flex items-center gap-2.5">
+<button class="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-outline-variant/40 text-on-surface hover:bg-surface-container-low transition-colors text-body-sm">
+<span class="material-symbols-outlined text-base text-neutral-600" data-icon="calendar_today">calendar_today</span>
+<span>Filtro Global</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-900 bg-neutral-900 text-white hover:bg-neutral-800 transition-colors text-body-sm font-medium" onclick="downloadLedger()">
+<span class="material-symbols-outlined text-base" data-icon="download">download</span>
+<span>Descargar Reporte</span>
+</button>
+<div class="h-4 w-px bg-outline-variant/40 mx-1"></div>
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-neutral-900 hover:bg-surface-container-low transition-colors" title="Tarjetas">
+<span class="material-symbols-outlined text-xl" data-icon="credit_card">credit_card</span>
+</button>
+<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-neutral-900 hover:bg-surface-container-low transition-colors relative" title="Notificaciones">
+<span class="material-symbols-outlined text-xl" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-neutral-900"></span>
+</button>
+<!-- User mini avatar -->
+<div class="w-7 h-7 rounded-full overflow-hidden border border-outline-variant/50 ml-1">
+<img class="w-full h-full object-cover" data-alt="Close up crop of an executive financial director with focused analytical look against minimal ambient blue and slate backdrop." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoJq1-Dlw66lBlfbQYsKcq7gwy_V4ZcybvQFj_wMoI5aW4oLLf3q6L--OsJmfcVGJwSPFwZzXJ0KLX9_aEOx_7hyvULqULr3wAeTEHJ1CVkBhM4FyfviXQuTtbLtEQFoRmsJ2p3bNLVrAoTgFyGCqmlEf7T31ZxCozE4KN3wMswKz-o34VJCNR4hyPMPW-Vd4JTC2eBI9J2rfrV0KxfHZSieQe97DzkuqG0WjVuDY"/>
+</div>
+</div>
+</div>
+</header>
+<!-- ==================== MAIN CONTENT CANVAS ==================== -->
+<main class="pl-64 min-h-[calc(100vh-3.5rem)] p-space-lg flex flex-col gap-space-lg bg-surface">
+<!-- KPI / Telemetry Mini-Strip (Minimalist Monochromatic) -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+<div class="bg-surface-container-lowest border border-outline-variant/40 rounded-lg p-3.5 flex flex-col justify-between">
+<div class="flex items-center justify-between text-outline text-label-sm uppercase tracking-wider">
+<span>Total Gastos y Movimientos</span>
+<span class="material-symbols-outlined text-base" data-icon="receipt_long">receipt_long</span>
+</div>
+<div class="mt-2 text-headline-sm font-semibold font-numeric-md text-neutral-900">148 <span class="text-body-sm text-outline font-normal">items</span></div>
+<div class="text-body-sm text-on-surface-variant flex items-center gap-1 mt-1 font-numeric-md text-xs">
+<span class="inline-block w-1.5 h-1.5 rounded-full bg-neutral-900"></span>
+<span>Al día y revisado</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/40 rounded-lg p-3.5 flex flex-col justify-between">
+<div class="flex items-center justify-between text-outline text-label-sm uppercase tracking-wider">
+<span>Ingresos Periodo</span>
+<span class="material-symbols-outlined text-base text-neutral-500" data-icon="arrow_downward">arrow_downward</span>
+</div>
+<div class="mt-2 text-headline-sm font-semibold font-numeric-md text-neutral-900">+$14,250.00</div>
+<div class="text-xs text-outline mt-1 font-numeric-md">2 operaciones acreditadas</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/40 rounded-lg p-3.5 flex flex-col justify-between">
+<div class="flex items-center justify-between text-outline text-label-sm uppercase tracking-wider">
+<span>Egresos &amp; Débitos</span>
+<span class="material-symbols-outlined text-base text-neutral-500" data-icon="arrow_upward">arrow_upward</span>
+</div>
+<div class="mt-2 text-headline-sm font-semibold font-numeric-md text-neutral-900">-$6,432.80</div>
+<div class="text-xs text-outline flex items-center gap-1 mt-1 font-numeric-md">
+<span>-4.2% vs ciclo anterior</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/40 rounded-lg p-3.5 flex flex-col justify-between">
+<div class="flex items-center justify-between text-outline text-label-sm uppercase tracking-wider">
+<span>Flujo Neto Resultante</span>
+<span class="material-symbols-outlined text-base text-neutral-500" data-icon="account_balance_wallet">account_balance_wallet</span>
+</div>
+<div class="mt-2 text-headline-sm font-semibold font-numeric-md text-neutral-900">+$7,817.20</div>
+<div class="text-xs text-outline mt-1 font-numeric-md">Tasa de ahorro +54.8%</div>
+</div>
+</div>
+<!-- ==================== POWER TOOLBAR / FILTERS ==================== -->
+<div class="bg-surface-container-lowest border border-outline-variant/40 rounded-lg p-3 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+<!-- Search & Selects row -->
+<div class="flex flex-wrap items-center gap-2.5 flex-1">
+<!-- Live Concept Search Input -->
+<div class="relative min-w-[220px] flex-1 max-w-sm">
+<span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-base pointer-events-none" data-icon="search">search</span>
+<input class="w-full h-9 pl-8 pr-3 bg-surface-container-lowest border border-outline-variant/50 rounded-lg text-body-sm text-neutral-900 placeholder:text-outline focus:border-neutral-900 focus:ring-0 outline-none transition-all" id="searchInput" placeholder="Buscar comercio, concepto, ID..." type="text"/>
+</div>
+<!-- Filter by Category -->
+<div class="relative">
+<select class="h-9 pl-2.5 pr-7 bg-surface-container-lowest border border-outline-variant/50 rounded-lg text-body-sm text-neutral-800 appearance-none focus:border-neutral-900 focus:ring-0 outline-none cursor-pointer">
+<option value="all">Todas las Categorías</option>
+<option value="tech">Tecnología &amp; SaaS</option>
+<option value="office">Espacio de Oficina</option>
+<option value="marketing">Marketing &amp; Pauta</option>
+<option value="lifestyle">Viajes &amp; Representación</option>
+<option value="dividends">Honorarios &amp; Rendimientos</option>
+<option value="taxes">Impuestos &amp; Legal</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-outline text-xs pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+<!-- Filter by Payment Method / Card -->
+<div class="relative">
+<select class="h-9 pl-2.5 pr-7 bg-surface-container-lowest border border-outline-variant/50 rounded-lg text-body-sm text-neutral-800 appearance-none focus:border-neutral-900 focus:ring-0 outline-none cursor-pointer">
+<option value="all">Todas las Cuentas / Tarjetas</option>
+<option value="amex">Black Corporate Metal (•• 8920)</option>
+<option value="visa">Aura Infinite Debit (•• 4102)</option>
+<option value="chase">Treasury Capital Wire (•• 1109)</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-outline text-xs pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+<!-- Date Range Filter -->
+<div class="relative">
+<select class="h-9 pl-2.5 pr-7 bg-surface-container-lowest border border-outline-variant/50 rounded-lg text-body-sm text-neutral-800 appearance-none focus:border-neutral-900 focus:ring-0 outline-none cursor-pointer">
+<option value="30d">Últimos 30 días (Oct - Nov)</option>
+<option value="this-month">Mes Actual</option>
+<option value="last-quarter">T3 2024</option>
+<option value="custom">Rango Personalizado...</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-outline text-xs pointer-events-none" data-icon="calendar_month">calendar_month</span>
+</div>
+<!-- Segmented Type Pills (Todos, Gasto, Ingreso) -->
+<div class="inline-flex p-0.5 bg-neutral-100 border border-outline-variant/30 rounded-lg text-label-sm">
+<button class="px-2.5 py-1 rounded bg-white text-neutral-900 font-medium shadow-none">Todos</button>
+<button class="px-2.5 py-1 rounded text-on-surface-variant hover:text-neutral-900 transition-all">Gasto</button>
+<button class="px-2.5 py-1 rounded text-on-surface-variant hover:text-neutral-900 transition-all">Ingreso</button>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex items-center gap-2 self-end lg:self-auto shrink-0">
+<button class="h-9 px-3 flex items-center gap-1.5 border border-outline-variant/50 text-neutral-800 hover:bg-neutral-100 rounded-lg text-body-sm transition-all" onclick="downloadLedger()" title="Exportar CSV o Excel">
+<span class="material-symbols-outlined text-base text-outline" data-icon="table_view">table_view</span>
+<span class="hidden sm:inline">Descargar CSV</span>
+</button>
+<button class="h-9 px-3.5 flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 text-white rounded-lg text-body-sm font-medium transition-all" onclick="openCreateModal()">
+<span class="material-symbols-outlined text-base" data-icon="add">add</span>
+<span>Registrar Movimiento</span>
+</button>
+</div>
+</div>
+<!-- ==================== TRANSACTIONS DATA TABLE (CLEAN MINIMAL) ==================== -->
+<div class="bg-surface-container-lowest border border-outline-variant/40 rounded-lg overflow-hidden flex flex-col flex-1">
+<div class="overflow-x-auto w-full">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-neutral-50/75 text-outline border-b border-outline-variant/30 text-label-sm uppercase tracking-wider">
+<th class="py-3 px-4 font-medium">Fecha &amp; Hora</th>
+<th class="py-3 px-4 font-medium">Concepto / Comercio</th>
+<th class="py-3 px-4 font-medium">Tarjeta / Cuenta</th>
+<th class="py-3 px-4 font-medium">Categoría</th>
+<th class="py-3 px-4 font-medium text-right">Monto</th>
+<th class="py-3 px-4 font-medium text-center">Estado</th>
+<th class="py-3 px-4 font-medium text-right">Acciones</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/20 text-body-sm" id="transactionRows">
+<!-- ROW 1: AWS Cloud Services -->
+<tr class="hover:bg-neutral-50/80 transition-colors group">
+<td class="py-3.5 px-4 whitespace-nowrap text-on-surface-variant font-numeric-md">
+<div class="font-medium text-neutral-900 text-xs">14 Nov, 2024</div>
+<div class="text-[11px] text-outline">18:42:10 UTC</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-neutral-100 border border-outline-variant/30 flex items-center justify-center text-neutral-700 shrink-0">
+<span class="material-symbols-outlined text-base" data-icon="cloud">cloud</span>
+</div>
+<div>
+<div class="font-medium text-neutral-900 group-hover:text-black transition-colors">Amazon Web Services EMEA</div>
+<div class="text-[11px] text-outline font-numeric-md">INFRA-COMPUTE-9831</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="flex items-center gap-1.5 text-neutral-700">
+<span class="material-symbols-outlined text-sm text-outline" data-icon="credit_card">credit_card</span>
+<span class="font-numeric-md text-xs">Black Metal •• 8920</span>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-neutral-100 text-neutral-800 border border-neutral-200">
+Tecnología &amp; SaaS
+</span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-right font-numeric-md font-medium text-neutral-900">
+-$1,248.50
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-numeric-md text-neutral-700 bg-neutral-100 border border-neutral-200">
+Completado
+</span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1 rounded hover:bg-neutral-100 text-outline hover:text-neutral-900 transition-colors" onclick="editItem('Amazon Web Services EMEA', 1248.50, '2024-11-14', 'Tecnología &amp; SaaS', 'Black Metal •• 8920', 'Servidores dedicados y clúster Kubernetes')" title="Editar">
+<span class="material-symbols-outlined text-base" data-icon="edit">edit</span>
+</button>
+<button class="p-1 rounded hover:bg-neutral-100 text-outline hover:text-neutral-900 transition-colors" onclick="confirmDelete('Amazon Web Services EMEA')" title="Eliminar">
+<span class="material-symbols-outlined text-base" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 2: Stripe Payout (Ingreso) -->
+<tr class="hover:bg-neutral-50/80 transition-colors group">
+<td class="py-3.5 px-4 whitespace-nowrap text-on-surface-variant font-numeric-md">
+<div class="font-medium text-neutral-900 text-xs">14 Nov, 2024</div>
+<div class="text-[11px] text-outline">09:15:00 UTC</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-neutral-100 border border-outline-variant/30 flex items-center justify-center text-neutral-700 shrink-0">
+<span class="material-symbols-outlined text-base" data-icon="payments">payments</span>
+</div>
+<div>
+<div class="font-medium text-neutral-900 transition-colors">Stripe Payments Liquidación Semanal</div>
+<div class="text-[11px] text-outline font-numeric-md">PO-STRIPE-89104</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="flex items-center gap-1.5 text-neutral-700">
+<span class="material-symbols-outlined text-sm text-outline" data-icon="account_balance">account_balance</span>
+<span class="font-numeric-md text-xs">Treasury Capital •• 1109</span>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-neutral-100 text-neutral-800 border border-neutral-200">
+Honorarios &amp; Rendimientos
+</span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-right font-numeric-md font-medium text-neutral-900">
++$12,500.00
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-numeric-md text-neutral-700 bg-neutral-100 border border-neutral-200">
+Conciliado
+</span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1 rounded hover:bg-neutral-100 text-outline hover:text-neutral-900 transition-colors" onclick="editItem('Stripe Payments Liquidación Semanal', -12500.00, '2024-11-14', 'Honorarios &amp; Rendimientos', 'Treasury Capital •• 1109', 'Pago facturación clientes Europa')" title="Editar">
+<span class="material-symbols-outlined text-base" data-icon="edit">edit</span>
+</button>
+<button class="p-1 rounded hover:bg-neutral-100 text-outline hover:text-neutral-900 transition-colors" onclick="confirmDelete('Stripe Payments Liquidación Semanal')" title="Eliminar">
+<span class="material-symbols-outlined text-base" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 3: WeWork Coworking Hub -->
+<tr class="hover:bg-neutral-50/80 transition-colors group">
+<td class="py-3.5 px-4 whitespace-nowrap text-on-surface-variant font-numeric-md">
+<div class="font-medium text-neutral-900 text-xs">12 Nov, 2024</div>
+<div class="text-[11px] text-outline">11:20:45 UTC</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-neutral-100 border border-outline-variant/30 flex items-center justify-center text-neutral-700 shrink-0">
+<span class="material-symbols-outlined text-base" data-icon="business">business</span>
+</div>
+<div>
+<div class="font-medium text-neutral-900 transition-colors">WeWork Private Office Zurich</div>
+<div class="text-[11px] text-outline font-numeric-md">REC-RENT-4091</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="flex items-center gap-1.5 text-neutral-700">
+<span class="material-symbols-outlined text-sm text-outline" data-icon="credit_card">credit_card</span>
+<span class="font-numeric-md text-xs">Black Metal •• 8920</span>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-neutral-100 text-neutral-800 border border-neutral-200">
+Espacio de Oficina
+</span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-right font-numeric-md font-medium text-neutral-900">
+-$2,100.00
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-numeric-md text-neutral-700 bg-neutral-100 border border-neutral-200">
+Completado
+</span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1 rounded hover:bg-neutral-100 text-outline hover:text-neutral-900 transition-colors" onclick="editItem('WeWork Private Office Zurich', 2100.00, '2024-11-12', 'Espacio de Oficina', 'Black Metal •• 8920', 'Alquiler sede ejecutiva mensual')" title="Editar">
+<span class="material-symbols-outlined text-base" data-icon="edit">edit</span>
+</button>
+<button class="p-1 rounded hover:bg-neutral-100 text-outline hover:text-neutral-900 transition-colors" onclick="confirmDelete('WeWork Private Office Zurich')" title="Eliminar">
+<span class="material-symbols-outlined text-base" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 4: Delta Airlines Business Class -->
+<tr class="hover:bg-neutral-50/80 transition-colors group">
+<td class="py-3.5 px-4 whitespace-nowrap text-on-surface-variant font-numeric-md">
+<div class="font-medium text-neutral-900 text-xs">10 Nov, 2024</div>
+<div class="text-[11px] text-outline">15:02:11 UTC</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-neutral-100 border border-outline-variant/30 flex items-center justify-center text-neutral-700 shrink-0">
+<span class="material-symbols-outlined text-base" data-icon="flight">flight</span>
+</div>
+<div>
+<div class="font-medium text-neutral-900 transition-colors">Delta Air Lines Ticket ZRH-JFK</div>
+<div class="text-[11px] text-outline font-numeric-md">TRV-AIR-8820</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="flex items-center gap-1.5 text-neutral-700">
+<span class="material-symbols-outlined text-sm text-outline" data-icon="credit_card">credit_card</span>
+<span class="font-numeric-md text-xs">Aura Infinite •• 4102</span>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-neutral-100 text-neutral-800 border border-neutral-200">
+Viajes &amp; Representación
+</span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-right font-numeric-md font-medium text-neutral-900">
+-$1,840.30
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-numeric-md text-neutral-500 bg-neutral-50 border border-neutral-200">
+Pendiente
+</span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1 rounded hover:bg-neutral-100 text-outline hover:text-neutral-900 transition-colors" onclick="editItem('Delta Air Lines Ticket ZRH-JFK', 1840.30, '2024-11-10', 'Viajes &amp; Representación', 'Aura Infinite •• 4102', 'Vuelo comitiva de inversores en Nueva York')" title="Editar">
+<span class="material-symbols-outlined text-base" data-icon="edit">edit</span>
+</button>
+<button class="p-1 rounded hover:bg-neutral-100 text-outline hover:text-neutral-900 transition-colors" onclick="confirmDelete('Delta Air Lines Ticket ZRH-JFK')" title="Eliminar">
+<span class="material-symbols-outlined text-base" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 5: Apple Store Device -->
+<tr class="hover:bg-neutral-50/80 transition-colors group">
+<td class="py-3.5 px-4 whitespace-nowrap text-on-surface-variant font-numeric-md">
+<div class="font-medium text-neutral-900 text-xs">08 Nov, 2024</div>
+<div class="text-[11px] text-outline">16:45:12 UTC</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-neutral-100 border border-outline-variant/30 flex items-center justify-center text-neutral-700 shrink-0">
+<span class="material-symbols-outlined text-base" data-icon="devices">devices</span>
+</div>
+<div>
+<div class="font-medium text-neutral-900 transition-colors">Apple Store Bahnhofstrasse</div>
+<div class="text-[11px] text-outline font-numeric-md">HW-DEV-00431</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="flex items-center gap-1.5 text-neutral-700">
+<span class="material-symbols-outlined text-sm text-outline" data-icon="credit_card">credit_card</span>
+<span class="font-numeric-md text-xs">Black Metal •• 8920</span>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-neutral-100 text-neutral-800 border border-neutral-200">
+Tecnología &amp; SaaS
+</span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-right font-numeric-md font-medium text-neutral-900">
+-$999.00
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-numeric-md text-neutral-700 bg-neutral-100 border border-neutral-200">
+Completado
+</span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1 rounded hover:bg-neutral-100 text-outline hover:text-neutral-900 transition-colors" onclick="editItem('Apple Store Bahnhofstrasse', 999.00, '2024-11-08', 'Tecnología &amp; SaaS', 'Black Metal •• 8920', 'MacBook Air M3 para analista junior')" title="Editar">
+<span class="material-symbols-outlined text-base" data-icon="edit">edit</span>
+</button>
+<button class="p-1 rounded hover:bg-neutral-100 text-outline hover:text-neutral-900 transition-colors" onclick="confirmDelete('Apple Store Bahnhofstrasse')" title="Eliminar">
+<span class="material-symbols-outlined text-base" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 6: Rendimientos Fondo Inversión (Ingreso) -->
+<tr class="hover:bg-neutral-50/80 transition-colors group">
+<td class="py-3.5 px-4 whitespace-nowrap text-on-surface-variant font-numeric-md">
+<div class="font-medium text-neutral-900 text-xs">05 Nov, 2024</div>
+<div class="text-[11px] text-outline">08:00:00 UTC</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-neutral-100 border border-outline-variant/30 flex items-center justify-center text-neutral-700 shrink-0">
+<span class="material-symbols-outlined text-base" data-icon="trending_up">trending_up</span>
+</div>
+<div>
+<div class="font-medium text-neutral-900 transition-colors">Vanguard S&amp;P 500 Dividend Payout</div>
+<div class="text-[11px] text-outline font-numeric-md">DIV-INDEX-1102</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="flex items-center gap-1.5 text-neutral-700">
+<span class="material-symbols-outlined text-sm text-outline" data-icon="account_balance">account_balance</span>
+<span class="font-numeric-md text-xs">Treasury Capital •• 1109</span>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-neutral-100 text-neutral-800 border border-neutral-200">
+Honorarios &amp; Rendimientos
+</span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-right font-numeric-md font-medium text-neutral-900">
++$1,750.00
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-numeric-md text-neutral-700 bg-neutral-100 border border-neutral-200">
+Conciliado
+</span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1 rounded hover:bg-neutral-100 text-outline hover:text-neutral-900 transition-colors" onclick="editItem('Vanguard S&amp;P 500 Dividend Payout', -1750.00, '2024-11-05', 'Honorarios &amp; Rendimientos', 'Treasury Capital •• 1109', 'Reinversión automática 50%')" title="Editar">
+<span class="material-symbols-outlined text-base" data-icon="edit">edit</span>
+</button>
+<button class="p-1 rounded hover:bg-neutral-100 text-outline hover:text-neutral-900 transition-colors" onclick="confirmDelete('Vanguard S&amp;P 500 Dividend Payout')" title="Eliminar">
+<span class="material-symbols-outlined text-base" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- ROW 7: Google Ads Campaign -->
+<tr class="hover:bg-neutral-50/80 transition-colors group">
+<td class="py-3.5 px-4 whitespace-nowrap text-on-surface-variant font-numeric-md">
+<div class="font-medium text-neutral-900 text-xs">02 Nov, 2024</div>
+<div class="text-[11px] text-outline">23:10:04 UTC</div>
+</td>
+<td class="py-3.5 px-4">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-neutral-100 border border-outline-variant/30 flex items-center justify-center text-neutral-700 shrink-0">
+<span class="material-symbols-outlined text-base" data-icon="campaign">campaign</span>
+</div>
+<div>
+<div class="font-medium text-neutral-900 transition-colors">Google Ads Ireland Ltd</div>
+<div class="text-[11px] text-outline font-numeric-md">MKT-SEARCH-4421</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<div class="flex items-center gap-1.5 text-neutral-700">
+<span class="material-symbols-outlined text-sm text-outline" data-icon="credit_card">credit_card</span>
+<span class="font-numeric-md text-xs">Aura Infinite •• 4102</span>
+</div>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-neutral-100 text-neutral-800 border border-neutral-200">
+Marketing &amp; Pauta
+</span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-right font-numeric-md font-medium text-neutral-900">
+-$245.00
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-numeric-md text-neutral-700 bg-neutral-100 border border-neutral-200">
+Completado
+</span>
+</td>
+<td class="py-3.5 px-4 whitespace-nowrap text-right">
+<div class="inline-flex items-center gap-1">
+<button class="p-1 rounded hover:bg-neutral-100 text-outline hover:text-neutral-900 transition-colors" onclick="editItem('Google Ads Ireland Ltd', 245.00, '2024-11-02', 'Marketing &amp; Pauta', 'Aura Infinite •• 4102', 'Campaña adquisición B2B Q4')" title="Editar">
+<span class="material-symbols-outlined text-base" data-icon="edit">edit</span>
+</button>
+<button class="p-1 rounded hover:bg-neutral-100 text-outline hover:text-neutral-900 transition-colors" onclick="confirmDelete('Google Ads Ireland Ltd')" title="Eliminar">
+<span class="material-symbols-outlined text-base" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- ==================== FOOTER: SUMMARY TOTALS & PAGINATION ==================== -->
+<div class="p-3.5 border-t border-outline-variant/30 bg-surface-container-lowest flex flex-col sm:flex-row items-center justify-between gap-3 text-body-sm">
+<!-- Totals summary note -->
+<div class="flex items-center gap-3 text-outline text-xs">
+<span>Mostrando <span class="text-neutral-900 font-medium font-numeric-md">1-7</span> de <span class="text-neutral-900 font-medium font-numeric-md">148</span> transacciones</span>
+<span class="hidden md:inline">•</span>
+<span class="hidden md:inline">Balance neto: <span class="font-numeric-md text-neutral-900 font-medium">+$7,817.20</span></span>
+</div>
+<!-- Pagination Controls -->
+<div class="flex items-center gap-1">
+<button class="h-7 w-7 rounded border border-outline-variant/40 flex items-center justify-center text-outline hover:text-neutral-900 hover:bg-neutral-100 transition-colors disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="h-7 px-2.5 rounded bg-neutral-900 text-white text-xs font-numeric-md font-medium">1</button>
+<button class="h-7 px-2.5 rounded border border-outline-variant/30 text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 text-xs font-numeric-md transition-colors">2</button>
+<button class="h-7 px-2.5 rounded border border-outline-variant/30 text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 text-xs font-numeric-md transition-colors">3</button>
+<span class="px-1 text-outline text-xs font-numeric-md">...</span>
+<button class="h-7 px-2.5 rounded border border-outline-variant/30 text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 text-xs font-numeric-md transition-colors">13</button>
+<button class="h-7 w-7 rounded border border-outline-variant/40 flex items-center justify-center text-outline hover:text-neutral-900 hover:bg-neutral-100 transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- ==================== DRAWER LATERAL / MODAL: EDITAR TRANSACCIÓN (CLEAN MINIMAL) ==================== -->
+<div class="fixed inset-0 bg-neutral-950/20 backdrop-blur-sm z-50 flex justify-end transition-opacity duration-300 opacity-100" id="drawerBackdrop">
+<!-- Panel Container -->
+<div class="w-full max-w-md bg-white h-full border-l border-outline-variant/40 shadow-xl flex flex-col justify-between transform transition-transform duration-300 translate-x-0" id="drawerPanel">
+<!-- Drawer Header -->
+<div class="px-5 py-4 border-b border-outline-variant/30 flex items-center justify-between bg-white">
+<div>
+<span class="text-label-sm text-outline uppercase tracking-wider block">Movimiento</span>
+<h2 class="text-body-lg font-semibold text-neutral-900" id="drawerTitle">Editar Transacción</h2>
+</div>
+<button class="p-1 rounded-lg text-outline hover:text-neutral-900 hover:bg-neutral-100 transition-colors" onclick="toggleDrawer(false)" title="Cerrar ventana">
+<span class="material-symbols-outlined text-xl" data-icon="close">close</span>
+</button>
+</div>
+<!-- Drawer Form Body -->
+<form class="px-5 py-4 flex-1 overflow-y-auto space-y-4" id="transactionForm" onsubmit="saveTransaction(event)">
+<!-- Nombre / Comercio -->
+<div>
+<label class="block text-label-sm font-medium text-neutral-700 mb-1">Nombre del gasto o comercio</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-base" data-icon="store">store</span>
+<input class="w-full h-9 pl-8 pr-3 bg-white border border-outline-variant/50 rounded-lg text-body-sm text-neutral-900 focus:border-neutral-900 focus:ring-0 outline-none transition-all" id="editConcepto" required="" type="text" value="Amazon Web Services EMEA"/>
+</div>
+</div>
+<!-- Monto & Tipo -->
+<div class="grid grid-cols-2 gap-3">
+<div>
+<label class="block text-label-sm font-medium text-neutral-700 mb-1">Monto ($ USD)</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-base" data-icon="attach_money">attach_money</span>
+<input class="w-full h-9 pl-8 pr-3 bg-white border border-outline-variant/50 rounded-lg text-body-sm font-numeric-md text-neutral-900 focus:border-neutral-900 focus:ring-0 outline-none transition-all" id="editMonto" required="" step="0.01" type="number" value="1248.50"/>
+</div>
+</div>
+<div>
+<label class="block text-label-sm font-medium text-neutral-700 mb-1">Tipo</label>
+<select class="w-full h-9 px-2.5 bg-white border border-outline-variant/50 rounded-lg text-body-sm text-neutral-900 focus:border-neutral-900 focus:ring-0 outline-none cursor-pointer" id="editTipo">
+<option selected="" value="expense">Gasto</option>
+<option value="income">Ingreso</option>
+</select>
+</div>
+</div>
+<!-- Fecha Simple -->
+<div>
+<label class="block text-label-sm font-medium text-neutral-700 mb-1">Fecha</label>
+<input class="w-full h-9 px-2.5 bg-white border border-outline-variant/50 rounded-lg text-body-sm text-neutral-900 focus:border-neutral-900 focus:ring-0 outline-none cursor-pointer" id="editFecha" type="date" value="2024-11-14"/>
+</div>
+<!-- Categoría -->
+<div>
+<label class="block text-label-sm font-medium text-neutral-700 mb-1">Categoría</label>
+<div class="relative">
+<select class="w-full h-9 pl-2.5 pr-8 bg-white border border-outline-variant/50 rounded-lg text-body-sm text-neutral-900 appearance-none focus:border-neutral-900 focus:ring-0 outline-none cursor-pointer" id="editCategoria">
+<option selected="" value="Tecnología &amp; SaaS">Tecnología &amp; Suscripciones</option>
+<option value="Espacio de Oficina">Hogar &amp; Servicios</option>
+<option value="Marketing &amp; Pauta">Compras &amp; Ocio</option>
+<option value="Viajes &amp; Representación">Viajes &amp; Salidas</option>
+<option value="Honorarios &amp; Rendimientos">Salario &amp; Rendimientos</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-outline text-xs pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<!-- Tarjeta / Cuenta -->
+<div>
+<label class="block text-label-sm font-medium text-neutral-700 mb-1">Tarjeta / Cuenta</label>
+<div class="relative">
+<select class="w-full h-9 pl-2.5 pr-8 bg-white border border-outline-variant/50 rounded-lg text-body-sm text-neutral-900 appearance-none focus:border-neutral-900 focus:ring-0 outline-none cursor-pointer" id="editTarjeta">
+<option selected="" value="Black Metal •• 8920">Tarjeta Principal (•• 8920)</option>
+<option value="Aura Infinite •• 4102">Tarjeta Débito (•• 4102)</option>
+<option value="Treasury Capital •• 1109">Cuenta de Ahorros (•• 1109)</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-outline text-xs pointer-events-none" data-icon="credit_card">credit_card</span>
+</div>
+</div>
+<!-- Notas personales -->
+<div>
+<label class="block text-label-sm font-medium text-neutral-700 mb-1">Notas personales</label>
+<textarea class="w-full p-2.5 bg-white border border-outline-variant/50 rounded-lg text-body-sm text-neutral-900 focus:border-neutral-900 focus:ring-0 outline-none transition-all placeholder:text-outline resize-none" id="editNotas" placeholder="Añade notas o detalles de este gasto..." rows="3">Servidores dedicados y suscripción mensual</textarea>
+</div>
+<!-- Eliminar Gasto botón simplificado -->
+<div class="pt-2 border-t border-outline-variant/20">
+<button class="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg border border-outline-variant/40 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-all text-body-sm" onclick="confirmDeleteCurrent()" type="button">
+<span class="material-symbols-outlined text-base" data-icon="delete">delete</span>
+<span>Eliminar Movimiento</span>
+</button>
+</div>
+</form>
+<!-- Drawer Footer Actions -->
+<div class="px-5 py-3 border-t border-outline-variant/30 bg-neutral-50/70 flex items-center justify-end gap-2.5">
+<button class="px-3.5 py-1.5 rounded-lg border border-outline-variant/40 text-neutral-700 hover:text-neutral-900 hover:bg-neutral-100 transition-colors text-body-sm active:scale-95" onclick="toggleDrawer(false)" type="button">
+Cancelar
+</button>
+<button class="px-4 py-1.5 rounded-lg bg-neutral-900 text-white hover:bg-neutral-800 transition-all text-body-sm font-medium active:scale-95 flex items-center gap-1.5" onclick="document.getElementById('transactionForm').requestSubmit()" type="button">
+<span class="material-symbols-outlined text-base" data-icon="check">check</span>
+<span>Guardar Cambios</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Notification Toast feedback (Minimal) -->
+<div class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none bg-neutral-900 text-white border border-neutral-800 rounded-lg px-3.5 py-2.5 flex items-center gap-2.5 shadow-lg text-body-sm" id="toast">
+<div class="w-5 h-5 rounded-full bg-white/10 text-white flex items-center justify-center" id="toastIcon">
+<span class="material-symbols-outlined text-sm" data-icon="check">check</span>
+</div>
+<div class="font-normal" id="toastMessage">Operación realizada con éxito</div>
+</div>
+<!-- JavaScript for Interactions -->
+<script>
+    function toggleDrawer(show) {
+      const backdrop = document.getElementById('drawerBackdrop');
+      const panel = document.getElementById('drawerPanel');
+      if (show) {
+        backdrop.classList.remove('hidden', 'pointer-events-none', 'opacity-0');
+        backdrop.classList.add('opacity-100');
+        panel.classList.remove('translate-x-full');
+        panel.classList.add('translate-x-0');
+      } else {
+        backdrop.classList.add('opacity-0', 'pointer-events-none');
+        panel.classList.add('translate-x-full');
+        panel.classList.remove('translate-x-0');
+        setTimeout(() => {
+          backdrop.classList.add('hidden');
+        }, 300);
+      }
+    }
+
+    function editItem(concepto, monto, fecha, categoria, tarjeta, notas) {
+      document.getElementById('drawerTitle').innerText = 'Editar Transacción';
+      document.getElementById('editConcepto').value = concepto;
+      document.getElementById('editMonto').value = Math.abs(monto).toFixed(2);
+      document.getElementById('editFecha').value = fecha;
+      document.getElementById('editCategoria').value = categoria;
+      document.getElementById('editTarjeta').value = tarjeta;
+      document.getElementById('editNotas').value = notas || '';
+      document.getElementById('editTipo').value = monto < 0 ? 'income' : 'expense';
+      toggleDrawer(true);
+    }
+
+    function openCreateModal() {
+      document.getElementById('drawerTitle').innerText = 'Registrar Nuevo Movimiento';
+      document.getElementById('editConcepto').value = '';
+      document.getElementById('editMonto').value = '';
+      document.getElementById('editFecha').value = new Date().toISOString().split('T')[0];
+      document.getElementById('editNotas').value = '';
+      toggleDrawer(true);
+    }
+
+    function confirmDelete(title) {
+      if (confirm(`¿Está seguro de que desea eliminar la transacción "${title}"? Esta acción auditará el balance patrimonial.`)) {
+        showToast(`Transacción "${title}" eliminada.`);
+      }
+    }
+
+    function confirmDeleteCurrent() {
+      const title = document.getElementById('editConcepto').value;
+      if (confirm(`¿Confirmar eliminación permanente de "${title}"?`)) {
+        toggleDrawer(false);
+        showToast('Transacción eliminada del libro contable.', 'error');
+      }
+    }
+
+    function saveTransaction(e) {
+      e.preventDefault();
+      toggleDrawer(false);
+      showToast('Cambios guardados en el registro contable.');
+    }
+
+    function downloadLedger() {
+      showToast('Generando reporte ledger en formato CSV/Excel...');
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      const toastIcon = document.getElementById('toastIcon');
+
+      toastMessage.innerText = message;
+      if (type === 'error') {
+        toastIcon.innerHTML = '<span class="material-symbols-outlined text-sm">priority_high</span>';
+      } else {
+        toastIcon.innerHTML = '<span class="material-symbols-outlined text-sm">check</span>';
+      }
+
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-24', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 3500);
+    }
+
+    // Live search filter simulation
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+      const term = e.target.value.toLowerCase();
+      const rows = document.querySelectorAll('#transactionRows tr');
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(term) ? '' : 'none';
+      });
+    });
+  </script>
+</body></html>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { parseDateString, type Transaction } from '@cofinance/core'
+import type { Transaction } from '@cofinance/core'
 
 const props = defineProps<{
   movements: Transaction[]
@@ -10,28 +10,13 @@ const props = defineProps<{
 }>()
 
 const PAGE_SIZE = 10
-const page = ref(1)
-
-watch(() => [props.periodKey, props.creditCardId], () => { page.value = 1 })
-
-const total = computed(() => props.movements.length)
-const pageCount = computed(() => Math.max(1, Math.ceil(total.value / PAGE_SIZE)))
-const from = computed(() => (total.value === 0 ? 0 : (page.value - 1) * PAGE_SIZE + 1))
-const to = computed(() => Math.min(page.value * PAGE_SIZE, total.value))
-const visible = computed(() => props.movements.slice((page.value - 1) * PAGE_SIZE, page.value * PAGE_SIZE))
+const { pageItems: visible, from, to, total, hasPrev, hasNext, prev, next } = usePagination(
+  toRef(props, 'movements'),
+  PAGE_SIZE,
+  [() => props.periodKey, () => props.creditCardId]
+)
 
 const isIncome = (tx: Transaction) => tx.type === 'income'
-const formatDate = (tx: Transaction) =>
-  parseDateString(tx.date.substring(0, 10)).toLocaleDateString('es-CO', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric'
-  })
-const method = (tx: Transaction) => {
-  if (tx.paymentMethod === 'debit_card') return 'Débito'
-  if (tx.paymentMethod === 'credit_card') return tx.creditCardBank ? `Crédito · ${tx.creditCardBank}` : 'Crédito'
-  return ''
-}
 </script>
 
 <template>
@@ -64,8 +49,8 @@ const method = (tx: Transaction) => {
                   {{ isIncome(tx) ? 'Ingreso' : tx.categoryName }}
                 </span>
               </td>
-              <td class="py-2.5 px-2.5 text-body-sm text-neutral-600 whitespace-nowrap">{{ formatDate(tx) }}</td>
-              <td class="py-2.5 px-2.5 text-body-sm text-neutral-500">{{ method(tx) }}</td>
+              <td class="py-2.5 px-2.5 text-body-sm text-neutral-600 whitespace-nowrap">{{ formatTxDate(tx) }}</td>
+              <td class="py-2.5 px-2.5 text-body-sm text-neutral-500">{{ paymentMethodLabel(tx) }}</td>
               <td
                 class="py-2.5 px-2.5 text-right text-numeric-md font-numeric-md whitespace-nowrap"
                 :class="isIncome(tx) ? 'text-emerald-700' : 'text-neutral-900'"
@@ -81,15 +66,15 @@ const method = (tx: Transaction) => {
         <div class="flex gap-2">
           <button
             class="px-3 h-8 rounded-md bg-white border border-slate-200 text-label-md font-label-md disabled:opacity-40 disabled:cursor-not-allowed enabled:hover:bg-neutral-50"
-            :disabled="page <= 1"
-            @click="page--"
+            :disabled="!hasPrev"
+            @click="prev"
           >
             Anterior
           </button>
           <button
             class="px-3 h-8 rounded-md bg-white border border-slate-200 text-label-md font-label-md disabled:opacity-40 disabled:cursor-not-allowed enabled:hover:bg-neutral-50"
-            :disabled="page >= pageCount"
-            @click="page++"
+            :disabled="!hasNext"
+            @click="next"
           >
             Siguiente
           </button>

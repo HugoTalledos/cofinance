@@ -1,5 +1,11 @@
 <script setup lang="ts">
 const { user, signOut } = useAuth()
+const route = useRoute()
+
+const navItems = [
+  { to: '/', icon: 'dashboard', label: 'Dashboard General' },
+  { to: '/historial', icon: 'receipt_long', label: 'Historial de Transacciones' }
+]
 </script>
 
 <template>
@@ -13,10 +19,16 @@ const { user, signOut } = useAuth()
           <span class="font-headline-sm text-headline-sm text-neutral-900">Cofinance</span>
         </div>
         <nav class="flex flex-col gap-space-xs">
-          <a class="flex items-center gap-space-sm px-space-md h-9 rounded-lg bg-surface-container text-on-surface font-medium">
-            <span class="material-symbols-outlined text-base">dashboard</span>
-            <span>Dashboard General</span>
-          </a>
+          <NuxtLink
+            v-for="item in navItems"
+            :key="item.to"
+            :to="item.to"
+            class="flex items-center gap-space-sm px-space-md h-9 rounded-lg"
+            :class="route.path === item.to ? 'bg-surface-container text-on-surface font-medium' : 'text-on-surface-variant hover:bg-surface-container-low'"
+          >
+            <span class="material-symbols-outlined text-base">{{ item.icon }}</span>
+            <span>{{ item.label }}</span>
+          </NuxtLink>
         </nav>
       </div>
       <div class="flex items-center gap-space-sm p-space-sm border-t border-slate-200">
