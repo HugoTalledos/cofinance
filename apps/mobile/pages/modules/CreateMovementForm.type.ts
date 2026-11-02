@@ -11,7 +11,9 @@ export interface MovementPayload {
   detail: string;
   value: number;
   date: Date;
-  type: 'income' | 'expense';
+  /** Fecha civil para abonos, sin conversión UTC. */
+  dateKey: string;
+  type: 'income' | 'expense' | 'card_payment';
   /** Solo en egresos */
   paymentMethod?: PaymentMethod;
   /** Solo en egresos con crédito */
@@ -27,7 +29,7 @@ export interface MovementFormValue {
   detail: string;
   value: number;
   date: string;
-  type: 'income' | 'expense';
+  type: 'income' | 'expense' | 'card_payment';
   paymentMethod?: PaymentMethod;
   creditCardId?: string;
 }
