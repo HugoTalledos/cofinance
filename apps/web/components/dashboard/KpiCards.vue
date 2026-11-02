@@ -5,6 +5,7 @@ const props = defineProps<{
   kpis: { income: Kpi; spent: Kpi; saved: Kpi; remaining: Kpi }
   cardBank: string | null
   loading: boolean
+  error?: string | null
 }>()
 
 const items = computed(() => [
@@ -26,7 +27,13 @@ const tone = (change: number, upIsBad: boolean) => {
 </script>
 
 <template>
-  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  <section
+    v-if="error"
+    class="bg-surface-container-lowest rounded-lg border border-slate-200 p-4"
+  >
+    <p class="text-body-sm text-red-700">No se pudieron cargar los indicadores del periodo.</p>
+  </section>
+  <section v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     <div
       v-for="item in items"
       :key="item.label"

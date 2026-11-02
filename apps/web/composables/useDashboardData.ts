@@ -28,8 +28,13 @@ const sumAmounts = (txs: Transaction[]): number => txs.reduce((acc, tx) => acc +
 
 export function useDashboardData(periodKey: Ref<string>, creditCardId: Ref<string | null>) {
   const loading = ref(true)
-  const errors = ref<{ transactions: string | null; recurring: string | null }>({
+  const errors = ref<{
+    transactions: string | null
+    categories: string | null
+    recurring: string | null
+  }>({
     transactions: null,
+    categories: null,
     recurring: null
   })
   const categories = ref<Category[]>([])
@@ -42,6 +47,7 @@ export function useDashboardData(periodKey: Ref<string>, creditCardId: Ref<strin
   const staticLoad = Promise.all([getCategories(), getCreditCards(), getRecurringExpenses()]).then(
     ([cats, cards, rec]) => {
       categories.value = cats.data ?? []
+      errors.value.categories = cats.error
       creditCards.value = cards.data ?? []
       recurringRaw.value = rec.data ?? []
       errors.value.recurring = rec.error
@@ -54,6 +60,7 @@ export function useDashboardData(periodKey: Ref<string>, creditCardId: Ref<strin
   const loadTransactions = async (key: string) => {
     const id = ++requestId
     loading.value = true
+    errors.value.transactions = null
     const currentRange = getBillingPeriodRangeFromKey(key)
     const previousRange = getBillingPeriodRangeFromKey(getPreviousMonth(key))
     const result = await getTransactions({
@@ -65,7 +72,11 @@ export function useDashboardData(periodKey: Ref<string>, creditCardId: Ref<strin
 
     const all = result.data ?? []
     currentTxs.value = all.filter(tx => tx.date.substring(0, 10) >= currentRange.startDate)
-    previousTxs.value = all.filter(tx => tx.date.substring(0, 10) < currentRange.startDate)
+    // Paridad con móvil: su consulta del periodo anterior usa `date <= endDate` (comparación
+    // de strings completos), así que un ISO completo del último día queda fuera.
+    previousTxs.value = all.filter(
+      tx => tx.date.substring(0, 10) < currentRange.startDate && tx.date <= previousRange.endDate
+    )
     errors.value.transactions = result.error
     loading.value = false
   }
