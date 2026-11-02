@@ -16,7 +16,7 @@ const route = useRoute()
       v-for="tab in TABS"
       :key="tab.to"
       :to="tab.to"
-      class="flex flex-col items-center justify-center rounded-xl px-4 py-1.5 active:scale-[0.98] transition-transform duration-150"
+      class="flex flex-col items-center justify-center rounded-xl px-2 py-1.5 active:scale-[0.98] transition-transform duration-150"
       :class="route.path === tab.to
         ? 'bg-primary-container text-white'
         : 'text-on-surface-variant hover:bg-surface-container-low'"

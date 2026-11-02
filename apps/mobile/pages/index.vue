@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CardConsumption from '~/components/summary/CardConsumption.vue'
 import AppShell from '~/components/AppShell/AppShell.vue'
 import { useSummary } from '~/composables/useSummary'
 import { useRecurringExpenses } from '~/composables/useRecurringExpenses'
@@ -97,11 +98,18 @@ const ringSegments = computed(() => {
     })
 })
 
+const slides = ref<HTMLElement | null>(null)
+const activeSlide = ref(0)
+function goToSlide(index: number) { slides.value?.scrollTo({left: index * slides.value.clientWidth, behavior: 'smooth'}) }
+function updateSlide() { if (slides.value) activeSlide.value = Math.round(slides.value.scrollLeft / slides.value.clientWidth) }
+
 const isDimmed = (key: SectionKey) => selectedKey.value !== null && selectedKey.value !== key
 </script>
 
 <template>
   <app-shell>
+    <div ref="slides" class="flex overflow-x-auto snap-x snap-mandatory w-full min-w-0 items-start [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Resumen y consumo por tarjeta" @scroll.passive="updateSlide">
+    <div class="w-full min-w-0 shrink-0 snap-start px-0.5">
     <section class="mt-2 bg-surface-container-lowest border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col items-center">
       <div class="relative flex items-center justify-center w-64 h-64 my-1">
         <svg class="w-full h-full -rotate-90" viewBox="0 0 160 160">
@@ -166,6 +174,10 @@ const isDimmed = (key: SectionKey) => selectedKey.value !== null && selectedKey.
         </div>
       </div>
     </section>
+    </div>
+    <div class="w-full min-w-0 shrink-0 snap-start px-0.5 pt-2"><CardConsumption :period-key="currentMonth || getCurrentBillingPeriodKey()" :period-label="periodLabel" /></div>
+    </div>
+    <div class="flex flex-col items-center gap-2 -mt-3"><div class="flex gap-3"><button v-for="(label,index) in ['Resumen','Tarjetas']" :key="label" type="button" :aria-current="activeSlide===index ? 'true' : undefined" class="px-3 py-2 rounded-full text-label-sm" :class="activeSlide===index ? 'bg-primary-container text-white' : 'bg-surface-container text-on-surface-variant'" @click="goToSlide(index)">{{ label }}</button></div><p class="text-[11px] text-slate-500">{{ activeSlide === 0 ? 'Desliza a la izquierda para ver el consumo por tarjeta' : 'Desliza a la derecha para volver al resumen' }}</p></div>
 
     <NuxtLink
       to="/registrar"

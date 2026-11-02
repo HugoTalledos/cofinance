@@ -64,7 +64,7 @@ pages/*.vue  →  composables/*.ts  →  @cofinance/core (packages/core/src/serv
 | `Transaction` | Firestore auto-id | `categoryName` denormalized; `month` field (`YYYY-MM`) separate from `date` (`YYYY-MM-DD`) for Firestore indexing |
 | `MonthlySummary` | `userId_month` | Compound ID for direct reads; updated atomically alongside transactions |
 | `RecurringExpense` | Firestore auto-id | Separate collection for recurring payments |
-| `CreditCard` | Firestore auto-id | `credit_cards` collection, read-only from the app (managed in the Firebase console); expenses store `creditCardId` + denormalized `creditCardBank` |
+| `CreditCard` | Firestore auto-id | `credit_cards` collection, created in Firebase console; app configures opening balance, tracking date and informational cutoff/payment days; expenses store `creditCardId` + denormalized `creditCardBank` |
 
 ### Billing periods
 

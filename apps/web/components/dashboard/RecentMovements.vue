@@ -46,7 +46,7 @@ const isIncome = (tx: Transaction) => tx.type === 'income'
               <td class="py-2.5 px-2.5 text-body-sm font-medium text-neutral-900">{{ tx.description }}</td>
               <td class="py-2.5 px-2.5">
                 <span class="px-2 py-0.5 rounded text-label-md font-label-md bg-neutral-100 text-neutral-700 border border-slate-200">
-                  {{ isIncome(tx) ? 'Ingreso' : tx.categoryName }}
+                  {{ tx.type === 'card_payment' ? 'Pago de tarjeta' : isIncome(tx) ? 'Ingreso' : tx.categoryName }}
                 </span>
               </td>
               <td class="py-2.5 px-2.5 text-body-sm text-neutral-600 whitespace-nowrap">{{ formatTxDate(tx) }}</td>

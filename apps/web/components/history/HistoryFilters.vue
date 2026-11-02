@@ -28,7 +28,8 @@ const onCategory = (e: Event) => update({ categoryId: (e.target as HTMLSelectEle
 const types = [
   { value: 'all', label: 'Todos' },
   { value: 'expense', label: 'Gasto' },
-  { value: 'income', label: 'Ingreso' }
+  { value: 'income', label: 'Ingreso' },
+  { value: 'card_payment', label: 'Pago de tarjeta' }
 ] as const
 
 const selectClass =

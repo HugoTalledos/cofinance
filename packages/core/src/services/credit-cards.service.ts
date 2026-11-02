@@ -3,8 +3,8 @@ import { useFirestoreDb, COLLECTIONS } from './firebase'
 import type { CreditCard, ApiResponse } from '../types'
 
 /**
- * Servicio de solo lectura para tarjetas de crédito.
- * Las tarjetas se crean y editan directamente en Firestore, no desde la app.
+ * Servicio de consulta y configuración de seguimiento para tarjetas de crédito.
+ * Las tarjetas se crean en Firestore; la app permite configurar su seguimiento.
  */
 
 /**
@@ -37,4 +37,18 @@ export const getCreditCards = async (): Promise<ApiResponse<CreditCard[]>> => {
   }
 
   return response
+}
+
+/** Guarda el punto inicial del seguimiento y los días informativos. */
+export const updateCreditCardSettings = async (id: string, input: import('../cards/balance').CardSettingsInput): Promise<ApiResponse<boolean>> => {
+  try {
+    const { validateCardSettings, cardToday } = await import('../cards/balance')
+    const validation = validateCardSettings(input, cardToday())
+    if (validation) throw new Error(validation)
+    const { doc, updateDoc, deleteField } = await import('firebase/firestore')
+    const db = useFirestoreDb()
+    if (!db) throw new Error('Firestore no disponible')
+    await updateDoc(doc(db, COLLECTIONS.CREDIT_CARDS, id), { ...input, statementDay: input.statementDay ?? deleteField(), paymentDay: input.paymentDay ?? deleteField() })
+    return { data:true,error:null,loading:false }
+  } catch (err) { return {data:null,error:err instanceof Error ? err.message : 'Error al configurar tarjeta',loading:false} }
 }

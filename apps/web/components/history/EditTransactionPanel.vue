@@ -51,16 +51,6 @@ watch(
 
 const isIncome = computed(() => props.transaction?.type === 'income')
 
-const formattedAmount = computed({
-  get() {
-    return form.value.amount === null ? '' : new Intl.NumberFormat('es-CO').format(form.value.amount)
-  },
-  set(raw: string) {
-    const numeric = parseInt(raw.replace(/\D/g, ''), 10)
-    form.value.amount = isNaN(numeric) ? null : numeric
-  }
-})
-
 const validationMessage = computed(() =>
   props.transaction ? validateEditForm(props.transaction, form.value, props.creditCards) : null
 )
@@ -156,17 +146,7 @@ const inputClass =
 
         <div>
           <label for="edit-amount" class="block text-label-sm font-medium text-neutral-700 mb-1">Monto (COP)</label>
-          <div class="relative">
-            <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-body-sm">$</span>
-            <input
-              id="edit-amount"
-              v-model="formattedAmount"
-              type="text"
-              inputmode="numeric"
-              placeholder="0"
-              :class="[inputClass, 'pl-6 font-numeric-md tabular-nums']"
-            >
-          </div>
+          <MoneyInput id="edit-amount" v-model="form.amount" />
         </div>
 
         <template v-if="!isIncome">

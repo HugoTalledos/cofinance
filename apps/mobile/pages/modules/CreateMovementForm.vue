@@ -2,7 +2,7 @@
 import { reactive, computed, ref } from 'vue'
 import type { Category, MovementPayload, MovementFormValue } from './CreateMovementForm.type'
 import { useToast } from '~/components/Toast/useToast'
-import { formatDateToString } from '@cofinance/core'
+import { formatDateToString, cardToday, validateCardPayment, isCardConfigured } from '@cofinance/core'
 import type { PaymentMethod, CreditCard } from '@cofinance/core'
 
 const { showToast } = useToast()
@@ -17,6 +17,7 @@ const props = defineProps<{
 const TYPE_OPTIONS = [
   { label: 'Egreso', value: 'expense', icon: 'arrow-up-right' },
   { label: 'Ingreso', value: 'income', icon: 'arrow-down' },
+  { label: 'Pago de tarjeta', value: 'card_payment', icon: 'wallet' },
 ] as const
 
 const PAYMENT_METHOD_OPTIONS: { label: string; value: PaymentMethod }[] = [
@@ -25,7 +26,7 @@ const PAYMENT_METHOD_OPTIONS: { label: string; value: PaymentMethod }[] = [
 ]
 
 const initialState = () => ({
-  type: props.initialValue?.type ?? 'expense' as 'income' | 'expense',
+  type: props.initialValue?.type ?? 'expense' as 'income' | 'expense' | 'card_payment',
   categoryId: props.initialValue?.categoryId ?? '',
   detail: props.initialValue?.detail ?? '',
   value: props.initialValue?.value ?? null as number | null,
@@ -48,7 +49,7 @@ const selectedCreditCard = computed(() =>
 )
 
 const requiresCreditCard = computed(() =>
-  form.type === 'expense' && form.paymentMethod === 'credit_card' && props.creditCards.length > 0
+  form.type === 'card_payment' || (form.type === 'expense' && form.paymentMethod === 'credit_card' && props.creditCards.length > 0)
 )
 
 const categorySearch = ref('')
@@ -77,7 +78,13 @@ const dateLabel = computed(() => {
   return date === today ? `Hoy, ${label}` : label
 })
 
+const paymentError = computed(() => {
+  if (!selectedCreditCard.value) return 'Elige una tarjeta'
+  return validateCardPayment({amount:form.value ?? 0,date:form.date || cardToday(),description:form.detail},selectedCreditCard.value,cardToday())
+})
+
 const isValid = computed(() => {
+  if (form.type === 'card_payment') return paymentError.value === null
   if (form.type === 'income') {
     return Boolean(form.detail && form.value && form.value > 0)
   }
@@ -87,7 +94,7 @@ const isValid = computed(() => {
 
 const submit = (): MovementPayload | null => {
   if (!isValid.value) {
-    showToast('Porfavor, completa los campos requeridos', 'error')
+    showToast(form.type === 'card_payment' ? paymentError.value || 'Revisa el abono' : 'Por favor, completa los campos requeridos', 'error')
     return null
   }
 
@@ -98,6 +105,7 @@ const submit = (): MovementPayload | null => {
     detail: form.detail,
     value: form.value || 0,
     date: submissionDate,
+    dateKey: form.date || cardToday(),
     type: form.type,
     ...(form.type === 'expense' && { paymentMethod: form.paymentMethod }),
     ...(requiresCreditCard.value && selectedCreditCard.value && {
@@ -123,7 +131,7 @@ defineExpose({ submit, reset })
         type="button"
         :aria-pressed="form.type === option.value"
         :disabled="lockType"
-        class="flex-1 py-2 px-3 rounded-lg text-title-md transition-all duration-200 flex items-center justify-center gap-1.5 disabled:cursor-not-allowed"
+        class="flex-1 min-w-0 py-2 px-1 rounded-lg text-label-md transition-all duration-200 flex items-center justify-center gap-1.5 disabled:cursor-not-allowed"
         :class="form.type === option.value
           ? 'bg-black text-white shadow-sm'
           : 'text-on-surface-variant hover:text-on-surface'"
@@ -136,7 +144,7 @@ defineExpose({ submit, reset })
 
     <section class="p-4 bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm text-center">
       <label for="amount" class="block text-label-sm uppercase text-outline mb-1">
-        {{ form.type === 'income' ? 'Monto del ingreso' : 'Monto del egreso' }}
+        {{ form.type === 'card_payment' ? 'Monto del abono' : form.type === 'income' ? 'Monto del ingreso' : 'Monto del egreso' }}
       </label>
       <div class="flex items-center justify-center gap-1">
         <span class="font-display text-currency-display text-outline select-none">$</span>
@@ -225,8 +233,12 @@ defineExpose({ submit, reset })
           {{ option.label }}
         </button>
       </div>
+    </section>
+
+    <section v-if="requiresCreditCard" class="flex flex-col gap-2">
+      <p class="text-label-sm uppercase text-outline">Tarjeta de crédito</p>
+      <p v-if="form.type === 'card_payment'" class="text-body-sm text-on-surface-variant">El abono reduce la deuda y no cuenta como otro gasto.</p>
       <div
-        v-if="requiresCreditCard"
         role="radiogroup"
         aria-label="Tarjeta de crédito"
         class="flex flex-wrap gap-2"
@@ -237,16 +249,20 @@ defineExpose({ submit, reset })
           type="button"
           role="radio"
           :aria-checked="selectedCreditCard?.id === card.id"
+          :disabled="form.type === 'card_payment' && !isCardConfigured(card)"
           class="px-3 py-1.5 rounded-full text-label-md font-semibold transition-all active:scale-[0.98]"
           :class="selectedCreditCard?.id === card.id
             ? 'bg-black text-white'
             : 'border border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:text-on-surface'"
           @click="form.creditCardId = card.id"
         >
-          {{ card.bank }}
+          {{ card.bank }}{{ form.type === 'card_payment' && !isCardConfigured(card) ? ' · Configurar en web' : '' }}
         </button>
       </div>
     </section>
+
+    <p v-if="form.type === 'card_payment' && !creditCards.length" role="status" class="text-body-sm text-on-surface-variant">No hay tarjetas disponibles. Configúralas desde Tarjetas en la web.</p>
+    <p v-if="form.type === 'card_payment' && selectedCreditCard && !isCardConfigured(selectedCreditCard)" class="text-body-sm text-error">Configura el saldo inicial de esta tarjeta desde la web para registrar abonos.</p>
 
     <label class="relative flex items-center gap-4 p-3 bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm">
       <span class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant shrink-0">
@@ -261,6 +277,8 @@ defineExpose({ submit, reset })
         v-model="form.date"
         type="date"
         aria-label="Fecha del registro"
+        :min="form.type === 'card_payment' ? selectedCreditCard?.trackingStartDate : undefined"
+        :max="form.type === 'card_payment' ? cardToday() : undefined"
         class="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
       />
     </label>
@@ -272,7 +290,7 @@ defineExpose({ submit, reset })
       <input
         v-model="form.detail"
         type="text"
-        placeholder="Descripción corta (ej: Almuerzo)"
+        :placeholder="form.type === 'card_payment' ? 'Descripción del abono (opcional)' : 'Descripción corta (ej: Almuerzo)'"
         class="flex-1 min-w-0 bg-transparent border-0 p-0 text-title-md font-normal text-on-surface placeholder:text-on-surface-variant/70 outline-none focus:ring-0"
       />
     </label>

@@ -40,16 +40,6 @@ watch(
 const isEdit = computed(() => props.mode === 'edit')
 const form = computed(() => (isEdit.value ? editForm.value : createForm.value))
 
-const formattedBudget = computed({
-  get() {
-    return form.value.budget === null ? '' : new Intl.NumberFormat('es-CO').format(form.value.budget)
-  },
-  set(raw: string) {
-    const numeric = parseInt(raw.replace(/\D/g, ''), 10)
-    form.value.budget = isNaN(numeric) ? null : numeric
-  }
-})
-
 const validationMessage = computed(() => {
   if (props.mode === 'create') {
     // Un formulario vacío no muestra mensaje hasta que se escriba algo
@@ -159,17 +149,7 @@ const readonlyClass =
 
         <div>
           <label for="cat-budget" class="block text-label-sm font-medium text-neutral-700 mb-1">Presupuesto (opcional)</label>
-          <div class="relative">
-            <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-body-sm">$</span>
-            <input
-              id="cat-budget"
-              v-model="formattedBudget"
-              type="text"
-              inputmode="numeric"
-              placeholder="0"
-              :class="[inputClass, 'pl-6 font-numeric-md tabular-nums']"
-            >
-          </div>
+          <MoneyInput id="cat-budget" v-model="form.budget" />
         </div>
 
         <div v-if="isEdit">

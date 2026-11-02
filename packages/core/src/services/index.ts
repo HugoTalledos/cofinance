@@ -37,7 +37,7 @@ export {
 } from './recurring-expenses.service'
 
 // Servicios de tarjetas de crédito (solo lectura)
-export { getCreditCards } from './credit-cards.service'
+export { getCreditCards, updateCreditCardSettings } from './credit-cards.service'
 
 // Servicios de resúmenes mensuales
 export {
@@ -49,3 +49,4 @@ export {
   recalculateMonthlySummary,
   deleteMonthlySummary
 } from './summary.service'
+export * from './card-payments.service'

@@ -5,6 +5,7 @@ import { useAuth } from '~/composables/useLogin'
 import { useCategories } from '~/composables/useCategories'
 import { useCreditCards } from '~/composables/useCreditCards'
 import { useToast } from '~/components/Toast/useToast'
+import { registerMobileCardPayment } from '~/utils/registerCardPayment'
 import { activeCategories } from '@cofinance/core'
 
 const { user } = useAuth()
@@ -25,6 +26,19 @@ async function createMovement() {
   if (!movementFormRef.value || saving.value) return
   const payload = movementFormRef.value.submit()
   if (!payload) return
+
+  if (payload.type === 'card_payment') {
+    saving.value = true
+    try {
+      const result = await registerMobileCardPayment({creditCardId:payload.creditCard?.id || '',amount:payload.value,date:payload.dateKey,description:payload.detail},user.value)
+      if (result.error) { showToast(result.error,'error'); return }
+      showToast('Pago de tarjeta registrado')
+      navigateTo('/')
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'No se pudo registrar el pago','error')
+    } finally { saving.value = false }
+    return
+  }
 
   const body = {
     userId: user.value?.uid || '',
@@ -83,6 +97,7 @@ async function createMovement() {
       <create-movement-form
         ref="movementFormRef"
         :categories="activeCategories(sortedCategories)"
+        :inert="saving"
         :credit-cards="creditCards"
       />
     </div>

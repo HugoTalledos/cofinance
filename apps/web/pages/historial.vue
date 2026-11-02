@@ -24,6 +24,12 @@ const filtered = computed(() => filterHistory(transactions.value, filters.value)
 const summary = computed(() => summarizeHistory(filtered.value))
 
 const editing = ref<Transaction | null>(null)
+const removing = ref<Transaction | null>(null)
+const onDeleted = async () => {
+  removing.value = null
+  // La recarga actualiza tabla, contador y totales desde las transacciones restantes.
+  await reload()
+}
 
 const onSaved = async () => {
   editing.value = null
@@ -69,8 +75,10 @@ const resetKeys = computed(() => [
         :error="error"
         :editable="true"
         @edit="tx => (editing = tx)"
+        @remove="tx => (removing = tx)"
       />
     </div>
+    <HistoryDeleteTransactionDialog :transaction="removing" @close="removing = null" @deleted="onDeleted" />
     <HistoryEditTransactionPanel
       :transaction="editing"
       :categories="categories"

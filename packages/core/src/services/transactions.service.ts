@@ -13,6 +13,8 @@ import {
   type QueryConstraint
 } from 'firebase/firestore'
 import { useFirestoreDb, COLLECTIONS } from './firebase'
+import { validateCardPayment, cardToday } from '../cards/balance'
+import { getCreditCards } from './credit-cards.service'
 import { updateMonthlySummaryIncremental } from './summary.service'
 import type {
   Transaction,
@@ -43,6 +45,15 @@ export const createTransaction = async (data: TransactionInput): Promise<ApiResp
     const db = useFirestoreDb();
     if (!db) {
       throw new Error('Firestore database not initialized');
+    }
+    if (data.type === 'card_payment') {
+      const cards = await getCreditCards()
+      if (cards.error) throw new Error(cards.error)
+      const card = cards.data?.find(c => c.id === data.creditCardId)
+      if (!card) throw new Error('Tarjeta no disponible')
+      const validation = validateCardPayment(data, card, cardToday())
+      if (validation) throw new Error(validation)
+      if (data.categoryId || data.categoryName || data.paymentMethod) throw new Error('Un abono no tiene categoría ni medio de pago')
     }
     const transactionId = await runTransaction(db, async (transaction) => {
       const transactionsRef = collection(db, COLLECTIONS.TRANSACTIONS);
@@ -156,6 +167,15 @@ export const updateTransaction = async (
     const { type: _ignoredType, ...changes } = data
     if (changes.date) {
       changes.month = extractMonthFromDate(changes.date)
+    }
+    if (before.type === 'card_payment') {
+      if (removeFields.length || changes.creditCardId !== undefined || changes.creditCardBank !== undefined || changes.categoryId !== undefined || changes.categoryName !== undefined || changes.paymentMethod !== undefined) throw new Error('Solo puedes editar monto, fecha y descripción del abono')
+      const cards = await getCreditCards()
+      if (cards.error) throw new Error(cards.error)
+      const card = cards.data?.find(c => c.id === before.creditCardId)
+      if (!card) throw new Error('Tarjeta no disponible')
+      const validation = validateCardPayment({...before,...changes},card,cardToday())
+      if (validation) throw new Error(validation)
     }
     const after: Transaction = { ...before, ...changes }
     const firestoreChanges: Record<string, unknown> = { ...changes }
@@ -342,7 +362,7 @@ export const getCategorySpentInMonth = async (
       return 0
     }
 
-    return result.data.reduce((total, transaction) => total + transaction.amount, 0)
+    return result.data.reduce((total, transaction) => total + ((transaction.type ?? 'expense') === 'expense' ? transaction.amount : 0), 0)
 
   } catch (error) {
     console.error('Error calculating category spent:', error)
@@ -367,7 +387,7 @@ export const getMonthlyTotal = async (
       return 0
     }
 
-    return result.data.reduce((total, transaction) => total + transaction.amount, 0)
+    return result.data.reduce((total, transaction) => total + ((transaction.type ?? 'expense') === 'expense' ? transaction.amount : 0), 0)
 
   } catch (error) {
     console.error('Error calculating monthly total:', error)

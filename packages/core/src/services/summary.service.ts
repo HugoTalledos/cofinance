@@ -338,6 +338,7 @@ export const recalculateMonthlySummary = async (
 
     snapshot.docs.forEach(doc => {
       const transaction = doc.data()
+      if ((transaction.type ?? 'expense') !== 'expense') return
       const categoryId = transaction.categoryId
       const amount = transaction.amount || 0
 
