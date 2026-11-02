@@ -3,9 +3,12 @@ const { user, signOut } = useAuth()
 const route = useRoute()
 
 const navItems = [
-  { to: '/tarjetas', icon: 'credit_card', label: 'Tarjetas' },
   { to: '/', icon: 'dashboard', label: 'Dashboard General' },
-  { to: '/historial', icon: 'receipt_long', label: 'Historial de Transacciones' },
+  { to: '/historial', icon: 'receipt_long', label: 'Historial de Transacciones' }
+]
+
+const adminItems = [
+  { to: '/tarjetas', icon: 'credit_card', label: 'Tarjetas' },
   { to: '/categorias', icon: 'pie_chart', label: 'Categorías' },
   { to: '/recurrentes', icon: 'event_repeat', label: 'Pagos recurrentes' }
 ]
@@ -32,6 +35,29 @@ const navItems = [
             <span class="material-symbols-outlined text-base">{{ item.icon }}</span>
             <span>{{ item.label }}</span>
           </NuxtLink>
+          <details class="group" :open="adminItems.some(item => route.path === item.to)">
+            <summary
+              class="flex items-center gap-space-sm px-space-md h-9 rounded-lg cursor-pointer list-none hover:bg-surface-container-low [&::-webkit-details-marker]:hidden"
+              :class="adminItems.some(item => route.path === item.to) ? 'text-on-surface font-medium' : 'text-on-surface-variant'"
+            >
+              <span class="material-symbols-outlined text-base">settings</span>
+              <span>Administración</span>
+              <span class="material-symbols-outlined text-base ml-auto transition-transform group-open:rotate-180">expand_more</span>
+            </summary>
+            <div class="ml-space-md pl-space-sm border-l border-slate-200 mt-space-xs flex flex-col gap-space-xs">
+              <NuxtLink
+                v-for="item in adminItems"
+                :key="item.to"
+                :to="item.to"
+                :aria-current="route.path === item.to ? 'page' : undefined"
+                class="flex items-center gap-space-sm px-space-sm h-9 rounded-lg text-body-sm"
+                :class="route.path === item.to ? 'bg-surface-container text-on-surface font-medium' : 'text-on-surface-variant hover:bg-surface-container-low'"
+              >
+                <span class="material-symbols-outlined text-base">{{ item.icon }}</span>
+                <span>{{ item.label }}</span>
+              </NuxtLink>
+            </div>
+          </details>
         </nav>
       </div>
       <div class="flex items-center gap-space-sm p-space-sm border-t border-slate-200">
