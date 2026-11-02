@@ -8,6 +8,7 @@ npm workspaces:
 
 ```
 apps/mobile/     # Nuxt + Capacitor app (web + Android)
+apps/web/        # Nuxt dashboard web de solo lectura (sin Capacitor); `npm run dev:web` / `generate:web`
 packages/core/   # @cofinance/core: types, helpers and Firestore services (no Vue/Nuxt deps)
 ```
 

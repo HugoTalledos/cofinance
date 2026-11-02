@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "npm run dev -w apps/mobile",
     "generate": "npm run generate -w apps/mobile",
+    "dev:web": "npm run dev -w apps/web",
+    "generate:web": "npm run generate -w apps/web",
     "android:build": "npm run android:build -w apps/mobile"
   }
 }

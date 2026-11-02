@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Aura Wealth - Dashboard General y Analíticas Financieras</title>
+<!-- Typography: Geist & JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 with configuration -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "secondary-fixed": "#d5e3fd",
+          "secondary-container": "#d5e3fd",
+          "on-error-container": "#93000a",
+          "tertiary-fixed": "#c9e6ff",
+          "inverse-on-surface": "#eaf1ff",
+          "surface-container-low": "#eff4ff",
+          "surface-bright": "#f8f9ff",
+          "surface-tint": "#565e74",
+          "error": "#ba1a1a",
+          "background": "#f8f9ff",
+          "surface": "#f8f9ff",
+          "on-tertiary-fixed": "#001e2f",
+          "primary-container": "#131b2e",
+          "tertiary-fixed-dim": "#89ceff",
+          "on-primary": "#ffffff",
+          "on-tertiary-container": "#008cc7",
+          "on-tertiary": "#ffffff",
+          "outline-variant": "#c6c6cd",
+          "surface-container-highest": "#d3e4fe",
+          "secondary-fixed-dim": "#b9c7e0",
+          "surface-container-lowest": "#ffffff",
+          "primary-fixed-dim": "#bec6e0",
+          "tertiary-container": "#001e2f",
+          "on-tertiary-fixed-variant": "#004c6e",
+          "error-container": "#ffdad6",
+          "surface-variant": "#d3e4fe",
+          "on-error": "#ffffff",
+          "surface-container-high": "#dce9ff",
+          "secondary": "#515f74",
+          "on-surface": "#0b1c30",
+          "on-primary-container": "#7c839b",
+          "outline": "#76777d",
+          "surface-dim": "#cbdbf5",
+          "on-secondary-container": "#57657b",
+          "on-secondary-fixed": "#0d1c2f",
+          "primary": "#000000",
+          "on-primary-fixed-variant": "#3f465c",
+          "surface-container": "#e5eeff",
+          "on-background": "#0b1c30",
+          "on-secondary-fixed-variant": "#3a485c",
+          "on-surface-variant": "#45464d",
+          "primary-fixed": "#dae2fd",
+          "on-secondary": "#ffffff",
+          "tertiary": "#000000",
+          "inverse-primary": "#bec6e0",
+          "inverse-surface": "#213145",
+          "on-primary-fixed": "#131b2e"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.125rem",
+          "lg": "0.25rem",
+          "xl": "0.5rem",
+          "full": "0.75rem"
+        },
+        "spacing": {
+          "space-md": "0.75rem",
+          "space-xl": "2rem",
+          "margin": "1rem",
+          "space-lg": "1.25rem",
+          "space-xs": "0.25rem",
+          "gutter": "1.25rem",
+          "margin-desktop": "3rem",
+          "gutter-desktop": "1.5rem",
+          "space-sm": "0.5rem",
+          "margin-tablet": "2rem"
+        },
+        "fontFamily": {
+          "headline-md": ["Geist"],
+          "headline-lg": ["Geist"],
+          "display-mobile": ["Geist"],
+          "display": ["Geist"],
+          "body-lg": ["Geist"],
+          "body-sm": ["Geist"],
+          "numeric-md": ["JetBrains Mono"],
+          "numeric-lg": ["JetBrains Mono"],
+          "body-md": ["Geist"],
+          "label-sm": ["JetBrains Mono"],
+          "headline-lg-mobile": ["Geist"],
+          "headline-sm": ["Geist"],
+          "label-md": ["JetBrains Mono"]
+        },
+        "fontSize": {
+          "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "500" }],
+          "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+          "display-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+          "display": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.03em", "fontWeight": "600" }],
+          "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+          "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+          "numeric-md": ["15px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+          "numeric-lg": ["24px", { "lineHeight": "30px", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+          "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+          "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+          "headline-lg-mobile": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.015em", "fontWeight": "500" }],
+          "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+          "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "500" }]
+        }
+      },
+    },
+  }
+</script>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen selection:bg-neutral-900 selection:text-white font-body-md text-body-md overflow-x-hidden">
+<!-- ========================================================================= -->
+<!-- SHARED COMPONENT: SideNavBar                                              -->
+<!-- ========================================================================= -->
+<aside class="fixed top-0 left-0 h-screen w-64 flex flex-col justify-between bg-surface-container-lowest border-r border-slate-200 p-space-md z-40 hidden md:flex">
+<!-- Brand / Identity Header -->
+<div class="flex flex-col gap-space-md">
+<div class="flex items-center gap-space-sm px-space-xs py-space-xs">
+<div class="w-8 h-8 rounded-lg bg-neutral-900 flex items-center justify-center text-white shadow-xs">
+<span class="material-symbols-outlined text-base" data-icon="account_balance_wallet">account_balance_wallet</span>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-neutral-900 tracking-tight font-headline-sm">Aura Wealth</span>
+<span class="text-[11px] font-label-md text-neutral-400">Cuenta Patrimonial</span>
+</div>
+</div>
+<!-- Quick Action CTA -->
+<button class="w-full h-9 px-space-md rounded-lg bg-neutral-900 hover:bg-neutral-800 text-white font-body-md text-[13px] font-medium flex items-center justify-center gap-space-xs transition-colors duration-150 active:scale-[0.99]">
+<span class="material-symbols-outlined text-base" data-icon="add">add</span>
+<span>Nueva Transacción</span>
+</button>
+<!-- Primary Navigation Tabs -->
+<nav class="flex flex-col gap-0.5 mt-space-xs">
+<!-- Tab 0: Dashboard General (ACTIVE) -->
+<a class="flex items-center gap-2.5 px-3 py-2 text-neutral-900 font-medium bg-neutral-100 rounded-md transition-colors duration-150" href="#dashboard">
+<span class="material-symbols-outlined text-lg text-neutral-900" data-icon="dashboard">dashboard</span>
+<span class="text-body-md">Dashboard General</span>
+</a>
+<!-- Tab 1: Historial de Transacciones -->
+<a class="flex items-center gap-2.5 px-3 py-2 text-neutral-500 font-normal hover:bg-neutral-50 hover:text-neutral-900 rounded-md transition-colors duration-150" href="#transacciones">
+<span class="material-symbols-outlined text-lg text-neutral-400" data-icon="receipt_long">receipt_long</span>
+<span class="text-body-md">Historial de Transacciones</span>
+</a>
+<!-- Tab 2: Tarjetas & Pagos Recurrentes -->
+<a class="flex items-center gap-2.5 px-3 py-2 text-neutral-500 font-normal hover:bg-neutral-50 hover:text-neutral-900 rounded-md transition-colors duration-150" href="#tarjetas">
+<span class="material-symbols-outlined text-lg text-neutral-400" data-icon="credit_card">credit_card</span>
+<span class="text-body-md">Tarjetas &amp; Pagos Recurrentes</span>
+</a>
+<!-- Tab 3: Categorías & Presupuestos -->
+<a class="flex items-center gap-2.5 px-3 py-2 text-neutral-500 font-normal hover:bg-neutral-50 hover:text-neutral-900 rounded-md transition-colors duration-150" href="#presupuestos">
+<span class="material-symbols-outlined text-lg text-neutral-400" data-icon="pie_chart">pie_chart</span>
+<span class="text-body-md">Categorías &amp; Presupuestos</span>
+</a>
+<!-- Tab 4: Configuración -->
+<a class="flex items-center gap-2.5 px-3 py-2 text-neutral-500 font-normal hover:bg-neutral-50 hover:text-neutral-900 rounded-md transition-colors duration-150" href="#configuracion">
+<span class="material-symbols-outlined text-lg text-neutral-400" data-icon="settings">settings</span>
+<span class="text-body-md">Configuración</span>
+</a>
+</nav>
+</div>
+<!-- SideNav Footer Utilities & Account Overview -->
+<div class="flex flex-col gap-space-xs pt-space-md border-t border-slate-200">
+<div class="p-2 rounded-lg bg-neutral-50 border border-slate-200/80 flex items-center gap-2.5">
+<img alt="Retrato del usuario" class="w-8 h-8 rounded-full object-cover border border-slate-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYHB6yZ24d5NiIjl3aHXTbccBCqnbbK_83Q50uszC1KhYMKEuBGh2cMUKKn83TKseduzrvpO_kQ69jmmh-ELOSEwLdUOz7S5yKweDT-xZD4BT-UGsUJ2v51ephcYoozrY_K4OsaRzbY7p3S-Q9P-oCz7YZsOLBwxRXkSzgWBGPNBfjQSVNcPf5vjspHQA01_SP_3CtUx-iQQ5XO3GratTvK4qC8HTlWCnXtWRhxBY"/>
+<div class="flex flex-col min-w-0">
+<span class="text-body-sm font-medium text-neutral-900 truncate">Alejandro Vance</span>
+<span class="text-[11px] font-label-sm text-neutral-400 truncate">Cuenta Personal</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- ========================================================================= -->
+<!-- SHARED COMPONENT: TopNavBar                                               -->
+<!-- ========================================================================= -->
+<header class="sticky top-0 right-0 w-full z-30 bg-surface-container-lowest/90 backdrop-blur-sm border-b border-slate-200">
+<div class="flex justify-between items-center h-14 px-space-lg w-full md:pl-64">
+<!-- Left: Mobile Brand & Global Context Filters -->
+<div class="flex items-center gap-space-md">
+<!-- Mobile Menu Toggle Button -->
+<button aria-label="Abrir navegación" class="md:hidden text-neutral-700 hover:text-neutral-900 p-1 focus:outline-none">
+<span class="material-symbols-outlined text-2xl" data-icon="menu">menu</span>
+</button>
+<div class="flex items-center gap-space-sm">
+<span class="md:hidden text-headline-sm font-semibold text-neutral-900 tracking-tight">Aura Wealth</span>
+<!-- Global Filter Indicator -->
+<div class="hidden sm:flex items-center gap-1.5 text-neutral-500 text-body-sm bg-neutral-100/80 px-2.5 py-1 rounded-md border border-slate-200">
+<span class="material-symbols-outlined text-sm text-neutral-500" data-icon="tune">tune</span>
+<span>Filtro Global:</span>
+<span class="text-neutral-900 font-medium">Todas las carteras activas</span>
+</div>
+</div>
+</div>
+<!-- Right: Global Actions & Profile Trigger -->
+<div class="flex items-center gap-2">
+<!-- Date Range Filter Trigger -->
+<div class="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-slate-200 text-neutral-700 hover:border-slate-300 transition-colors cursor-pointer text-body-sm">
+<span class="material-symbols-outlined text-neutral-500 text-sm" data-icon="calendar_today">calendar_today</span>
+<span class="text-label-md font-label-md text-neutral-800">Este Mes (1 - 31 Oct)</span>
+<span class="material-symbols-outlined text-sm text-neutral-400" data-icon="expand_more">expand_more</span>
+</div>
+<!-- Account Selector Trigger -->
+<div class="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white border border-slate-200 text-neutral-700 hover:border-slate-300 transition-colors cursor-pointer text-body-sm">
+<span class="material-symbols-outlined text-neutral-500 text-sm" data-icon="credit_card">credit_card</span>
+<span class="text-label-md font-label-md text-neutral-800">Todas las tarjetas</span>
+<span class="material-symbols-outlined text-sm text-neutral-400" data-icon="expand_more">expand_more</span>
+</div>
+<!-- Notifications Action -->
+<button aria-label="Notificaciones" class="relative p-1.5 rounded-md bg-white border border-slate-200 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50 transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-neutral-900"></span>
+</button>
+<!-- Primary Trailing Action: Exportar / Descargar Reporte -->
+<button class="h-8 px-3 rounded-md bg-white border border-slate-200 hover:bg-neutral-50 hover:border-slate-300 text-neutral-800 font-label-md text-label-md flex items-center gap-1.5 transition-colors duration-150">
+<span class="material-symbols-outlined text-sm text-neutral-600" data-icon="download">download</span>
+<span class="hidden sm:inline">Descargar Reporte</span>
+</button>
+<!-- User Profile Avatar Pill -->
+<div class="flex items-center pl-1 border-l border-slate-200 ml-1">
+<img alt="Avatar del usuario en encabezado" class="w-7 h-7 rounded-full object-cover border border-slate-200" data-alt="Close up executive portrait of personal finance account holder with calm confidence and sleek modern glass background in midnight indigo palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXGMohMFe7uKEAwWwuIlMMPGepjnKy8ZaDK5bu_4i_xEfvQEqHQ-aiVo2YgouM9fPi8DO3xC31kh5L7Cr0DyZokiy7SuKLNGbHT6GWFLmoppwWSjgLtkR-aXYam0fRIAa3o7D2L-sJzGxe-2JkDdc7fTSfwA2NlHeL8-kaGEiRxPJuQAAataq87ufpJKDs_wCQWhe1LFdJzmXLYe24WSyRqAzKReXXv8kFYv3GtVg"/>
+</div>
+</div>
+</div>
+</header>
+<!-- ========================================================================= -->
+<!-- MAIN WORKSPACE CONTENT CANVAS                                             -->
+<!-- ========================================================================= -->
+<main class="md:pl-64 flex flex-col min-h-[calc(100vh-3.5rem)] p-space-md md:p-space-lg max-w-[1400px] mx-auto w-full gap-5">
+<!-- PAGE HEADER TITLE ROW & CONTEXT TELEMETRY -->
+<section class="flex flex-col md:flex-row md:items-center justify-between gap-space-md border-b border-slate-200 pb-4">
+<div class="flex flex-col gap-0.5">
+<h1 class="text-headline-lg font-headline-lg text-neutral-900 tracking-tight font-semibold">Dashboard General y Analíticas Financieras</h1>
+<p class="text-body-sm text-neutral-500">Resumen mensual de tus ingresos, gastos y ahorro.</p>
+</div>
+<!-- Quick Responsive Date & Export Toolbar -->
+<div class="flex flex-wrap items-center gap-2">
+<div class="flex items-center bg-white border border-slate-200 rounded-md p-0.5 text-label-sm font-label-sm">
+<button class="px-2.5 py-1 rounded bg-neutral-900 text-white font-medium transition-colors">Este Mes</button>
+<button class="px-2.5 py-1 rounded text-neutral-500 hover:text-neutral-900 transition-colors">Q3 2024</button>
+<button class="px-2.5 py-1 rounded text-neutral-500 hover:text-neutral-900 transition-colors">Año en Curso</button>
+</div>
+<button class="h-8 px-2.5 rounded-md bg-white border border-slate-200 hover:bg-neutral-50 text-neutral-700 font-label-md text-label-md flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-sm text-neutral-500" data-icon="tune">tune</span>
+<span>Filtro Global</span>
+</button>
+</div>
+</section>
+<!-- ======================================================================= -->
+<!-- ROW 1: UPPER TELEMETRY KPI BLOCKS (4 CARDS)                             -->
+<!-- ======================================================================= -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- KPI 1: Balance Total disponible -->
+<div class="bg-surface-container-lowest rounded-lg border border-slate-200 p-4 flex flex-col justify-between hover:border-slate-300 transition-colors">
+<div class="flex items-center justify-between">
+<span class="text-label-sm font-label-sm text-neutral-400 uppercase tracking-wider">Balance Total Disponible</span>
+<span class="material-symbols-outlined text-base text-neutral-400" data-icon="account_balance">account_balance</span>
+</div>
+<div class="my-3">
+<div class="text-numeric-lg font-numeric-lg text-neutral-900 font-semibold tracking-tight">$24,850.00 <span class="text-xs font-normal text-neutral-400 font-label-sm">USD</span></div>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-slate-100">
+<div class="inline-flex items-center gap-1 text-emerald-700 text-label-sm font-label-sm font-medium">
+<span class="material-symbols-outlined text-xs" data-icon="trending_up">trending_up</span>
+<span>+8.4%</span>
+</div>
+<span class="text-body-sm text-neutral-400 text-xs">vs mes anterior</span>
+</div>
+</div>
+<!-- KPI 2: Ingresos del Mes -->
+<div class="bg-surface-container-lowest rounded-lg border border-slate-200 p-4 flex flex-col justify-between hover:border-slate-300 transition-colors">
+<div class="flex items-center justify-between">
+<span class="text-label-sm font-label-sm text-neutral-400 uppercase tracking-wider">Ingresos del Mes</span>
+<span class="material-symbols-outlined text-base text-neutral-400" data-icon="arrow_downward">arrow_downward</span>
+</div>
+<div class="my-3">
+<div class="text-numeric-lg font-numeric-lg text-neutral-900 font-semibold tracking-tight">$7,420.00 <span class="text-xs font-normal text-neutral-400 font-label-sm">USD</span></div>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-slate-100">
+<div class="inline-flex items-center gap-1 text-emerald-700 text-label-sm font-label-sm font-medium">
+<span class="material-symbols-outlined text-xs" data-icon="trending_up">trending_up</span>
+<span>+4.1%</span>
+</div>
+<span class="text-body-sm text-neutral-400 text-xs">vs promedio 90d</span>
+</div>
+</div>
+<!-- KPI 3: Gastos del Mes -->
+<div class="bg-surface-container-lowest rounded-lg border border-slate-200 p-4 flex flex-col justify-between hover:border-slate-300 transition-colors">
+<div class="flex items-center justify-between">
+<span class="text-label-sm font-label-sm text-neutral-400 uppercase tracking-wider">Gastos del Mes</span>
+<span class="material-symbols-outlined text-base text-neutral-400" data-icon="arrow_upward">arrow_upward</span>
+</div>
+<div class="my-3">
+<div class="text-numeric-lg font-numeric-lg text-neutral-900 font-semibold tracking-tight">$3,890.50 <span class="text-xs font-normal text-neutral-400 font-label-sm">USD</span></div>
+</div>
+<div class="flex items-center justify-between pt-2 border-t border-slate-100">
+<div class="inline-flex items-center gap-1 text-emerald-700 text-label-sm font-label-sm font-medium" title="Disminución de gastos favorable">
+<span class="material-symbols-outlined text-xs" data-icon="trending_down">trending_down</span>
+<span>-12.3% favorable</span>
+</div>
+<span class="text-body-sm text-neutral-400 text-xs">vs límite fijado</span>
+</div>
+</div>
+<!-- KPI 4: Capacidad de Ahorro / Proyección -->
+<div class="bg-surface-container-lowest rounded-lg border border-slate-200 p-4 flex flex-col justify-between hover:border-slate-300 transition-colors">
+<div class="flex items-center justify-between">
+<span class="text-label-sm font-label-sm text-neutral-400 uppercase tracking-wider">Capacidad de Ahorro</span>
+<span class="material-symbols-outlined text-base text-neutral-400" data-icon="savings">savings</span>
+</div>
+<div class="my-3">
+<div class="text-numeric-lg font-numeric-lg text-neutral-900 font-semibold tracking-tight">$3,529.50 <span class="text-xs font-normal text-neutral-400 font-label-sm">USD</span></div>
+</div>
+<div class="flex flex-col gap-1 pt-2 border-t border-slate-100">
+<div class="flex items-center justify-between text-body-sm">
+<span class="text-neutral-600 text-xs font-medium">Meta cumplida: 85%</span>
+<span class="text-label-sm font-label-sm text-neutral-500 font-medium">$4,150.00 Obj.</span>
+</div>
+<div class="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
+<div class="h-full bg-neutral-900 rounded-full" style="width: 85%"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- ======================================================================= -->
+<!-- ROW 2: COMPARATIVE ANALYTICS & RANKING OF TOP EXPENSES (BENTO GRID)     -->
+<!-- ======================================================================= -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+<!-- LEFT / MAIN: SECCIÓN ANALÍTICA COMPARATIVA INTERACTIVA (7 COLS) -->
+<div class="lg:col-span-7 bg-surface-container-lowest rounded-lg border border-slate-200 p-4 flex flex-col justify-between">
+<!-- Header -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm border-b border-slate-100 pb-3">
+<div>
+<h2 class="text-headline-sm font-headline-sm font-semibold text-neutral-900">Comparativa de Gastos por Periodo</h2>
+<p class="text-body-sm text-neutral-500">Evolución frente al mes anterior y dispersión de variación por categoría activa.</p>
+</div>
+<div class="flex items-center gap-space-xs self-start sm:self-auto">
+<span class="flex items-center gap-1.5 text-label-sm font-label-sm text-neutral-500">
+<span class="w-2 h-2 rounded-full bg-neutral-900"></span> Mes Actual
+</span>
+<span class="flex items-center gap-1.5 text-label-sm font-label-sm text-neutral-400 ml-3">
+<span class="w-2 h-2 rounded-full bg-slate-300"></span> Mes Anterior
+</span>
+</div>
+</div>
+<!-- Metric Variation Quick Ribbon -->
+<div class="grid grid-cols-2 sm:grid-cols-5 gap-2 my-3 py-2 px-3 rounded-md bg-neutral-50 border border-slate-200/70 text-center">
+<div class="flex flex-col items-center">
+<span class="text-label-sm font-label-sm text-neutral-400">Alimentación</span>
+<span class="text-label-md font-label-md font-semibold text-neutral-900 mt-0.5">+6.0%</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-label-sm font-label-sm text-neutral-400">Vivienda</span>
+<span class="text-label-md font-label-md font-semibold text-neutral-500 mt-0.5">0.0%</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-label-sm font-label-sm text-neutral-400">Entretenimiento</span>
+<span class="text-label-md font-label-md font-semibold text-emerald-700 mt-0.5">-18.0%</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-label-sm font-label-sm text-neutral-400">Transporte</span>
+<span class="text-label-md font-label-md font-semibold text-neutral-900 mt-0.5">+12.0%</span>
+</div>
+<div class="flex flex-col items-center col-span-2 sm:col-span-1">
+<span class="text-label-sm font-label-sm text-neutral-400">Servicios</span>
+<span class="text-label-md font-label-md font-semibold text-emerald-700 mt-0.5">-4.0%</span>
+</div>
+</div>
+<!-- High-Precision Telemetry Comparative Chart Simulation -->
+<div class="flex flex-col gap-3 my-1">
+<!-- Item 1: Alimentación (+6%) -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center text-body-sm">
+<span class="text-neutral-800 font-medium flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-neutral-400" data-icon="restaurant">restaurant</span>
+Alimentación y Supermercado
+</span>
+<div class="flex items-center gap-2 text-label-md font-label-md">
+<span class="text-neutral-900 font-semibold">$890.00</span>
+<span class="text-neutral-400 text-xs">vs $839.60</span>
+<span class="px-1.5 py-0.2 rounded text-[11px] bg-neutral-100 text-neutral-700 border border-slate-200">+6.0%</span>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-1 h-2 items-center">
+<div class="col-span-12 bg-slate-100 rounded-full h-1.5 overflow-hidden flex">
+<div class="bg-neutral-900 h-full rounded-l-full" style="width: 58%"></div>
+<div class="bg-neutral-400 h-full rounded-r-full" style="width: 6%"></div>
+</div>
+</div>
+</div>
+<!-- Item 2: Vivienda (0%) -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center text-body-sm">
+<span class="text-neutral-800 font-medium flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-neutral-400" data-icon="home">home</span>
+Vivienda, Alquiler &amp; Préstamo
+</span>
+<div class="flex items-center gap-2 text-label-md font-label-md">
+<span class="text-neutral-900 font-semibold">$1,450.00</span>
+<span class="text-neutral-400 text-xs">vs $1,450.00</span>
+<span class="px-1.5 py-0.2 rounded text-[11px] bg-neutral-100 text-neutral-600 border border-slate-200">0.0%</span>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-1 h-2 items-center">
+<div class="col-span-12 bg-slate-100 rounded-full h-1.5 overflow-hidden flex">
+<div class="bg-neutral-900 h-full rounded-full" style="width: 82%"></div>
+</div>
+</div>
+</div>
+<!-- Item 3: Entretenimiento (-18% Favorable) -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center text-body-sm">
+<span class="text-neutral-800 font-medium flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-neutral-400" data-icon="movie">movie</span>
+Entretenimiento y Suscripciones
+</span>
+<div class="flex items-center gap-2 text-label-md font-label-md">
+<span class="text-neutral-900 font-semibold">$340.50</span>
+<span class="text-neutral-400 text-xs">vs $415.20</span>
+<span class="px-1.5 py-0.2 rounded text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200">-18.0%</span>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-1 h-2 items-center">
+<div class="col-span-12 bg-slate-100 rounded-full h-1.5 overflow-hidden flex">
+<div class="bg-neutral-700 h-full rounded-full" style="width: 32%"></div>
+</div>
+</div>
+</div>
+<!-- Item 4: Transporte (+12%) -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center text-body-sm">
+<span class="text-neutral-800 font-medium flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-neutral-400" data-icon="directions_car">directions_car</span>
+Transporte &amp; Combustible
+</span>
+<div class="flex items-center gap-2 text-label-md font-label-md">
+<span class="text-neutral-900 font-semibold">$480.00</span>
+<span class="text-neutral-400 text-xs">vs $428.50</span>
+<span class="px-1.5 py-0.2 rounded text-[11px] bg-neutral-100 text-neutral-700 border border-slate-200">+12.0%</span>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-1 h-2 items-center">
+<div class="col-span-12 bg-slate-100 rounded-full h-1.5 overflow-hidden flex">
+<div class="bg-neutral-900 h-full rounded-l-full" style="width: 40%"></div>
+<div class="bg-neutral-400 h-full rounded-r-full" style="width: 12%"></div>
+</div>
+</div>
+</div>
+<!-- Item 5: Servicios (-4% Favorable) -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between items-center text-body-sm">
+<span class="text-neutral-800 font-medium flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-neutral-400" data-icon="power">power</span>
+Servicios Públicos &amp; Telecom
+</span>
+<div class="flex items-center gap-2 text-label-md font-label-md">
+<span class="text-neutral-900 font-semibold">$730.00</span>
+<span class="text-neutral-400 text-xs">vs $760.40</span>
+<span class="px-1.5 py-0.2 rounded text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200">-4.0%</span>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-1 h-2 items-center">
+<div class="col-span-12 bg-slate-100 rounded-full h-1.5 overflow-hidden flex">
+<div class="bg-neutral-700 h-full rounded-full" style="width: 52%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer status bar -->
+<div class="mt-3 pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between text-body-sm text-neutral-500 text-xs">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-emerald-700" data-icon="check_circle">check_circle</span>
+Gasto global neto optimizado en un 3.8% frente al ciclo base de septiembre.
+</span>
+<button class="text-neutral-900 hover:underline font-label-md text-label-md flex items-center gap-0.5">
+<span>Ver desglose de dispersión</span>
+<span class="material-symbols-outlined text-xs" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- RIGHT / RANKING: TOP CATEGORÍAS CON MAYORES GASTOS (5 COLS) -->
+<div class="lg:col-span-5 bg-surface-container-lowest rounded-lg border border-slate-200 p-4 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between border-b border-slate-100 pb-3">
+<div>
+<h2 class="text-headline-sm font-headline-sm font-semibold text-neutral-900">Ranking: Mayores Gastos</h2>
+<p class="text-body-sm text-neutral-500">Presupuesto consumido y delta porcentual.</p>
+</div>
+<span class="text-label-sm font-label-sm px-2 py-0.5 rounded bg-neutral-100 text-neutral-700 font-medium border border-slate-200">OCT 2024</span>
+</div>
+<!-- Classified Category Stack -->
+<div class="flex flex-col divide-y divide-slate-100 mt-2">
+<!-- Category Rank 1 -->
+<div class="py-2.5 flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-4 text-label-sm font-label-sm text-neutral-400">01</span>
+<div class="w-7 h-7 rounded bg-neutral-100 border border-slate-200 flex items-center justify-center text-neutral-700">
+<span class="material-symbols-outlined text-sm" data-icon="home">home</span>
+</div>
+<div class="flex flex-col">
+<span class="text-body-sm font-medium text-neutral-900">Vivienda &amp; Inmuebles</span>
+<span class="text-label-sm font-label-sm text-neutral-400">Presupuesto: $1,500.00</span>
+</div>
+</div>
+<div class="text-right">
+<div class="text-label-md font-label-md font-semibold text-neutral-900">$1,450.00</div>
+<span class="text-label-sm font-label-sm text-neutral-400">96.6% consumido</span>
+</div>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-1 overflow-hidden">
+<div class="bg-neutral-900 h-full rounded-full" style="width: 96.6%"></div>
+</div>
+<div class="flex items-center justify-between text-label-sm font-label-sm text-xs">
+<span class="text-neutral-400">Ritmo de consumo: Normal</span>
+<span class="text-neutral-600 font-medium">0.0% vs sept</span>
+</div>
+</div>
+<!-- Category Rank 2 -->
+<div class="py-2.5 flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-4 text-label-sm font-label-sm text-neutral-400">02</span>
+<div class="w-7 h-7 rounded bg-neutral-100 border border-slate-200 flex items-center justify-center text-neutral-700">
+<span class="material-symbols-outlined text-sm" data-icon="restaurant">restaurant</span>
+</div>
+<div class="flex flex-col">
+<span class="text-body-sm font-medium text-neutral-900">Alimentación &amp; Gourmets</span>
+<span class="text-label-sm font-label-sm text-neutral-400">Presupuesto: $1,000.00</span>
+</div>
+</div>
+<div class="text-right">
+<div class="text-label-md font-label-md font-semibold text-neutral-900">$890.00</div>
+<span class="text-label-sm font-label-sm text-neutral-500">89.0% consumido</span>
+</div>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-1 overflow-hidden">
+<div class="bg-neutral-700 h-full rounded-full" style="width: 89%"></div>
+</div>
+<div class="flex items-center justify-between text-label-sm font-label-sm text-xs">
+<span class="text-neutral-400">Ritmo: +2.1% acelerado</span>
+<span class="text-neutral-700 font-medium">+6.0% vs sept</span>
+</div>
+</div>
+<!-- Category Rank 3 -->
+<div class="py-2.5 flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-4 text-label-sm font-label-sm text-neutral-400">03</span>
+<div class="w-7 h-7 rounded bg-neutral-100 border border-slate-200 flex items-center justify-center text-neutral-700">
+<span class="material-symbols-outlined text-sm" data-icon="bolt">bolt</span>
+</div>
+<div class="flex flex-col">
+<span class="text-body-sm font-medium text-neutral-900">Servicios &amp; Data Centers</span>
+<span class="text-label-sm font-label-sm text-neutral-400">Presupuesto: $850.00</span>
+</div>
+</div>
+<div class="text-right">
+<div class="text-label-md font-label-md font-semibold text-neutral-900">$730.00</div>
+<span class="text-label-sm font-label-sm text-emerald-700">85.8% consumido</span>
+</div>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-1 overflow-hidden">
+<div class="bg-neutral-700 h-full rounded-full" style="width: 85.8%"></div>
+</div>
+<div class="flex items-center justify-between text-label-sm font-label-sm text-xs">
+<span class="text-neutral-400">Ritmo: Controlado</span>
+<span class="text-emerald-700 font-medium">-4.0% vs sept</span>
+</div>
+</div>
+<!-- Category Rank 4 -->
+<div class="py-2.5 flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-4 text-label-sm font-label-sm text-neutral-400">04</span>
+<div class="w-7 h-7 rounded bg-neutral-100 border border-slate-200 flex items-center justify-center text-neutral-700">
+<span class="material-symbols-outlined text-sm" data-icon="local_gas_station">local_gas_station</span>
+</div>
+<div class="flex flex-col">
+<span class="text-body-sm font-medium text-neutral-900">Transporte &amp; Logística</span>
+<span class="text-label-sm font-label-sm text-neutral-400">Presupuesto: $500.00</span>
+</div>
+</div>
+<div class="text-right">
+<div class="text-label-md font-label-md font-semibold text-neutral-900">$480.00</div>
+<span class="text-label-sm font-label-sm text-neutral-500">96.0% consumido</span>
+</div>
+</div>
+<div class="w-full bg-slate-100 rounded-full h-1 overflow-hidden">
+<div class="bg-neutral-900 h-full rounded-full" style="width: 96%"></div>
+</div>
+<div class="flex items-center justify-between text-label-sm font-label-sm text-xs">
+<span class="text-neutral-400">Alerta: Umbral crítico</span>
+<span class="text-neutral-700 font-medium">+12.0% vs sept</span>
+</div>
+</div>
+</div>
+</div>
+<button class="mt-3 w-full py-1.5 rounded-md bg-neutral-50 border border-slate-200 hover:bg-neutral-100 text-neutral-800 font-body-sm text-body-sm font-medium flex items-center justify-center gap-1.5 transition-colors">
+<span>Administrar Todos los Presupuestos</span>
+<span class="material-symbols-outlined text-xs" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</section>
+<!-- ======================================================================= -->
+<!-- ROW 3: RECENT MOVEMENTS & UPCOMING URGENT PAYMENTS (SPLIT VIEW)          -->
+<!-- ======================================================================= -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4">
+<!-- LEFT: RESUMEN DE ÚLTIMOS MOVIMIENTOS (8 COLS) -->
+<div class="lg:col-span-8 bg-surface-container-lowest rounded-lg border border-slate-200 p-4 flex flex-col justify-between">
+<div>
+<!-- Header with Filter & Link -->
+<div class="flex items-center justify-between border-b border-slate-100 pb-3">
+<div>
+<h2 class="text-headline-sm font-headline-sm font-semibold text-neutral-900">Últimos Movimientos</h2>
+<p class="text-body-sm text-neutral-500">Registros transaccionales recientes y liquidaciones en curso.</p>
+</div>
+<a class="text-neutral-900 hover:underline text-label-md font-label-md font-medium flex items-center gap-0.5" href="#transacciones">
+<span>Ver todo el historial</span>
+<span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</a>
+</div>
+<!-- Transaction Ledger Table -->
+<div class="overflow-x-auto mt-2">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-slate-100 text-label-md font-label-md text-neutral-400">
+<th class="py-2 px-2.5 font-medium">Concepto / Entidad</th>
+<th class="py-2 px-2.5 font-medium">Categoría</th>
+<th class="py-2 px-2.5 font-medium">Fecha &amp; Canal</th>
+<th class="py-2 px-2.5 font-medium text-right">Importe</th>
+<th class="py-2 px-2.5 font-medium text-right">Estado</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 text-body-sm">
+<!-- Tx 1: Ingreso -->
+<tr class="hover:bg-neutral-50/70 transition-colors group">
+<td class="py-2.5 px-2.5">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-neutral-100 border border-slate-200 text-neutral-700 flex items-center justify-center">
+<span class="material-symbols-outlined text-base" data-icon="account_balance">account_balance</span>
+</div>
+<div class="flex flex-col">
+<span class="font-medium text-neutral-900">Vance &amp; Partners Tech Consulting</span>
+<span class="text-[11px] text-neutral-400 font-label-sm">HONORARIOS PROFESIONALES</span>
+</div>
+</div>
+</td>
+<td class="py-2.5 px-2.5">
+<span class="inline-flex px-2 py-0.5 rounded text-xs bg-neutral-100 text-neutral-700 border border-slate-200">Ingreso Operativo</span>
+</td>
+<td class="py-2.5 px-2.5 text-neutral-500">
+<div>28 Oct, 2024</div>
+<div class="text-[11px] text-neutral-400 font-label-sm">Wire Transfer SWIFT</div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<span class="text-numeric-md font-numeric-md text-emerald-700 font-medium">+$4,250.00</span>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-neutral-100 text-neutral-700 text-label-sm font-label-sm border border-slate-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Liquidado
+</span>
+</td>
+</tr>
+<!-- Tx 2: Gasto Amazon AWS -->
+<tr class="hover:bg-neutral-50/70 transition-colors group">
+<td class="py-2.5 px-2.5">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-neutral-100 border border-slate-200 text-neutral-700 flex items-center justify-center">
+<span class="material-symbols-outlined text-base" data-icon="cloud">cloud</span>
+</div>
+<div class="flex flex-col">
+<span class="font-semibold text-neutral-900">Amazon Web Services EMEA</span>
+<span class="text-[11px] text-neutral-400 font-label-sm">INFRAESTRUCTURA CLOUD</span>
+</div>
+</div>
+</td>
+<td class="py-2.5 px-2.5">
+<span class="inline-flex px-2 py-0.5 rounded text-xs bg-neutral-100 text-neutral-700 border border-slate-200">Servicios &amp; IT</span>
+</td>
+<td class="py-2.5 px-2.5 text-neutral-500">
+<div>27 Oct, 2024</div>
+<div class="text-[11px] text-neutral-400 font-label-sm">Aura Visa Black *4092</div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<span class="text-numeric-md font-numeric-md text-neutral-900 font-medium">-$312.40</span>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-neutral-100 text-neutral-700 text-label-sm font-label-sm border border-slate-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Liquidado
+</span>
+</td>
+</tr>
+<!-- Tx 3: Gasto Restaurante -->
+<tr class="hover:bg-neutral-50/70 transition-colors group">
+<td class="py-2.5 px-2.5">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-neutral-100 border border-slate-200 text-neutral-700 flex items-center justify-center">
+<span class="material-symbols-outlined text-base" data-icon="dining">dining</span>
+</div>
+<div class="flex flex-col">
+<span class="font-semibold text-neutral-900">Restaurante Astrid y Gastón</span>
+<span class="text-[11px] text-neutral-400 font-label-sm">ALIMENTACIÓN &amp; EVENTOS</span>
+</div>
+</div>
+</td>
+<td class="py-2.5 px-2.5">
+<span class="inline-flex px-2 py-0.5 rounded text-xs bg-neutral-100 text-neutral-700 border border-slate-200">Alimentación</span>
+</td>
+<td class="py-2.5 px-2.5 text-neutral-500">
+<div>25 Oct, 2024</div>
+<div class="text-[11px] text-neutral-400 font-label-sm">Aura Debit Infinite</div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<span class="text-numeric-md font-numeric-md text-neutral-900 font-medium">-$185.00</span>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-neutral-100 text-neutral-700 text-label-sm font-label-sm border border-slate-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Liquidado
+</span>
+</td>
+</tr>
+<!-- Tx 4: Suscripción Bloomberg -->
+<tr class="hover:bg-neutral-50/70 transition-colors group">
+<td class="py-2.5 px-2.5">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded bg-neutral-100 border border-slate-200 text-neutral-700 flex items-center justify-center">
+<span class="material-symbols-outlined text-base" data-icon="newspaper">newspaper</span>
+</div>
+<div class="flex flex-col">
+<span class="font-semibold text-neutral-900">Bloomberg Professional Terminal</span>
+<span class="text-[11px] text-neutral-400 font-label-sm">SUSCRIPCIÓN FINANCIERA</span>
+</div>
+</div>
+</td>
+<td class="py-2.5 px-2.5">
+<span class="inline-flex px-2 py-0.5 rounded text-xs bg-neutral-100 text-neutral-700 border border-slate-200">Entretenimiento &amp; Medios</span>
+</td>
+<td class="py-2.5 px-2.5 text-neutral-500">
+<div>24 Oct, 2024</div>
+<div class="text-[11px] text-neutral-400 font-label-sm">Aura Visa Black *4092</div>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<span class="text-numeric-md font-numeric-md text-neutral-900 font-medium">-$240.00</span>
+</td>
+<td class="py-2.5 px-2.5 text-right">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-neutral-100 text-neutral-700 text-label-sm font-label-sm border border-slate-200">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> En Tránsito
+</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="pt-3 border-t border-slate-100 flex items-center justify-between text-body-sm text-neutral-500 text-xs">
+<span>Mostrando 4 de 142 movimientos de este periodo.</span>
+<div class="flex items-center gap-1.5">
+<button class="px-2 py-1 rounded bg-white text-neutral-600 hover:text-neutral-900 border border-slate-200 text-xs">Anterior</button>
+<button class="px-2 py-1 rounded bg-white text-neutral-600 hover:text-neutral-900 border border-slate-200 text-xs">Siguiente</button>
+</div>
+</div>
+</div>
+<!-- RIGHT: WIDGET DE PAGOS PRÓXIMOS URGENTES (4 COLS) -->
+<div class="lg:col-span-4 bg-surface-container-lowest rounded-lg border border-slate-200 p-4 flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between border-b border-slate-100 pb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-neutral-700 text-lg" data-icon="flash_on">flash_on</span>
+<div>
+<h2 class="text-headline-sm font-headline-sm font-semibold text-neutral-900">Pagos Habituales</h2>
+<p class="text-body-sm text-neutral-500">Atajos para tus pagos frecuentes de este mes.</p>
+</div>
+</div>
+<a class="text-neutral-900 hover:underline text-label-md font-label-md font-medium flex items-center gap-0.5" href="#tarjetas">
+<span>Ver todos</span>
+<span class="material-symbols-outlined text-xs" data-icon="chevron_right">chevron_right</span>
+</a>
+</div>
+<div class="flex flex-col gap-2 mt-3">
+<!-- Payment Item 1 -->
+<div class="p-2.5 rounded-md bg-neutral-50 border border-slate-200 flex flex-col gap-2">
+<div class="flex items-start justify-between">
+<div>
+<span class="text-label-sm font-label-sm text-neutral-500 font-medium">VENCE EN 2 DÍAS • 01 NOV</span>
+<div class="text-body-md font-medium text-neutral-900 mt-0.5">Seguro Allianz</div>
+<span class="text-xs text-neutral-400">Servicios del hogar</span>
+</div>
+<div class="text-right">
+<div class="text-label-md font-label-md font-semibold text-neutral-900">$640.00</div>
+<span class="text-xs text-neutral-400">USD</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1.5 border-t border-slate-200/60">
+<span class="text-xs text-neutral-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-emerald-700" data-icon="check">check</span> Saldo listo
+</span>
+<button class="px-2 py-1 rounded bg-neutral-900 text-white hover:bg-neutral-800 font-label-sm text-label-sm font-medium transition-colors flex items-center gap-1 text-xs">
+<span class="material-symbols-outlined text-xs" data-icon="touch_app">touch_app</span> Pagar con un toque
+</button>
+</div>
+</div>
+<!-- Payment Item 2 -->
+<div class="p-2.5 rounded-md bg-neutral-50 border border-slate-200 flex flex-col gap-2">
+<div class="flex items-start justify-between">
+<div>
+<span class="text-label-sm font-label-sm text-neutral-500 font-medium">VENCE EN 5 DÍAS • 04 NOV</span>
+<div class="text-body-md font-medium text-neutral-900 mt-0.5">Alquiler Mensual</div>
+<span class="text-xs text-neutral-400">Vivienda</span>
+</div>
+<div class="text-right">
+<div class="text-label-md font-label-md font-semibold text-neutral-900">$1,450.00</div>
+<span class="text-xs text-neutral-400">USD</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1.5 border-t border-slate-200/60">
+<span class="text-xs text-neutral-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-neutral-400" data-icon="schedule">schedule</span> Recordatorio activo
+</span>
+<button class="px-2 py-1 rounded bg-neutral-900 text-white hover:bg-neutral-800 font-label-sm text-label-sm font-medium transition-colors flex items-center gap-1 text-xs">
+<span class="material-symbols-outlined text-xs" data-icon="touch_app">touch_app</span> Pagar con un toque
+</button>
+</div>
+</div>
+<!-- Payment Item 3 -->
+<div class="p-2.5 rounded-md bg-neutral-50 border border-slate-200 flex flex-col gap-2">
+<div class="flex items-start justify-between">
+<div>
+<span class="text-label-sm font-label-sm text-neutral-400 font-medium">VENCE EN 7 DÍAS • 06 NOV</span>
+<div class="text-body-md font-medium text-neutral-900 mt-0.5">Tarjeta Aura Visa</div>
+<span class="text-xs text-neutral-400">Gasto mensual acumulado</span>
+</div>
+<div class="text-right">
+<div class="text-label-md font-label-md font-semibold text-neutral-900">$1,890.20</div>
+<span class="text-xs text-neutral-400">USD</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1.5 border-t border-slate-200/60">
+<span class="text-xs text-neutral-400 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="credit_card">credit_card</span> Pago puntual
+</span>
+<button class="px-2 py-1 rounded bg-neutral-900 text-white hover:bg-neutral-800 font-label-sm text-label-sm font-medium transition-colors flex items-center gap-1 text-xs">
+<span class="material-symbols-outlined text-xs" data-icon="touch_app">touch_app</span> Pagar con un toque
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-3 pt-2 border-t border-slate-100">
+<button class="w-full py-2 rounded-md bg-white border border-slate-200 hover:bg-neutral-50 text-neutral-900 font-body-sm text-body-sm font-medium flex items-center justify-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="flash_on">flash_on</span>
+<span>Registrar Pago Rápido</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- ========================================================================= -->
+<!-- MOBILE BOTTOM NAVIGATION BAR                                              -->
+<!-- ========================================================================= -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest/95 backdrop-blur-md border-t border-slate-200 px-space-md py-2 flex items-center justify-around">
+<a class="flex flex-col items-center gap-0.5 text-neutral-900" href="#dashboard">
+<span class="material-symbols-outlined text-xl" data-icon="dashboard">dashboard</span>
+<span class="text-label-sm font-label-sm font-medium">Dashboard</span>
+</a>
+<a class="flex flex-col items-center gap-0.5 text-neutral-400 hover:text-neutral-700" href="#transacciones">
+<span class="material-symbols-outlined text-xl" data-icon="receipt_long">receipt_long</span>
+<span class="text-label-sm font-label-sm">Historial</span>
+</a>
+<button aria-label="Nueva Transacción" class="w-10 h-10 -mt-4 rounded-full bg-neutral-900 text-white flex items-center justify-center shadow-md active:scale-95">
+<span class="material-symbols-outlined text-xl" data-icon="add">add</span>
+</button>
+<a class="flex flex-col items-center gap-0.5 text-neutral-400 hover:text-neutral-700" href="#tarjetas">
+<span class="material-symbols-outlined text-xl" data-icon="credit_card">credit_card</span>
+<span class="text-label-sm font-label-sm">Tarjetas</span>
+</a>
+<a class="flex flex-col items-center gap-0.5 text-neutral-400 hover:text-neutral-700" href="#presupuestos">
+<span class="material-symbols-outlined text-xl" data-icon="pie_chart">pie_chart</span>
+<span class="text-label-sm font-label-sm">Presupuestos</span>
+</a>
+</nav>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('Aura Wealth Ledger Initialized: Minimalist Theme.');
+    });
+  </script>
+</body></html>
