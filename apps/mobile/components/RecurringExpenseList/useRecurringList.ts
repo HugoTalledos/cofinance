@@ -2,7 +2,7 @@ import { ref, computed } from 'vue'
 import { useAuth } from '~/composables/useLogin'
 import { useRecurringExpenses } from '~/composables/useRecurringExpenses'
 import { useTransactions } from '~/composables/useTransactions'
-import type { RecurringExpense } from '@cofinance/core'
+import { recurringPaymentFields, type RecurringExpense } from '@cofinance/core'
 
 export const useRecurringList = (
   onPaid?: (expense: RecurringExpense, amount: number) => void
@@ -24,6 +24,7 @@ export const useRecurringList = (
     if (!user.value?.uid || amount <= 0) return
     const today = new Date().toISOString().split('T')[0]
     await addTransaction({
+      ...recurringPaymentFields(expense),
       userId: user.value.uid,
       username: user.value.displayName || '',
       categoryId: expense.categoryId,
