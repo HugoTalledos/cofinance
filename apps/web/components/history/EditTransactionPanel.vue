@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import {
+  activeCategories,
   buildTransactionEdit,
+  isCategoryActive,
   hasEditChanges,
   toEditForm,
   updateTransaction,
@@ -68,6 +70,14 @@ const edit = computed(() =>
     ? buildTransactionEdit(props.transaction, form.value, props.categories, props.creditCards)
     : null
 )
+
+// Solo categorías activas; si la actual del movimiento está archivada, se conserva como opción
+const categoryOptions = computed(() => {
+  const options = activeCategories(props.categories).map(c => ({ id: c.id, label: c.name }))
+  const current = props.categories.find(c => c.id === props.transaction?.categoryId)
+  if (current && !isCategoryActive(current)) options.push({ id: current.id, label: `${current.name} (eliminada)` })
+  return options
+})
 
 const canSave = computed(() =>
   !saving.value && !validationMessage.value && edit.value !== null && hasEditChanges(edit.value)
@@ -164,7 +174,7 @@ const inputClass =
             <label for="edit-category" class="block text-label-sm font-medium text-neutral-700 mb-1">Categoría</label>
             <select id="edit-category" v-model="form.categoryId" :class="[inputClass, 'cursor-pointer']">
               <option value="" disabled>Elige una categoría</option>
-              <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
+              <option v-for="option in categoryOptions" :key="option.id" :value="option.id">{{ option.label }}</option>
             </select>
           </div>
 

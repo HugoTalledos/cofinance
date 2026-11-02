@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { activeCategories } from '@cofinance/core'
 import type { Category, CreditCard, HistoryFilters, PaymentFilter } from '@cofinance/core'
 
 const props = defineProps<{
@@ -7,6 +8,8 @@ const props = defineProps<{
   creditCards: CreditCard[]
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: HistoryFilters] }>()
+
+const categoryOptions = computed(() => activeCategories(props.categories))
 
 const update = (patch: Partial<HistoryFilters>) => emit('update:modelValue', { ...props.modelValue, ...patch })
 
@@ -46,7 +49,7 @@ const selectClass =
     </div>
     <select aria-label="Categoría" :class="selectClass" :value="modelValue.categoryId ?? ''" @change="onCategory">
       <option value="">Todas las categorías</option>
-      <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
+      <option v-for="c in categoryOptions" :key="c.id" :value="c.id">{{ c.name }}</option>
     </select>
     <select aria-label="Medio de pago" :class="selectClass" :value="paymentValue" @change="onPayment">
       <option value="all">Todos los medios</option>

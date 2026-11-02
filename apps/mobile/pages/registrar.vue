@@ -5,6 +5,7 @@ import { useAuth } from '~/composables/useLogin'
 import { useCategories } from '~/composables/useCategories'
 import { useCreditCards } from '~/composables/useCreditCards'
 import { useToast } from '~/components/Toast/useToast'
+import { activeCategories } from '@cofinance/core'
 
 const { user } = useAuth()
 const { showToast } = useToast()
@@ -81,7 +82,7 @@ async function createMovement() {
     <div class="mt-4 pb-16">
       <create-movement-form
         ref="movementFormRef"
-        :categories="sortedCategories"
+        :categories="activeCategories(sortedCategories)"
         :credit-cards="creditCards"
       />
     </div>
