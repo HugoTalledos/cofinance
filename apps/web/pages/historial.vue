@@ -20,8 +20,8 @@ const filters = ref<HistoryFilters>({
 
 const { loading, error, transactions, categories, creditCards, reload } = useHistoryData(periodKey)
 
-const filtered = computed(() => filterHistory(transactions.value, filters.value))
-const summary = computed(() => summarizeHistory(filtered.value))
+const filtered = computed(() => filterHistory(transactions.value, filters.value, categories.value))
+const summary = computed(() => summarizeHistory(filtered.value, categories.value))
 
 const editing = ref<Transaction | null>(null)
 const removing = ref<Transaction | null>(null)

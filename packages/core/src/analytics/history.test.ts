@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Transaction } from '../types'
+import type { Category, Transaction } from '../types'
 import { filterHistory, summarizeHistory, type HistoryFilters } from './history'
 
 let seq = 0
@@ -51,6 +51,19 @@ describe('filterHistory', () => {
 
 describe('summarizeHistory', () => {
   it('resume ingresos, egresos y flujo neto', () => {
-    expect(summarizeHistory(all)).toEqual({ count: 4, income: 1000, expenses: 180, net: 820 })
+    expect(summarizeHistory(all)).toEqual({ count: 4, income: 1000, expenses: 180, savings: 0, net: 820 })
+  })
+})
+
+const categories = [{ id: 'savings', isSaving: true, archivedAt: 1 }] as Category[]
+
+describe('categorías de ahorro en el histórico', () => {
+  it('separa ahorros de egresos y conserva su efecto en el flujo neto', () => {
+    expect(summarizeHistory(all, categories)).toEqual({ count: 4, income: 1000, expenses: 150, savings: 30, net: 820 })
+  })
+  it('permite filtrar ahorros sin incluirlos en gastos', () => {
+    expect(names(filterHistory(all, { ...base, type: 'expense' }, categories))).toEqual(['Mercado', 'Netflix'])
+    expect(names(filterHistory(all, { ...base, type: 'saving' }, categories))).toEqual(['Ahorro'])
+    expect(names(filterHistory(all, { ...base, categoryId: 'savings' }, categories))).toEqual(['Ahorro'])
   })
 })
