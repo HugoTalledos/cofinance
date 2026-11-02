@@ -10,7 +10,7 @@ import type {
   RecurringExpenseInput,
   RecurringExpenseUpdate,
 } from '@cofinance/core'
-import { getBillingPeriodRange, getCurrentBillingPeriodKey } from '@cofinance/core'
+import { getCurrentBillingPeriodKey, isPaidInPeriod } from '@cofinance/core'
 
 const expenses: Ref<RecurringExpense[]> = ref([])
 const loading: Ref<boolean> = ref(false)
@@ -22,8 +22,7 @@ const error: Ref<string | null> = ref(null)
  * cualquier dispositivo y se reinicia solo al empezar un periodo nuevo.
  */
 const isPaidThisPeriod = (expense: RecurringExpense): boolean =>
-  expense.lastPaidAt != null &&
-  getBillingPeriodRange(new Date(expense.lastPaidAt)).periodKey === getCurrentBillingPeriodKey()
+  isPaidInPeriod(expense, getCurrentBillingPeriodKey())
 
 export const useRecurringExpenses = () => {
   const fetchExpenses = async (): Promise<boolean> => {

@@ -20,6 +20,7 @@ import {
   getBillingPeriodRangeFromKey,
   isOverBudget as isOverBudgetHelper,
   getCurrentTimestamp,
+  computePeriodTotals,
 } from '@cofinance/core'
 
 
@@ -64,37 +65,23 @@ export const useSummary = () => {
       }
     }
 
-    const expenseTxs = transactions.filter(tx => (tx.type ?? 'expense') === 'expense')
-    const incomeTxs = transactions.filter(tx => tx.type === 'income')
+    const totals = computePeriodTotals(transactions, categories)
 
-    currentTotalIncome.value = incomeTxs.reduce((sum, tx) => sum + tx.amount, 0)
-
-    // Los egresos en categorías de ahorro se apartan: no cuentan como gastado
-    const savingCategoryIds = new Set(categories.filter(cat => cat.isSaving).map(cat => cat.id))
-
-    let totalSpent = 0
-    let totalSaved = 0
-    for (const tx of expenseTxs) {
-      if (tx.categoryId && savingCategoryIds.has(tx.categoryId)) {
-        totalSaved += tx.amount
-      } else {
-        totalSpent += tx.amount
+    for (const [categoryId, spent] of Object.entries(totals.spentByCategory)) {
+      if (!categoriesMap[categoryId]) {
+        categoriesMap[categoryId] = { budget: 0, spent: 0 }
       }
-      if (tx.categoryId) {
-        if (!categoriesMap[tx.categoryId]) {
-          categoriesMap[tx.categoryId] = { budget: 0, spent: 0 }
-        }
-        categoriesMap[tx.categoryId].spent += tx.amount
-      }
+      categoriesMap[categoryId].spent = spent
     }
 
-    currentTotalSaved.value = totalSaved
+    currentTotalIncome.value = totals.income
+    currentTotalSaved.value = totals.saved
 
     return {
       id: `billing_${periodKey}`,
       month: periodKey,
       categories: categoriesMap,
-      totalSpent,
+      totalSpent: totals.spent,
       updatedAt: getCurrentTimestamp(),
     }
   }
