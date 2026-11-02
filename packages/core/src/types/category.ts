@@ -15,6 +15,8 @@ export interface Category {
    * dinero restante pero no cuentan como gastado. Ausente equivale a false.
    */
   isSaving?: boolean
+  /** Marca de tiempo de archivado. Ausente = categoría activa. */
+  archivedAt?: number
 }
 
 /**

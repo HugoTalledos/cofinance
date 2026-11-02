@@ -57,6 +57,12 @@ describe('computePeriodTotals', () => {
     expect(r.spent).toBe(30)
     expect(r.spentByCategory).toEqual({})
   })
+  it('computePeriodTotals cuenta como ahorro una categoría de ahorro archivada', () => {
+    const archived = [...cats, cat({ id: 'old-save', name: 'Viejo ahorro', isSaving: true, archivedAt: 1 })]
+    const r = computePeriodTotals([exp('old-save', 40)], archived)
+    expect(r.saved).toBe(40)
+    expect(r.spent).toBe(0)
+  })
 })
 
 describe('getSpendingTransactions', () => {

@@ -9,6 +9,7 @@ export { configureFirebase, initializeFirebase, getFirestoreInstance, getAuthIns
 export {
   createCategory,
   updateCategory,
+  archiveCategory,
   deleteCategory,
   getCategories,
   getCategoryById,

@@ -88,6 +88,34 @@ export const updateCategory = async (
 }
 
 /**
+ * Archiva una categoría (la oculta de los selectores sin borrar nada)
+ */
+export const archiveCategory = async (categoryId: string): Promise<ApiResponse<boolean>> => {
+  const response: ApiResponse<boolean> = {
+    data: null,
+    error: null,
+    loading: false
+  }
+
+  try {
+    const db = useFirestoreDb()
+    if (!db) {
+      throw new Error('Firestore database not initialized');
+    }
+    const categoryRef = doc(db, COLLECTIONS.CATEGORIES, categoryId)
+
+    await updateDoc(categoryRef, { archivedAt: getCurrentTimestamp() })
+    response.data = true
+
+  } catch (error) {
+    console.error('Error archiving category:', error)
+    response.error = error instanceof Error ? error.message : 'Error al archivar la categoría'
+  }
+
+  return response
+}
+
+/**
  * Elimina una categoría
  * NOTA: Verifica que no haya transacciones asociadas antes de llamar esta función
  */
