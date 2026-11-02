@@ -8,7 +8,10 @@ const panelMode = ref<'create' | 'edit' | null>(null)
 const editing = ref<Category | null>(null)
 const removing = ref<Category | null>(null)
 
+// Sin la lista completa no se puede validar el nombre único, así que no se abre el panel
+const canCreate = computed(() => !loading.value && !error.value)
 const openCreate = () => {
+  if (!canCreate.value) return
   editing.value = null
   panelMode.value = 'create'
 }
@@ -40,7 +43,8 @@ const closePanel = () => {
       <div class="flex justify-end">
         <button
           type="button"
-          class="px-4 py-1.5 rounded-lg bg-neutral-900 text-white hover:bg-neutral-800 transition-all text-body-sm font-medium active:scale-95 flex items-center gap-1.5"
+          :disabled="!canCreate"
+          class="px-4 py-1.5 rounded-lg bg-neutral-900 text-white hover:bg-neutral-800 transition-all text-body-sm font-medium active:scale-95 flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-neutral-900 disabled:active:scale-100"
           @click="openCreate"
         >
           <span class="material-symbols-outlined text-base">add</span>
