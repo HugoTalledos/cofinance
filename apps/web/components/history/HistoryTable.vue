@@ -8,7 +8,7 @@ const props = defineProps<{
   error: string | null
   editable: boolean
 }>()
-defineEmits<{ edit: [tx: Transaction] }>()
+defineEmits<{ edit: [tx: Transaction]; remove: [tx: Transaction] }>()
 
 const PAGE_SIZE = 10
 const { pageItems, from, to, total, hasPrev, hasNext, prev, next } = usePagination(
@@ -62,6 +62,9 @@ const isIncome = (tx: Transaction) => tx.type === 'income'
                   @click="tx.type === 'card_payment' ? navigateTo('/tarjetas') : $emit('edit', tx)"
                 >
                   <span class="material-symbols-outlined text-base">edit</span>
+                </button>
+                <button type="button" :aria-label="`Eliminar ${tx.description}`" title="Eliminar movimiento" class="w-8 h-8 inline-flex items-center justify-center rounded-md text-red-700 hover:bg-red-50" @click="$emit('remove', tx)">
+                  <span class="material-symbols-outlined text-base">delete</span>
                 </button>
               </td>
             </tr>
