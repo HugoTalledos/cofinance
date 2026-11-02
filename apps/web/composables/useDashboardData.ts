@@ -19,6 +19,9 @@ import {
   type Transaction
 } from '@cofinance/core'
 
+/** Cuántas categorías muestra el ranking de mayores gastos */
+const RANKING_LIMIT = 5
+
 export interface Kpi {
   value: number
   change: number | null
@@ -109,7 +112,7 @@ export function useDashboardData(periodKey: Ref<string>, creditCardId: Ref<strin
   const comparison = computed(() =>
     buildCategoryComparison(currentSpending.value, previousSpending.value, categories.value)
   )
-  const ranking = computed(() => buildSpendingRanking(comparison.value, categories.value))
+  const ranking = computed(() => buildSpendingRanking(comparison.value, categories.value, RANKING_LIMIT))
 
   const movements = computed(() =>
     (creditCardId.value === null ? [...currentTxs.value] : [...currentSpending.value]).sort(

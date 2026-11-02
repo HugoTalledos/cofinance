@@ -37,20 +37,27 @@ const cardBank = computed(() => creditCards.value.find(c => c.id === creditCardI
         <h1 class="text-headline-lg font-headline-lg text-neutral-900 tracking-tight font-semibold">Dashboard General</h1>
         <p class="text-body-sm text-neutral-500">{{ formatBillingPeriodLabel(periodKey) }}</p>
       </section>
-      <DashboardKpiCards :kpis="kpis" :card-bank="cardBank" :loading="loading" :error="amountsError" />
       <section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        <DashboardCategoryComparison :rows="comparison" :loading="loading" :error="amountsError" />
-        <DashboardSpendingRanking :rows="ranking" :period-key="periodKey" :loading="loading" :error="amountsError" />
-      </section>
-      <section class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4">
         <DashboardRecentMovements
+          class="lg:col-span-8"
           :movements="movements"
           :period-key="periodKey"
           :credit-card-id="creditCardId"
           :loading="loading"
           :error="errors.transactions"
         />
-        <DashboardRecurringPayments :items="recurring" :loading="loading" :error="errors.recurring" />
+        <DashboardSpendingRanking
+          class="lg:col-span-4"
+          :rows="ranking"
+          :period-key="periodKey"
+          :loading="loading"
+          :error="amountsError"
+        />
+      </section>
+      <DashboardKpiCards :kpis="kpis" :card-bank="cardBank" :loading="loading" :error="amountsError" />
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4">
+        <DashboardCategoryComparison class="lg:col-span-8" :rows="comparison" :loading="loading" :error="amountsError" />
+        <DashboardRecurringPayments class="lg:col-span-4" :items="recurring" :loading="loading" :error="errors.recurring" />
       </section>
     </div>
   </AppShell>

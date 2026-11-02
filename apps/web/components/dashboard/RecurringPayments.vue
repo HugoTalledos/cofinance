@@ -6,7 +6,7 @@ defineProps<{ items: Item[]; loading: boolean; error: string | null }>()
 </script>
 
 <template>
-  <div class="lg:col-span-4 bg-surface-container-lowest rounded-lg border border-slate-200 p-4 flex flex-col">
+  <div class="bg-surface-container-lowest rounded-lg border border-slate-200 p-4 flex flex-col">
     <div class="border-b border-slate-100 pb-3">
       <h2 class="text-headline-sm font-headline-sm font-semibold text-neutral-900">Pagos habituales</h2>
       <p class="text-body-sm text-neutral-500">Estado de este periodo</p>

@@ -11,10 +11,10 @@ const tone = (change: number | null) => {
 </script>
 
 <template>
-  <div class="lg:col-span-5 bg-surface-container-lowest rounded-lg border border-slate-200 p-4 flex flex-col">
+  <div class="bg-surface-container-lowest rounded-lg border border-slate-200 p-4 flex flex-col">
     <div class="flex items-center justify-between border-b border-slate-100 pb-3 gap-2">
       <div>
-        <h2 class="text-headline-sm font-headline-sm font-semibold text-neutral-900">Ranking: Mayores Gastos</h2>
+        <h2 class="text-headline-sm font-headline-sm font-semibold text-neutral-900">Top 5: Mayores Gastos</h2>
         <p class="text-body-sm text-neutral-500">Presupuesto consumido y variación porcentual.</p>
       </div>
       <span class="text-label-sm font-label-sm px-2 py-0.5 rounded bg-neutral-100 text-neutral-700 font-medium border border-slate-200 whitespace-nowrap">

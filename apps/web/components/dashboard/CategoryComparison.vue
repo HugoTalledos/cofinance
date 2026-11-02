@@ -27,7 +27,7 @@ const pct = (change: number | null) => (change === null ? '—' : formatPercent(
 </script>
 
 <template>
-  <div class="lg:col-span-7 bg-surface-container-lowest rounded-lg border border-slate-200 p-4 flex flex-col">
+  <div class="bg-surface-container-lowest rounded-lg border border-slate-200 p-4 flex flex-col">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm border-b border-slate-100 pb-3">
       <div>
         <h2 class="text-headline-sm font-headline-sm font-semibold text-neutral-900">Comparativa de Gastos por Periodo</h2>
