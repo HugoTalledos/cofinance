@@ -4,6 +4,7 @@ import type { IconName } from '~/components/AppIcon.vue'
 const TABS: { to: string; label: string; icon: IconName }[] = [
   { to: '/', label: 'Resumen', icon: 'dashboard' },
   { to: '/registrar', label: 'Registrar', icon: 'add-circle' },
+  { to: '/tarjetas', label: 'Tarjetas', icon: 'wallet' },
   { to: '/recurrentes', label: 'Recurrentes', icon: 'sync' },
 ]
 
@@ -16,7 +17,7 @@ const route = useRoute()
       v-for="tab in TABS"
       :key="tab.to"
       :to="tab.to"
-      class="flex flex-col items-center justify-center rounded-xl px-4 py-1.5 active:scale-[0.98] transition-transform duration-150"
+      class="flex flex-col items-center justify-center rounded-xl px-2 py-1.5 active:scale-[0.98] transition-transform duration-150"
       :class="route.path === tab.to
         ? 'bg-primary-container text-white'
         : 'text-on-surface-variant hover:bg-surface-container-low'"

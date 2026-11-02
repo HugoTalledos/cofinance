@@ -23,6 +23,7 @@ export const formatTxDate = (tx: Transaction): string =>
   })
 
 export const paymentMethodLabel = (tx: Transaction): string => {
+  if (tx.type === 'card_payment') return `Pago de tarjeta · ${tx.creditCardBank ?? ''}`
   if (tx.paymentMethod === 'debit_card') return 'Débito'
   if (tx.paymentMethod === 'credit_card') return tx.creditCardBank ? `Crédito · ${tx.creditCardBank}` : 'Crédito'
   return ''

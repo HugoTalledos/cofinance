@@ -16,6 +16,7 @@ const emit = defineEmits<{
     <template v-else v-for="item in items" :key="item.id">
       <list-item
         :id="item.id"
+        :type="item.type"
         :icon="item.icon"
         :title="item.title"
         :description="item.description"

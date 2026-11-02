@@ -45,7 +45,7 @@ const isIncome = (tx: Transaction) => tx.type === 'income'
               <td class="py-3 px-4 text-body-sm text-neutral-500">{{ paymentMethodLabel(tx) }}</td>
               <td class="py-3 px-4">
                 <span class="px-2 py-0.5 rounded text-label-md font-label-md bg-neutral-100 text-neutral-700 border border-slate-200">
-                  {{ isIncome(tx) ? 'Ingreso' : tx.categoryName }}
+                  {{ tx.type === 'card_payment' ? 'Pago de tarjeta' : isIncome(tx) ? 'Ingreso' : tx.categoryName }}
                 </span>
               </td>
               <td
@@ -59,7 +59,7 @@ const isIncome = (tx: Transaction) => tx.type === 'income'
                   type="button"
                   title="Editar"
                   class="w-8 h-8 inline-flex items-center justify-center rounded-md text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900"
-                  @click="$emit('edit', tx)"
+                  @click="tx.type === 'card_payment' ? navigateTo('/tarjetas') : $emit('edit', tx)"
                 >
                   <span class="material-symbols-outlined text-base">edit</span>
                 </button>

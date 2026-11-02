@@ -430,7 +430,7 @@ export const useTransactions = () => {
         categoryId: transaction.categoryId,
         type: transaction.type ?? 'expense',
         title: transaction.description,
-        description: transaction.categoryName,
+        description: transaction.type === 'card_payment' ? 'Pago de tarjeta' : transaction.categoryName,
         icon: { icon: transaction.category?.icon , color: transaction.category?.color },
         amount: { value: formatCurrency(transaction.amount), short: shortFormatCurrency(transaction.amount) },
         author: transaction.username,

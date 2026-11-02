@@ -19,7 +19,7 @@ export interface Transaction {
   /** Mes en formato YYYY-MM para indexación */
   month: string
   /** Tipo de movimiento */
-  type?: 'income' | 'expense'
+  type?: 'income' | 'expense' | 'card_payment'
   /** Solo en egresos registrados desde el formulario; ausente en los anteriores */
   paymentMethod?: PaymentMethod
   /** Solo en egresos con crédito: id del doc en 'credit_cards' */

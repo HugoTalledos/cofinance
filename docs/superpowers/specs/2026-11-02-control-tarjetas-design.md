@@ -1,6 +1,6 @@
 # Control de saldo y abonos por tarjeta
 
-Estado: propuesta para aprobación. Alcance acordado: web y móvil, saldo y abonos; corte y pago solo informativos.
+Estado: aprobado por el usuario; implementado con verificaciones locales. Alcance acordado: web y móvil, saldo y abonos; corte y pago solo informativos.
 
 ## Intención y alternativas
 

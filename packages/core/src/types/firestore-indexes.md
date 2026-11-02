@@ -250,3 +250,9 @@ export const onTransactionCreate = functions.firestore
 - Firestore creará automáticamente índices simples para campos individuales
 - Monitorea el uso de índices en la consola de Firebase
 - Para queries complejas, Firestore sugerirá automáticamente crear índices necesarios
+
+## Seguimiento por tarjeta
+
+La consulta reutiliza el rango inclusivo `date >= trackingStartDate`, `date <= hoy`, ordenado por `date` descendente. Filtra `creditCardId` en memoria; no necesita un nuevo índice compuesto y no aplica límite de recientes ni mes. Para muchos movimientos puede evolucionar a una consulta indexada por tarjeta.
+
+Las tarjetas existentes se configuran mediante update en `credit_cards`; verificar en las reglas desplegadas que los usuarios ya autorizados puedan actualizar `openingBalance`, `trackingStartDate`, `statementDay` y `paymentDay`. Las reglas no están versionadas aquí: la comprobación de permisos reales queda pendiente antes del lanzamiento. No abrir acceso público ni cambiar el ámbito compartido.
