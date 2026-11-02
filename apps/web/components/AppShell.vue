@@ -5,7 +5,8 @@ const route = useRoute()
 const navItems = [
   { to: '/', icon: 'dashboard', label: 'Dashboard General' },
   { to: '/historial', icon: 'receipt_long', label: 'Historial de Transacciones' },
-  { to: '/categorias', icon: 'pie_chart', label: 'Categorías' }
+  { to: '/categorias', icon: 'pie_chart', label: 'Categorías' },
+  { to: '/recurrentes', icon: 'event_repeat', label: 'Pagos recurrentes' }
 ]
 </script>
 
