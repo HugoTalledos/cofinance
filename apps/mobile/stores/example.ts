@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { AppState } from '~/types'
+import type { AppState } from '@cofinance/core'
 
 /**
  * Store de ejemplo usando Pinia con Composition API

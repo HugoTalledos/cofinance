@@ -2,8 +2,8 @@
 import { reactive, computed, ref } from 'vue'
 import type { Category, MovementPayload, MovementFormValue } from './CreateMovementForm.type'
 import { useToast } from '~/components/Toast/useToast'
-import { formatDateToString } from '~/types'
-import type { PaymentMethod, CreditCard } from '~/types'
+import { formatDateToString } from '@cofinance/core'
+import type { PaymentMethod, CreditCard } from '@cofinance/core'
 
 const { showToast } = useToast()
 

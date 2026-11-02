@@ -253,3 +253,11 @@ export const formatBillingPeriodLabel = (
   const endStr = end.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })
   return `${startStr} – ${endStr}`
 }
+
+/**
+ * Código estable de una categoría a partir de su nombre (ej: "Comida rápida" → "code_comida_rápida")
+ */
+export const getCategoryCode = (category: { name: string }): string => {
+  const formatedName = category.name.trim().toLocaleLowerCase().replace(" ", "_")
+  return `code_${formatedName}`
+}

@@ -2,7 +2,7 @@
 import AppShell from '~/components/AppShell/AppShell.vue'
 import { useSummary } from '~/composables/useSummary'
 import { useRecurringExpenses } from '~/composables/useRecurringExpenses'
-import { formatBillingPeriodLabel, getCurrentBillingPeriodKey } from '~/types'
+import { formatBillingPeriodLabel, getCurrentBillingPeriodKey } from '@cofinance/core'
 
 const {
   totalIncome,

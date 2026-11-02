@@ -3,7 +3,7 @@ import InputCurrency from '~/components/InputForm/InputCurrency.vue'
 import { useRecurringExpenses } from '~/composables/useRecurringExpenses'
 import { useCategories } from '~/composables/useCategories'
 import { useRecurringList } from './useRecurringList'
-import type { RecurringExpense } from '~/types'
+import type { RecurringExpense } from '@cofinance/core'
 
 const emit = defineEmits<{
   (e: 'paid', expense: RecurringExpense, amount: number): void

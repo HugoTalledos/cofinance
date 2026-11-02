@@ -17,10 +17,10 @@ import type {
   MonthlySummaryStats,
   CategorySummary,
   ApiResponse
-} from '~/types'
-import { getCurrentTimestamp, generateMonthlySummaryId } from '~/types'
+} from '../types'
+import { getCurrentTimestamp, generateMonthlySummaryId } from '../types'
 
-import { getCategoryById } from '~/services/categories.service'
+import { getCategoryById } from './categories.service'
 
 /**
  * Servicio para gestión de resúmenes mensuales en Firestore

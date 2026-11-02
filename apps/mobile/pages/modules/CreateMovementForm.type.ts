@@ -4,7 +4,7 @@ export interface Category {
   icon?: string;
 }
 
-import type { PaymentMethod, CreditCard } from '~/types'
+import type { PaymentMethod, CreditCard } from '@cofinance/core'
 
 export interface MovementPayload {
   category: Category;

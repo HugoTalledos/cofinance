@@ -1,6 +1,6 @@
 import { collection, getDocs, query, orderBy } from 'firebase/firestore'
 import { useFirestoreDb, COLLECTIONS } from './firebase'
-import type { CreditCard, ApiResponse } from '~/types'
+import type { CreditCard, ApiResponse } from '../types'
 
 /**
  * Servicio de solo lectura para tarjetas de crédito.

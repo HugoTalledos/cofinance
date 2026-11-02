@@ -3,7 +3,7 @@
  */
 
 // Firebase core
-export { initializeFirebase, getFirestoreInstance, useFirestoreDb, COLLECTIONS } from './firebase'
+export { configureFirebase, initializeFirebase, getFirestoreInstance, getAuthInstance, useFirestoreDb, useFirebaseAuth, COLLECTIONS } from './firebase'
 
 // Servicios de categorías
 export {

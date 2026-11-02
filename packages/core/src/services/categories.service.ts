@@ -11,8 +11,8 @@ import {
   type QueryConstraint
 } from 'firebase/firestore'
 import { useFirestoreDb, COLLECTIONS } from './firebase'
-import type { Category, CategoryInput, CategoryUpdate, ApiResponse } from '~/types'
-import { getCurrentTimestamp } from '~/types'
+import type { Category, CategoryInput, CategoryUpdate, ApiResponse } from '../types'
+import { getCurrentTimestamp, getCategoryCode } from '../types'
 
 /**
  * Servicio para gestión de categorías en Firestore

@@ -4,13 +4,13 @@ import {
   updateRecurringExpense,
   deleteRecurringExpense,
   getRecurringExpenses,
-} from '~/services'
+} from '@cofinance/core'
 import type {
   RecurringExpense,
   RecurringExpenseInput,
   RecurringExpenseUpdate,
-} from '~/types'
-import { getBillingPeriodRange, getCurrentBillingPeriodKey } from '~/types'
+} from '@cofinance/core'
+import { getBillingPeriodRange, getCurrentBillingPeriodKey } from '@cofinance/core'
 
 const expenses: Ref<RecurringExpense[]> = ref([])
 const loading: Ref<boolean> = ref(false)

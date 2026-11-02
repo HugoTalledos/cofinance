@@ -6,7 +6,7 @@ import {
   recalculateMonthlySummary as recalculateMonthlySummaryService,
   getTransactions,
   getCategories,
-} from '~/services'
+} from '@cofinance/core'
 import type {
   MonthlySummary,
   MonthlySummaryFilters,
@@ -14,13 +14,13 @@ import type {
   CategorySummary,
   Transaction,
   Category,
-} from '~/types'
+} from '@cofinance/core'
 import {
   getCurrentBillingPeriodKey,
   getBillingPeriodRangeFromKey,
   isOverBudget as isOverBudgetHelper,
   getCurrentTimestamp,
-} from '~/types'
+} from '@cofinance/core'
 
 
 const currentSummary: Ref<MonthlySummary | null> = ref(null)

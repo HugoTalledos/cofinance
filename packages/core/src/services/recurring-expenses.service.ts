@@ -9,8 +9,8 @@ import {
   orderBy,
 } from 'firebase/firestore'
 import { useFirestoreDb, COLLECTIONS } from './firebase'
-import type { RecurringExpense, RecurringExpenseInput, RecurringExpenseUpdate, ApiResponse } from '~/types'
-import { getCurrentTimestamp } from '~/types'
+import type { RecurringExpense, RecurringExpenseInput, RecurringExpenseUpdate, ApiResponse } from '../types'
+import { getCurrentTimestamp } from '../types'
 
 export const createRecurringExpense = async (
   data: RecurringExpenseInput

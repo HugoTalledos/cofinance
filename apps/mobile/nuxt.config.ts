@@ -11,6 +11,10 @@ export default defineNuxtConfig({
     typeCheck: true
   },
   css: ['~/assets/css/main.css'],
+  // core se consume como TypeScript fuente: Vite lo compila junto con la app
+  build: {
+    transpile: ['@cofinance/core']
+  },
   runtimeConfig: {
     public: {
       firebaseApiKey: process.env.NUXT_PUBLIC_FIREBASE_API_KEY,

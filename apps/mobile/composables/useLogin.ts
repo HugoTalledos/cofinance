@@ -8,7 +8,7 @@ import {
   type User,
   type AuthProvider
 } from "firebase/auth";
-import { useFirebaseAuth } from '../services/firebase';
+import { useFirebaseAuth } from '@cofinance/core';
 
 let FirebaseAuthentication: any = null;
 let Capacitor: any = null;

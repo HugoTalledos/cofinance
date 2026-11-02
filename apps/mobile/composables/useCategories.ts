@@ -6,8 +6,8 @@ import {
   getCategories as getCategoriesService,
   getCategoryById as getCategoryByIdService,
   categoryHasTransactions as categoryHasTransactionsService
-} from '~/services'
-import type { Category, CategoryInput, CategoryUpdate } from '~/types'
+} from '@cofinance/core'
+import type { Category, CategoryInput, CategoryUpdate } from '@cofinance/core'
 
 // Estado reactivo
 const categories: Ref<Category[]> = ref([])

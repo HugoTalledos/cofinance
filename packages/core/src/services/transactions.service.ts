@@ -19,8 +19,8 @@ import type {
   TransactionUpdate,
   TransactionFilters,
   ApiResponse
-} from '~/types'
-import { getCurrentTimestamp, extractMonthFromDate } from '~/types'
+} from '../types'
+import { getCurrentTimestamp, extractMonthFromDate } from '../types'
 
 /**
  * Servicio para gestión de transacciones en Firestore

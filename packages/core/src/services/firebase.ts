@@ -1,19 +1,28 @@
-import { initializeApp, type FirebaseApp, getApps } from 'firebase/app'
+import { initializeApp, type FirebaseApp, type FirebaseOptions, getApps } from 'firebase/app'
 import { getFirestore, type Firestore } from 'firebase/firestore'
 import { getAuth, type Auth } from 'firebase/auth'
 
 let app: FirebaseApp | null = null
 let db: Firestore | null = null
 let auth: Auth | null = null
+let firebaseOptions: FirebaseOptions | null = null
 
 /**
- * Inicializa Firebase con las variables de entorno configuradas
+ * Registra la configuración de Firebase. Cada app la llama una vez al arrancar
+ * (en mobile: plugins/firebase.client.ts) antes de usar cualquier servicio.
+ */
+export const configureFirebase = (options: FirebaseOptions): void => {
+  firebaseOptions = options
+}
+
+/**
+ * Inicializa Firebase con la configuración registrada en configureFirebase()
  * Usa singleton para evitar múltiples inicializaciones
  * Compatible con SSR - solo se ejecuta en el cliente
  */
 export const initializeFirebase = (): FirebaseApp | null => {
   // Solo inicializar en el cliente (browser)
-  if (process.server) {
+  if (typeof window === 'undefined') {
     console.warn('Firebase no se puede inicializar en el servidor (SSR)')
     return null
   }
@@ -29,17 +38,11 @@ export const initializeFirebase = (): FirebaseApp | null => {
     return app
   }
 
-  const config = useRuntimeConfig()
-  const firebaseConfig = {
-    apiKey: config.public.firebaseApiKey as string,
-    authDomain: config.public.firebaseAuthDomain as string,
-    projectId: config.public.firebaseProjectId as string,
-    storageBucket: config.public.firebaseStorageBucket as string,
-    messagingSenderId: config.public.firebaseMessagingSenderId as string,
-    appId: config.public.firebaseAppId as string
+  if (!firebaseOptions) {
+    throw new Error('Firebase no configurado: llama configureFirebase() primero')
   }
-  
-  app = initializeApp(firebaseConfig)
+
+  app = initializeApp(firebaseOptions)
   return app
 }
 
@@ -48,7 +51,7 @@ export const initializeFirebase = (): FirebaseApp | null => {
  * Compatible con SSR - retorna null en el servidor
  */
 export const getFirestoreInstance = (): Firestore | null => {
-  if (process.server) return null
+  if (typeof window === 'undefined') return null
   if (!db) {
     const firebaseApp = initializeFirebase()
     if (firebaseApp) {
@@ -63,7 +66,7 @@ export const getFirestoreInstance = (): Firestore | null => {
  * Compatible con SSR - retorna null en el servidor
  */
 export const getAuthInstance = (): Auth | null => { 
-  if (process.server) return null
+  if (typeof window === 'undefined') return null
   if (!auth) {
     const firebaseApp = initializeFirebase()
     if (firebaseApp) {

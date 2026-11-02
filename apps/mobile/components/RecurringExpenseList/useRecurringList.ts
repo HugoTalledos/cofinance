@@ -2,7 +2,7 @@ import { ref, computed } from 'vue'
 import { useAuth } from '~/composables/useLogin'
 import { useRecurringExpenses } from '~/composables/useRecurringExpenses'
 import { useTransactions } from '~/composables/useTransactions'
-import type { RecurringExpense } from '~/types'
+import type { RecurringExpense } from '@cofinance/core'
 
 export const useRecurringList = (
   onPaid?: (expense: RecurringExpense, amount: number) => void

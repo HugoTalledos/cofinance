@@ -1,13 +1,17 @@
+import { configureFirebase } from '@cofinance/core'
+
 /**
- * Plugin de Firebase para Nuxt 3
+ * Registra la configuración de Firebase antes de que cualquier composable use los servicios.
  * Solo se ejecuta en el cliente (.client.ts)
- * Compatible con SSR
  */
 export default defineNuxtPlugin(() => {
-  // Firebase se inicializará automáticamente cuando se use
-  // No es necesario inicializar aquí, solo asegurar que el plugin existe
-  
-  if (process.client) {
-    console.log('✅ Firebase plugin cargado (client-side)')
-  }
+  const config = useRuntimeConfig().public
+  configureFirebase({
+    apiKey: config.firebaseApiKey as string,
+    authDomain: config.firebaseAuthDomain as string,
+    projectId: config.firebaseProjectId as string,
+    storageBucket: config.firebaseStorageBucket as string,
+    messagingSenderId: config.firebaseMessagingSenderId as string,
+    appId: config.firebaseAppId as string
+  })
 })

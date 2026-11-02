@@ -9,19 +9,19 @@ import {
   getCategories,
   updateTransaction as updateTransactionService,
   deleteTransaction as deleteTransactionService,
-} from '~/services'
+} from '@cofinance/core'
 import type {
   Transaction,
   TransactionInput,
   TransactionFilters,
   TransactionUpdate,
   Category
-} from '~/types'
+} from '@cofinance/core'
 import {
   getCurrentBillingPeriodKey,
   extractMonthFromDate,
   formatDateToString,
-} from '~/types'
+} from '@cofinance/core'
 
 /**
  * Composable para gestión de transacciones

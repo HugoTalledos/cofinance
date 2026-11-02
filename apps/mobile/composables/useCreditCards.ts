@@ -1,6 +1,6 @@
 import { ref, type Ref } from 'vue'
-import { getCreditCards } from '~/services'
-import type { CreditCard } from '~/types'
+import { getCreditCards } from '@cofinance/core'
+import type { CreditCard } from '@cofinance/core'
 
 // Estado compartido: las tarjetas casi nunca cambian, se cargan una vez por sesión
 const creditCards: Ref<CreditCard[]> = ref([])

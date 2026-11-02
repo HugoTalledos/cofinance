@@ -20,9 +20,9 @@ import {
   type DocumentData,
   type FirestoreError
 } from 'firebase/firestore'
-import { useFirestoreDb } from '~/services/firebase'
-import type { ApiResponse } from '~/types'
-import { getCurrentTimestamp } from '~/types'
+import { useFirestoreDb } from '@cofinance/core'
+import type { ApiResponse } from '@cofinance/core'
+import { getCurrentTimestamp } from '@cofinance/core'
 
 /**
  * Composable genérico para operaciones CRUD con Firestore
@@ -36,7 +36,7 @@ import { getCurrentTimestamp } from '~/types'
  * await notesCollection.create({ title: 'Mi nota' })
  * 
  * // Para categorías, transacciones y resúmenes, usa los servicios:
- * import { createCategory, createTransaction } from '~/services'
+ * import { createCategory, createTransaction } from '@cofinance/core'
  */
 export const useFirebaseCollection = <T extends DocumentData>(collectionName: string) => {
   const db = useFirestoreDb()
