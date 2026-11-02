@@ -67,3 +67,6 @@ export interface TransactionQueryOptions {
   orderDirection?: TransactionOrderDirection
   limit?: number
 }
+
+/** Campos opcionales de tarjeta que se pueden borrar del documento */
+export type RemovableTransactionField = 'creditCardId' | 'creditCardBank'

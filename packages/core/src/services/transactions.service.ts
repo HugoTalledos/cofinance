@@ -4,6 +4,7 @@ import {
   getDoc,
   getDocs,
   updateDoc,
+  deleteField,
   deleteDoc,
   query,
   where,
@@ -17,6 +18,7 @@ import type {
   Transaction,
   TransactionInput,
   TransactionUpdate,
+  RemovableTransactionField,
   TransactionFilters,
   ApiResponse
 } from '../types'
@@ -128,7 +130,8 @@ const adjustSummaryForChange = async (
  */
 export const updateTransaction = async (
   id: string,
-  data: TransactionUpdate
+  data: TransactionUpdate,
+  removeFields: RemovableTransactionField[] = []
 ): Promise<ApiResponse<boolean>> => {
   const response: ApiResponse<boolean> = {
     data: null,
@@ -154,9 +157,14 @@ export const updateTransaction = async (
     if (changes.date) {
       changes.month = extractMonthFromDate(changes.date)
     }
-    const after = { ...before, ...changes }
+    const after: Transaction = { ...before, ...changes }
+    const firestoreChanges: Record<string, unknown> = { ...changes }
+    for (const field of removeFields) {
+      delete after[field]
+      firestoreChanges[field] = deleteField()
+    }
 
-    await updateDoc(transactionRef, changes)
+    await updateDoc(transactionRef, firestoreChanges)
     await adjustSummaryForChange(before, after)
 
     response.data = true
