@@ -4,6 +4,7 @@ import {
   formatBillingPeriodLabel,
   getCurrentBillingPeriodKey,
   summarizeHistory,
+  type Transaction,
   type HistoryFilters
 } from '@cofinance/core'
 
@@ -17,10 +18,17 @@ const filters = ref<HistoryFilters>({
   type: 'all'
 })
 
-const { loading, error, transactions, categories, creditCards } = useHistoryData(periodKey)
+const { loading, error, transactions, categories, creditCards, reload } = useHistoryData(periodKey)
 
 const filtered = computed(() => filterHistory(transactions.value, filters.value))
 const summary = computed(() => summarizeHistory(filtered.value))
+
+const editing = ref<Transaction | null>(null)
+
+const onSaved = async () => {
+  editing.value = null
+  await reload()
+}
 
 // La tabla vuelve a la página 1 al cambiar periodo o cualquier filtro
 const resetKeys = computed(() => [
@@ -59,8 +67,16 @@ const resetKeys = computed(() => [
         :reset-keys="resetKeys"
         :loading="loading"
         :error="error"
-        :editable="false"
+        :editable="true"
+        @edit="tx => (editing = tx)"
       />
     </div>
+    <HistoryEditTransactionPanel
+      :transaction="editing"
+      :categories="categories"
+      :credit-cards="creditCards"
+      @close="editing = null"
+      @saved="onSaved"
+    />
   </AppShell>
 </template>
