@@ -3,15 +3,22 @@ import type { CategoryComparisonRow } from '@cofinance/core'
 
 const props = defineProps<{ rows: CategoryComparisonRow[]; loading: boolean; error: string | null }>()
 
-const summary = computed(() => props.rows.slice(0, 5))
+// Resumen: las categorías que más subieron y más bajaron, por diferencia en pesos
+const MOVERS_LIMIT = 3
+const delta = (row: CategoryComparisonRow) => row.current - row.previous
+const wentUp = computed(() =>
+  props.rows.filter(r => delta(r) > 0).sort((a, b) => delta(b) - delta(a)).slice(0, MOVERS_LIMIT)
+)
+const wentDown = computed(() =>
+  props.rows.filter(r => delta(r) < 0).sort((a, b) => delta(a) - delta(b)).slice(0, MOVERS_LIMIT)
+)
+// Sin gasto en el periodo anterior no hay % que calcular: es una categoría nueva
+const moverDetail = (row: CategoryComparisonRow) =>
+  row.change === null ? 'nuevo' : formatPercent(row.change)
 const max = computed(() => Math.max(1, ...props.rows.map(r => Math.max(r.current, r.previous))))
 const width = (v: number) => `${Math.min(100, (v / max.value) * 100)}%`
 
 // En gastos, subir es malo
-const tone = (change: number | null) => {
-  if (change === null || change === 0) return 'text-neutral-500'
-  return change > 0 ? 'text-red-700' : 'text-emerald-700'
-}
 const badge = (change: number | null) => {
   if (change === null || change === 0) return 'bg-neutral-100 text-neutral-700 border-slate-200'
   return change > 0 ? 'bg-red-50 text-red-700 border-red-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
@@ -40,10 +47,26 @@ const pct = (change: number | null) => (change === null ? '—' : formatPercent(
     <p v-else-if="loading" class="py-6 text-body-sm text-neutral-400">Cargando…</p>
     <p v-else-if="rows.length === 0" class="py-6 text-body-sm text-neutral-400">Sin movimientos en este periodo</p>
     <template v-else>
-      <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 my-3 py-2 px-3 rounded-md bg-neutral-50 border border-slate-200/70 text-center">
-        <div v-for="row in summary" :key="row.categoryId" class="flex flex-col items-center min-w-0">
-          <span class="text-label-sm font-label-sm text-neutral-400 truncate max-w-full">{{ row.name }}</span>
-          <span class="text-label-md font-label-md font-semibold mt-0.5" :class="tone(row.change)">{{ pct(row.change) }}</span>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 my-3">
+        <div
+          v-for="group in [
+            { title: 'Subieron', rows: wentUp, sign: '+', tone: 'text-red-700', empty: 'Ninguna categoría subió' },
+            { title: 'Bajaron', rows: wentDown, sign: '−', tone: 'text-emerald-700', empty: 'Ninguna categoría bajó' },
+          ]"
+          :key="group.title"
+          class="py-2 px-3 rounded-md bg-neutral-50 border border-slate-200/70"
+        >
+          <p class="text-label-sm font-label-sm uppercase text-neutral-400 mb-1">{{ group.title }}</p>
+          <p v-if="group.rows.length === 0" class="text-body-sm text-neutral-400">{{ group.empty }}</p>
+          <ul v-else class="flex flex-col gap-1">
+            <li v-for="row in group.rows" :key="row.categoryId" class="flex justify-between items-center gap-2 text-body-sm">
+              <span class="text-neutral-800 truncate">{{ row.icon }} {{ row.name }}</span>
+              <span class="text-label-md font-label-md font-semibold shrink-0" :class="group.tone">
+                {{ group.sign }}{{ formatCOP(Math.abs(delta(row))) }}
+                <span class="font-normal text-neutral-400">· {{ moverDetail(row) }}</span>
+              </span>
+            </li>
+          </ul>
         </div>
       </div>
       <div class="flex flex-col gap-3 my-1">
